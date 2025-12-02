@@ -9,10 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-} from '@solana/wallet-adapter-wallets';
+import { SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 import { Toaster } from 'sonner';
 import { CONFIG } from '@/lib/constants';
@@ -35,9 +32,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const endpoint = useMemo(() => CONFIG.SOLANA_RPC_URL, []);
 
   // Configure wallets
+  // Note: Phantom now auto-registers via Standard Wallet API, so we don't need to explicitly add it
+  // This prevents the "Phantom was registered as a Standard Wallet" warning
   const wallets = useMemo(
     () => [
-      new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
     ],
     []
