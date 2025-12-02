@@ -46,6 +46,14 @@ export const vaultApi = {
   delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiClient.delete<ApiResponse<void>>(`${API_ENDPOINTS.VAULTS}/${id}`);
   },
+
+  // Link vault to authenticated user
+  link: async (vaultPublicKey: string, name?: string): Promise<ApiResponse<Vault>> => {
+    return apiClient.post<ApiResponse<Vault>>(`${API_ENDPOINTS.VAULTS}/link`, {
+      vaultPublicKey,
+      name,
+    });
+  },
 };
 
 // ============================================================================

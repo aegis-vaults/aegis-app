@@ -20,6 +20,7 @@ import { instructions } from '@/lib/solana/instructions';
 import { getConnection } from '@/lib/solana/config';
 import { LAMPORTS_PER_SOL, TOAST_MESSAGES } from '@/lib/constants';
 import { Loader2, Plus } from 'lucide-react';
+import { api } from '@/lib/api';
 
 interface CreateVaultDialogProps {
   onSuccess?: () => void;
@@ -137,6 +138,33 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
         vaultAuthority: vaultAuthority.toBase58(),
         signature,
       });
+
+      // Link vault to user account
+      // Wait a bit for the event listener to process the vault creation
+      toast.loading('Linking vault to your account...', { id: 'link-vault' });
+
+      let linkAttempts = 0;
+      const maxLinkAttempts = 10;
+      const linkRetryDelay = 2000; // 2 seconds
+
+      while (linkAttempts < maxLinkAttempts) {
+        try {
+          await new Promise((resolve) => setTimeout(resolve, linkRetryDelay));
+          await api.vaults.link(vault.toBase58(), formData.name);
+          toast.success('Vault linked successfully', { id: 'link-vault' });
+          break;
+        } catch (error: any) {
+          linkAttempts++;
+          if (linkAttempts >= maxLinkAttempts) {
+            console.error('Failed to link vault after max attempts:', error);
+            toast.warning(
+              'Vault created but linking failed. Refresh the page to see your vault.',
+              { id: 'link-vault', duration: 5000 }
+            );
+          }
+          // Continue retrying
+        }
+      }
 
       // Reset form and close dialog
       setFormData({ name: '', dailyLimit: '', agentSigner: '' });

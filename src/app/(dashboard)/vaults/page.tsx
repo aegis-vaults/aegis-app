@@ -9,7 +9,7 @@ import { Plus, Vault as VaultIcon, Settings, Pause, Play } from 'lucide-react';
 import { CreateVaultDialog } from '@/components/vault/create-vault-dialog';
 
 export default function VaultsPage() {
-  const { data, isLoading, refetch } = useVaults();
+  const { data, isLoading, refetch } = useVaults({ myVaults: true });
   const vaults = data?.data?.items || [];
 
   return (

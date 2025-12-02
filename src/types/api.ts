@@ -326,6 +326,7 @@ export interface ListVaultsParams {
   owner?: string;
   guardian?: string;
   isActive?: boolean;
+  myVaults?: boolean;
   search?: string;
   sortBy?: 'createdAt' | 'updatedAt' | 'dailyLimit' | 'name';
   sortOrder?: 'asc' | 'desc';
