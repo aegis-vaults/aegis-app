@@ -5,11 +5,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { formatAddress } from '@/lib/utils';
-import { Wallet, Bell, Shield, Palette } from 'lucide-react';
+import { Wallet, Bell, Shield, Palette, Loader2 } from 'lucide-react';
 import { ApiKeysSection } from '@/components/settings/api-keys-section';
+import { EmailSetup } from '@/components/settings/email-setup';
+import { TelegramSetup } from '@/components/settings/telegram-setup';
+import { DiscordSetup } from '@/components/settings/discord-setup';
+import { NotificationPreferences } from '@/components/settings/notification-preferences';
+import { useUserProfile } from '@/hooks/use-user-profile';
 
 export default function SettingsPage() {
   const { publicKey, connected } = useWallet();
+  const { profile, loading: profileLoading, refresh } = useUserProfile();
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -49,23 +55,49 @@ export default function SettingsPage() {
             <Bell className="w-5 h-5 text-aegis-purple" />
             <CardTitle>Notifications</CardTitle>
           </div>
-          <CardDescription>Manage how you receive notifications</CardDescription>
+          <CardDescription>
+            Configure how and when you receive notifications about your vaults
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-medium text-aegis-text-primary">Transaction Alerts</div>
-              <div className="text-sm text-aegis-text-tertiary">Get notified about new transactions</div>
+        <CardContent>
+          {!connected ? (
+            <div className="text-center py-8 text-aegis-text-tertiary">
+              <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>Connect your wallet to manage notification settings</p>
             </div>
-            <Button variant="outline" size="sm">Enable</Button>
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-medium text-aegis-text-primary">Override Requests</div>
-              <div className="text-sm text-aegis-text-tertiary">Get notified about override requests</div>
+          ) : profileLoading ? (
+            <div className="text-center py-8">
+              <Loader2 className="w-8 h-8 mx-auto animate-spin text-aegis-blue" />
+              <p className="text-sm text-aegis-text-tertiary mt-2">Loading settings...</p>
             </div>
-            <Button variant="outline" size="sm">Enable</Button>
-          </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Notification Channels */}
+              <div>
+                <h3 className="font-semibold text-aegis-text-primary mb-4">
+                  Notification Channels
+                </h3>
+                <div className="space-y-6">
+                  <EmailSetup user={profile} onUpdate={refresh} />
+                  <div className="border-t border-aegis-border" />
+                  <TelegramSetup user={profile} onUpdate={refresh} />
+                  <div className="border-t border-aegis-border" />
+                  <DiscordSetup user={profile} onUpdate={refresh} />
+                </div>
+              </div>
+
+              {/* Notification Preferences */}
+              <div className="border-t border-aegis-border pt-6">
+                <h3 className="font-semibold text-aegis-text-primary mb-4">
+                  Notification Preferences
+                </h3>
+                <p className="text-sm text-aegis-text-tertiary mb-4">
+                  Choose which events trigger notifications across all your channels
+                </p>
+                <NotificationPreferences user={profile} onUpdate={refresh} />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
