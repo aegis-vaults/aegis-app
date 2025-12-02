@@ -1,0 +1,145 @@
+/**
+ * Aegis Frontend - API Methods
+ * All API calls to aegis-guardian backend
+ */
+
+import apiClient from './client';
+import {
+  Vault,
+  Transaction,
+  Override,
+  VaultAnalytics,
+  SpendingTrend,
+  FeeAnalytics,
+  GlobalAnalytics,
+  ApiResponse,
+  PaginatedResponse,
+  ListVaultsParams,
+  ListTransactionsParams,
+  ListOverridesParams,
+  UpdateVaultParams,
+  ApproveOverrideParams,
+} from '@/types/api';
+import { API_ENDPOINTS } from '@/lib/constants';
+
+// ============================================================================
+// Vault API
+// ============================================================================
+
+export const vaultApi = {
+  // List all vaults with pagination and filters
+  list: async (params?: ListVaultsParams): Promise<PaginatedResponse<Vault>> => {
+    return apiClient.get<PaginatedResponse<Vault>>(API_ENDPOINTS.VAULTS, params);
+  },
+
+  // Get single vault by ID
+  get: async (id: string): Promise<ApiResponse<Vault>> => {
+    return apiClient.get<ApiResponse<Vault>>(`${API_ENDPOINTS.VAULTS}/${id}`);
+  },
+
+  // Update vault configuration
+  update: async (id: string, data: UpdateVaultParams): Promise<ApiResponse<Vault>> => {
+    return apiClient.patch<ApiResponse<Vault>>(`${API_ENDPOINTS.VAULTS}/${id}`, data);
+  },
+
+  // Soft delete vault
+  delete: async (id: string): Promise<ApiResponse<void>> => {
+    return apiClient.delete<ApiResponse<void>>(`${API_ENDPOINTS.VAULTS}/${id}`);
+  },
+};
+
+// ============================================================================
+// Transaction API
+// ============================================================================
+
+export const transactionApi = {
+  // List transactions with pagination and filters
+  list: async (params?: ListTransactionsParams): Promise<PaginatedResponse<Transaction>> => {
+    return apiClient.get<PaginatedResponse<Transaction>>(API_ENDPOINTS.TRANSACTIONS, params);
+  },
+
+  // Get single transaction by ID
+  get: async (id: string): Promise<ApiResponse<Transaction>> => {
+    return apiClient.get<ApiResponse<Transaction>>(`${API_ENDPOINTS.TRANSACTIONS}/${id}`);
+  },
+};
+
+// ============================================================================
+// Override API
+// ============================================================================
+
+export const overrideApi = {
+  // List override requests with pagination and filters
+  list: async (params?: ListOverridesParams): Promise<PaginatedResponse<Override>> => {
+    return apiClient.get<PaginatedResponse<Override>>(API_ENDPOINTS.OVERRIDES, params);
+  },
+
+  // Get single override by ID
+  get: async (id: string): Promise<ApiResponse<Override>> => {
+    return apiClient.get<ApiResponse<Override>>(`${API_ENDPOINTS.OVERRIDES}/${id}`);
+  },
+
+  // Approve override request
+  approve: async (id: string, data: ApproveOverrideParams): Promise<ApiResponse<Override>> => {
+    return apiClient.post<ApiResponse<Override>>(`${API_ENDPOINTS.OVERRIDES}/${id}`, data);
+  },
+
+  // Cancel override request
+  cancel: async (id: string): Promise<ApiResponse<void>> => {
+    return apiClient.delete<ApiResponse<void>>(`${API_ENDPOINTS.OVERRIDES}/${id}`);
+  },
+};
+
+// ============================================================================
+// Analytics API
+// ============================================================================
+
+export const analyticsApi = {
+  // Get global analytics (all vaults)
+  global: async (): Promise<ApiResponse<GlobalAnalytics>> => {
+    return apiClient.get<ApiResponse<GlobalAnalytics>>(`${API_ENDPOINTS.ANALYTICS}/global`);
+  },
+
+  // Get vault-specific analytics
+  vault: async (vaultId: string, timeRange?: '7d' | '30d' | '90d'): Promise<ApiResponse<VaultAnalytics>> => {
+    return apiClient.get<ApiResponse<VaultAnalytics>>(
+      `${API_ENDPOINTS.ANALYTICS}/${vaultId}`,
+      timeRange ? { timeRange } : undefined
+    );
+  },
+
+  // Get spending trend for vault
+  spendingTrend: async (vaultId: string, days?: number): Promise<ApiResponse<SpendingTrend[]>> => {
+    return apiClient.get<ApiResponse<SpendingTrend[]>>(
+      `${API_ENDPOINTS.ANALYTICS}/${vaultId}/spending-trend`,
+      days ? { days } : undefined
+    );
+  },
+
+  // Get fee analytics
+  fees: async (): Promise<ApiResponse<FeeAnalytics>> => {
+    return apiClient.get<ApiResponse<FeeAnalytics>>(`${API_ENDPOINTS.ANALYTICS}/fees`);
+  },
+};
+
+// ============================================================================
+// Health API
+// ============================================================================
+
+export const healthApi = {
+  // Health check
+  check: async (): Promise<ApiResponse<{ status: string; uptime: number; database: string; redis: string }>> => {
+    return apiClient.get<ApiResponse<any>>(API_ENDPOINTS.HEALTH);
+  },
+};
+
+// Export all APIs
+export const api = {
+  vaults: vaultApi,
+  transactions: transactionApi,
+  overrides: overrideApi,
+  analytics: analyticsApi,
+  health: healthApi,
+};
+
+export default api;

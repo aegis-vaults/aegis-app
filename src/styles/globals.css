@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 222 47% 11%; /* #0A0E27 */
+    --foreground: 228 100% 97%; /* #F0F4FF */
+
+    --card: 227 38% 18%; /* #1E2749 */
+    --card-foreground: 228 100% 97%;
+
+    --popover: 227 38% 18%;
+    --popover-foreground: 228 100% 97%;
+
+    --primary: 193 100% 50%; /* #00D4FF Electric Blue */
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 281 100% 57%; /* #B026FF Neon Purple */
+    --secondary-foreground: 228 100% 97%;
+
+    --muted: 227 23% 26%;
+    --muted-foreground: 222 19% 56%;
+
+    --accent: 167 100% 50%; /* #00FFA3 Emerald */
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 349 100% 61%; /* #FF3366 Crimson */
+    --destructive-foreground: 228 100% 97%;
+
+    --border: 227 23% 26%;
+    --input: 227 23% 26%;
+    --ring: 193 100% 50%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-aegis-bg-primary text-aegis-text-primary font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-variant-numeric: tabular-nums;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+  code, pre {
+    @apply font-mono;
+  }
+}
+
+@layer components {
+  /* Glassmorphic Card */
+  .glass-card {
+    @apply bg-aegis-bg-secondary/50 backdrop-blur-md border border-white/5;
+  }
+
+  /* Glow Effect */
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+  }
+
+  .glow-emerald {
+    box-shadow: 0 0 20px rgba(0, 255, 163, 0.3);
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #00D4FF 0%, #B026FF 100%);
+  }
+
+  /* Animated Border */
+  .animated-border {
+    position: relative;
+    background: linear-gradient(135deg, #0A0E27 0%, #1E2749 100%);
+  }
+
+  .animated-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, #00D4FF 0%, #B026FF 100%);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-aegis-bg-secondary;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-aegis-blue/30 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-aegis-blue/50;
+  }
+
+  /* Number Counter Animation */
+  @keyframes counter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .number-counter {
+    animation: counter 0.3s ease-out;
+  }
+
+  /* Pulse Animation for Live Data */
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      filter: brightness(1);
+    }
+    50% {
+      opacity: 0.8;
+      filter: brightness(1.2);
+    }
+  }
+
+  .pulse-live {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Matrix-style cascade */
+  @keyframes cascade {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    90% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+
+  .cascade-number {
+    animation: cascade 1s ease-out;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Cyber Grid Background */
+  .cyber-grid {
+    background-image:
+      linear-gradient(to right, rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* Terminal-style monospace */
+  .terminal {
+    @apply font-mono text-sm bg-black/50 p-4 rounded border border-aegis-blue/20;
+  }
+}
