@@ -87,18 +87,24 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
       // Send transaction
       const connection = getConnection();
-      const signature = await sendTransaction(transaction, connection);
+
+      // Get blockhash before sending so we can use it for confirmation
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+
+      const signature = await sendTransaction(transaction, connection, {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
+      });
 
       toast.loading('Confirming transaction...', { id: signature });
 
-      // Wait for confirmation with longer timeout (60 seconds for devnet)
+      // Wait for confirmation using the blockhash from before we sent
       try {
-        const latestBlockhash = await connection.getLatestBlockhash();
         const confirmation = await connection.confirmTransaction(
           {
             signature,
-            blockhash: latestBlockhash.blockhash,
-            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+            blockhash,
+            lastValidBlockHeight,
           },
           'confirmed'
         );
@@ -109,10 +115,14 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
         toast.success(TOAST_MESSAGES.VAULT_CREATED, { id: signature });
       } catch (confirmError: any) {
-        // If confirmation times out, the transaction might still succeed
-        if (confirmError.message?.includes('timeout') || confirmError.message?.includes('not confirmed')) {
+        // If confirmation times out or block height exceeded, provide helpful info
+        if (
+          confirmError.message?.includes('timeout') ||
+          confirmError.message?.includes('not confirmed') ||
+          confirmError.message?.includes('block height exceeded')
+        ) {
           toast.warning(
-            `Transaction sent but confirmation timed out. Check signature: ${signature.slice(0, 8)}...`,
+            `Transaction sent but confirmation unclear. Check signature: ${signature.slice(0, 8)}...`,
             { id: signature, duration: 10000 }
           );
           console.log('Check transaction:', `https://explorer.solana.com/tx/${signature}?cluster=devnet`);
