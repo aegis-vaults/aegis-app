@@ -46,7 +46,12 @@ export function ApiKeysSection({ userId }: { userId: string }) {
     queryKey: ['api-keys', userId],
     queryFn: async () => {
       const response = await fetch(
-        `${CONFIG.GUARDIAN_API_URL}/api/api-keys?userId=${userId}`
+        `${CONFIG.GUARDIAN_API_URL}/api/api-keys`,
+        {
+          headers: {
+            'x-user-id': userId,
+          },
+        }
       );
       if (!response.ok) throw new Error('Failed to fetch API keys');
       const json = await response.json();
@@ -61,10 +66,12 @@ export function ApiKeysSection({ userId }: { userId: string }) {
     mutationFn: async (name: string) => {
       const response = await fetch(`${CONFIG.GUARDIAN_API_URL}/api/api-keys`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId,
+        },
         body: JSON.stringify({
           name,
-          userId,
           permissions: ['vault:read', 'vault:write'],
         }),
       });
@@ -87,8 +94,13 @@ export function ApiKeysSection({ userId }: { userId: string }) {
   const revokeMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(
-        `${CONFIG.GUARDIAN_API_URL}/api/api-keys/${id}?userId=${userId}`,
-        { method: 'DELETE' }
+        `${CONFIG.GUARDIAN_API_URL}/api/api-keys/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'x-user-id': userId,
+          },
+        }
       );
       if (!response.ok) throw new Error('Failed to revoke API key');
     },

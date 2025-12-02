@@ -91,14 +91,35 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
       toast.loading('Confirming transaction...', { id: signature });
 
-      // Wait for confirmation
-      const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+      // Wait for confirmation with longer timeout (60 seconds for devnet)
+      try {
+        const latestBlockhash = await connection.getLatestBlockhash();
+        const confirmation = await connection.confirmTransaction(
+          {
+            signature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+          },
+          'confirmed'
+        );
 
-      if (confirmation.value.err) {
-        throw new Error('Transaction failed');
+        if (confirmation.value.err) {
+          throw new Error('Transaction failed');
+        }
+
+        toast.success(TOAST_MESSAGES.VAULT_CREATED, { id: signature });
+      } catch (confirmError: any) {
+        // If confirmation times out, the transaction might still succeed
+        if (confirmError.message?.includes('timeout') || confirmError.message?.includes('not confirmed')) {
+          toast.warning(
+            `Transaction sent but confirmation timed out. Check signature: ${signature.slice(0, 8)}...`,
+            { id: signature, duration: 10000 }
+          );
+          console.log('Check transaction:', `https://explorer.solana.com/tx/${signature}?cluster=devnet`);
+        } else {
+          throw confirmError;
+        }
       }
-
-      toast.success(TOAST_MESSAGES.VAULT_CREATED, { id: signature });
 
       // Log vault details
       console.log('Vault created:', {

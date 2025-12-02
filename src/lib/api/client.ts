@@ -13,9 +13,18 @@ import { retry } from '@/lib/utils';
 
 class ApiClient {
   private baseUrl: string;
+  private userId: string | null = null;
 
   constructor(baseUrl: string = CONFIG.GUARDIAN_API_URL) {
     this.baseUrl = baseUrl;
+  }
+
+  /**
+   * Set the user ID (wallet public key) for authentication
+   * This will be sent as x-user-id header in all requests
+   */
+  setUserId(userId: string | null) {
+    this.userId = userId;
   }
 
   private async request<T = any>(
@@ -27,6 +36,11 @@ class ApiClient {
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
     };
+
+    // Add x-user-id header if userId is set
+    if (this.userId) {
+      defaultHeaders['x-user-id'] = this.userId;
+    }
 
     const config: RequestInit = {
       ...options,
