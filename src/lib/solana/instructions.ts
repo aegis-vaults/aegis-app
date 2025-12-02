@@ -1,33 +1,41 @@
 /**
  * Aegis Frontend - Solana Instructions
- * Placeholder implementations - to be completed with full Anchor integration
  */
 
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-import { connection, PROGRAM_ID } from './config';
-
-/**
- * NOTE: These are placeholder implementations.
- * In a production app, you would:
- * 1. Copy the IDL from aegis-protocol/target/idl/aegis_core.json
- * 2. Use @coral-xyz/anchor to generate typed instructions
- * 3. Build proper transaction builders for each instruction
- *
- * For now, these return placeholder transactions that demonstrate the structure.
- */
+import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
+import type { AnchorWallet } from '@solana/wallet-adapter-react';
+import { BN } from '@coral-xyz/anchor';
+import { getProgram, getVaultPDA, getVaultAuthorityPDA } from './program';
+import { getConnection } from './config';
 
 export const instructions = {
   // Initialize vault instruction
   initializeVault: async (
-    authority: PublicKey,
+    wallet: AnchorWallet,
     agentSigner: PublicKey,
     dailyLimit: bigint,
     name: string
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('initializeVault placeholder:', { authority, agentSigner, dailyLimit, name });
-    return transaction;
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    // Derive PDAs
+    const [vault] = getVaultPDA(authority);
+    const [vaultAuthority] = getVaultAuthorityPDA(vault);
+
+    // Build instruction
+    const tx = await program.methods
+      .initializeVault(agentSigner, new BN(dailyLimit.toString()), name)
+      .accounts({
+        vault,
+        vaultAuthority,
+        authority,
+        systemProgram: SystemProgram.programId,
+      })
+      .transaction();
+
+    return { transaction: tx, vault, vaultAuthority };
   },
 
   // Execute guarded transaction

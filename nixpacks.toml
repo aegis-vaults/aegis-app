@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "python3", "gcc", "gnumake", "pkg-config", "systemd"]
+nixPkgs = ["nodejs_20", "python3", "gcc", "gnumake", "pkg-config", "systemd", "systemd.dev", "udev"]
 
 [phases.install]
 cmds = ["npm ci"]

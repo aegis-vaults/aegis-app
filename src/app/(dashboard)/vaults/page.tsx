@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatSol, formatAddress } from '@/lib/utils';
 import { Plus, Vault as VaultIcon, Settings, Pause, Play } from 'lucide-react';
+import { CreateVaultDialog } from '@/components/vault/create-vault-dialog';
 
 export default function VaultsPage() {
-  const { data, isLoading } = useVaults();
+  const { data, isLoading, refetch } = useVaults();
   const vaults = data?.data?.items || [];
 
   return (
@@ -19,10 +20,7 @@ export default function VaultsPage() {
           <h1 className="text-3xl font-bold text-aegis-text-primary">Vaults</h1>
           <p className="text-aegis-text-secondary mt-1">Manage your AI agent vaults</p>
         </div>
-        <Button className="bg-aegis-blue hover:bg-aegis-blue/90">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Vault
-        </Button>
+        <CreateVaultDialog onSuccess={() => refetch()} />
       </div>
 
       {/* Vaults Grid */}
@@ -38,10 +36,7 @@ export default function VaultsPage() {
             <p className="text-aegis-text-secondary text-center mb-6 max-w-md">
               Create your first vault to start managing AI agent transactions with programmable guardrails.
             </p>
-            <Button className="bg-aegis-blue hover:bg-aegis-blue/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Your First Vault
-            </Button>
+            <CreateVaultDialog onSuccess={() => refetch()} />
           </CardContent>
         </Card>
       ) : (

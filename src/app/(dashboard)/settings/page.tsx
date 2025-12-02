@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { formatAddress } from '@/lib/utils';
 import { Wallet, Bell, Shield, Palette } from 'lucide-react';
+import { ApiKeysSection } from '@/components/settings/api-keys-section';
 
 export default function SettingsPage() {
   const { publicKey, connected } = useWallet();
@@ -68,6 +69,11 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* API Keys */}
+      {connected && publicKey && (
+        <ApiKeysSection userId={publicKey.toString()} />
+      )}
+
       {/* Security Settings */}
       <Card className="glass-card">
         <CardHeader>
@@ -109,3 +115,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+
