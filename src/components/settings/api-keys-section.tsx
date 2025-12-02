@@ -141,7 +141,7 @@ export function ApiKeysSection({ userId }: { userId: string }) {
                   <DialogHeader>
                     <DialogTitle>API Key Created</DialogTitle>
                     <DialogDescription>
-                      Save this key securely. You won't be able to see it again.
+                      Save this key securely. You won&apos;t be able to see it again.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
@@ -169,13 +169,13 @@ export function ApiKeysSection({ userId }: { userId: string }) {
                     </div>
                     <div className="p-3 bg-aegis-amber/10 border border-aegis-amber/30 rounded-lg">
                       <p className="text-sm text-aegis-text-secondary">
-                        <strong>Important:</strong> Store this key securely. You won't be able to view it again after closing this dialog.
+                        <strong>Important:</strong> Store this key securely. You won&apos;t be able to view it again after closing this dialog.
                       </p>
                     </div>
                   </div>
                   <DialogFooter>
                     <Button onClick={handleCloseCreateDialog}>
-                      I've saved my key
+                      I&apos;ve saved my key
                     </Button>
                   </DialogFooter>
                 </>
