@@ -5,7 +5,10 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["npm ci"]
+# Skip optional dependencies and ignore build scripts to avoid USB native build issues
+# USB is not needed for cloud deployment (Phantom/Solflare wallets don't require it)
+# --ignore-scripts skips node-gyp builds that require Python
+cmds = ["npm ci --omit=optional --ignore-scripts"]
 
 [phases.build]
 cmds = ["npm run build"]

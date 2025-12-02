@@ -14,6 +14,7 @@ const nextConfig = {
         'net': false,
         'tls': false,
         'encoding': false,
+        'usb': false,
       }
     }
 
@@ -21,7 +22,14 @@ const nextConfig = {
     config.ignoreWarnings = [
       { module: /node_modules\/pino/ },
       { module: /node_modules\/@walletconnect/ },
+      { module: /node_modules\/usb/ },
     ]
+
+    // Ignore usb module completely (not needed for cloud deployment)
+    config.externals = config.externals || []
+    if (isServer) {
+      config.externals.push('usb')
+    }
 
     return config
   },
