@@ -47,11 +47,13 @@ export function SocialShare({ url, title, description, className }: SocialShareP
     }
   };
 
+  const hasNativeShare = typeof navigator !== 'undefined' && 'share' in navigator;
+
   return (
     <div className={className}>
       <div className="flex items-center gap-2">
         {/* Native share button (mobile) */}
-        {typeof navigator !== 'undefined' && navigator.share && (
+        {hasNativeShare && (
           <Button
             variant="outline"
             size="sm"

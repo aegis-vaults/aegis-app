@@ -11,7 +11,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "generate:favicons": "node scripts/generate-favicons.js"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",
