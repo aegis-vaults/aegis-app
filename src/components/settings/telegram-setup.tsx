@@ -151,7 +151,7 @@ export function TelegramSetup({ user, onUpdate }: TelegramSetupProps) {
         
         {!user?.telegramChatId && (
           <p className="text-xs text-aegis-text-tertiary mt-2 pl-6">
-            You'll be redirected to Telegram. Send /start to complete the setup.
+            You&apos;ll be redirected to Telegram. Send /start to complete the setup.
           </p>
         )}
       </div>
