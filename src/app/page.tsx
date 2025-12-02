@@ -41,7 +41,7 @@ export default function LandingPage() {
               <Link href="#how-it-works" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors">
                 How It Works
               </Link>
-              <Link href="https://github.com" target="_blank" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors">
+              <Link href="https://github.com/aegis-vaults" target="_blank" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors">
                 <Github className="w-5 h-5" />
               </Link>
               {connected ? (
