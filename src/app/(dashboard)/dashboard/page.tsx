@@ -9,7 +9,8 @@ import { TransactionStatus } from '@/types/api';
 import { Vault, ArrowRightLeft, TrendingUp, Coins } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { data: vaultsData, isLoading: vaultsLoading } = useVaults();
+  // Only show user's own vaults on dashboard
+  const { data: vaultsData, isLoading: vaultsLoading } = useVaults({ myVaults: true });
   const { data: transactionsData, isLoading: transactionsLoading } = useTransactions({ pageSize: 10 });
 
   const vaults = vaultsData?.data?.items || [];
