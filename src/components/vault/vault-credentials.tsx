@@ -222,12 +222,12 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
                 <h4 className="text-sm font-medium text-aegis-text-primary">1. Install the SDK</h4>
                 <div className="relative">
                   <pre className="p-3 rounded-lg bg-aegis-bg-primary border border-aegis-border overflow-x-auto">
-                    <code className="text-xs font-mono text-aegis-text-primary">npm install @aegis-vaults/sdk</code>
+                    <code className="text-xs font-mono text-aegis-text-primary">npm install @aegis-vaults/sdk @solana/web3.js @coral-xyz/anchor bn.js</code>
                   </pre>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard('npm install @aegis-vaults/sdk', 'Command')}
+                    onClick={() => copyToClipboard('npm install @aegis-vaults/sdk @solana/web3.js @coral-xyz/anchor bn.js', 'Command')}
                     className="absolute top-2 right-2 h-7 w-7 p-0"
                   >
                     {copiedField === 'Command' ? (
@@ -246,14 +246,14 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
                     <code className="text-xs font-mono text-aegis-text-primary whitespace-pre">{`import { AegisClient } from '@aegis-vaults/sdk';
 import { Keypair } from '@solana/web3.js';
 
-// Load your agent's keypair (securely!)
+// Load your agent's keypair from environment
 const agentKeypair = Keypair.fromSecretKey(
-  new Uint8Array(JSON.parse(process.env.AGENT_SECRET_KEY))
+  new Uint8Array(JSON.parse(process.env.AGENT_SECRET_KEY!))
 );
 
 const client = new AegisClient({
   cluster: 'devnet',
-  programId: '${process.env.NEXT_PUBLIC_PROGRAM_ID || 'ET9WDoFE2bf4bSmciLL7q7sKdeSYeNkWbNMHbAMBu2ZJ'}',
+  guardianApiUrl: 'https://aegis-guardian-production.up.railway.app',
 });
 
 client.setWallet(agentKeypair);`}</code>
@@ -265,22 +265,35 @@ client.setWallet(agentKeypair);`}</code>
                 <h4 className="text-sm font-medium text-aegis-text-primary">3. Execute transactions</h4>
                 <div className="relative">
                   <pre className="p-3 rounded-lg bg-aegis-bg-primary border border-aegis-border overflow-x-auto">
-                    <code className="text-xs font-mono text-aegis-text-primary whitespace-pre">{`// Execute a guarded transaction
-const signature = await client.executeGuarded({
-  vault: '${vaultAddress}',
-  destination: 'recipient_address_here',
-  amount: '100000000', // 0.1 SOL in lamports
-  purpose: 'Payment for service',
-});
+                    <code className="text-xs font-mono text-aegis-text-primary whitespace-pre">{`// Check vault balance first
+const balance = await client.getVaultBalance('${vaultAddress}');
+console.log('Balance:', balance / 1e9, 'SOL');
 
-console.log('Transaction:', signature);`}</code>
+// Execute a guarded transaction
+try {
+  const signature = await client.executeGuarded({
+    vault: '${vaultAddress}',
+    destination: 'RECIPIENT_ADDRESS',
+    amount: 100000000, // 0.1 SOL in lamports
+    purpose: 'Payment for service',
+  });
+  console.log('Success:', signature);
+} catch (error) {
+  console.error('Transaction blocked:', error.message);
+}`}</code>
                   </pre>
                 </div>
               </div>
 
+              <div className="p-3 rounded-lg bg-aegis-emerald/10 border border-aegis-emerald/30">
+                <p className="text-xs text-aegis-text-secondary">
+                  <strong className="text-aegis-emerald">Deposit Address:</strong> Send SOL to <code className="bg-aegis-bg-tertiary px-1 rounded">{depositAddress ? formatAddress(depositAddress, 8) : '...'}</code> to fund this vault.
+                </p>
+              </div>
+
               <div className="p-3 rounded-lg bg-aegis-blue/10 border border-aegis-blue/30">
                 <p className="text-xs text-aegis-text-secondary">
-                  <strong className="text-aegis-blue">Important:</strong> Store your agent&apos;s secret key securely in environment variables.
+                  <strong className="text-aegis-blue">Security:</strong> Store your agent&apos;s secret key in environment variables.
                   Never commit it to version control or expose it in client-side code.
                 </p>
               </div>
