@@ -145,28 +145,39 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
       toast.loading('Linking vault to your account...', { id: 'link-vault' });
 
       let linkAttempts = 0;
-      const maxLinkAttempts = 10;
+      const maxLinkAttempts = 5;
       const linkRetryDelay = 2000; // 2 seconds
 
       // Ensure API client has the latest wallet address before linking
       apiClient.setUserId(publicKey.toString());
 
-      while (linkAttempts < maxLinkAttempts) {
+      let linked = false;
+      while (linkAttempts < maxLinkAttempts && !linked) {
         try {
           await new Promise((resolve) => setTimeout(resolve, linkRetryDelay));
           await api.vaults.link(vault.toBase58(), formData.name);
           toast.success('Vault linked successfully', { id: 'link-vault' });
-          break;
+          linked = true;
         } catch (error: any) {
           linkAttempts++;
-          if (linkAttempts >= maxLinkAttempts) {
-            console.error('Failed to link vault after max attempts:', error);
-            toast.warning(
-              'Vault created but linking failed. Refresh the page to see your vault.',
-              { id: 'link-vault', duration: 5000 }
-            );
-          }
+          console.log(`Link attempt ${linkAttempts} failed:`, error.message);
           // Continue retrying
+        }
+      }
+
+      // If linking failed, try syncing directly from blockchain
+      if (!linked) {
+        toast.loading('Syncing vault from blockchain...', { id: 'link-vault' });
+        try {
+          await api.vaults.sync(vault.toBase58());
+          toast.success('Vault synced and linked successfully', { id: 'link-vault' });
+          linked = true;
+        } catch (syncError: any) {
+          console.error('Failed to sync vault:', syncError);
+          toast.warning(
+            'Vault created but linking failed. Try refreshing the page or manually syncing later.',
+            { id: 'link-vault', duration: 5000 }
+          );
         }
       }
 

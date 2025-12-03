@@ -54,6 +54,13 @@ export const vaultApi = {
       name,
     });
   },
+
+  // Sync vault from blockchain (manual sync when event listener misses events)
+  sync: async (vaultPublicKey: string): Promise<ApiResponse<Vault>> => {
+    return apiClient.post<ApiResponse<Vault>>(`${API_ENDPOINTS.VAULTS}/sync`, {
+      vaultPublicKey,
+    });
+  },
 };
 
 // ============================================================================
