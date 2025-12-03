@@ -7,23 +7,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatSol, formatAddress } from '@/lib/utils';
-import { Plus, Vault as VaultIcon, Settings, Pause, Play, Wallet, RefreshCw, Code2 } from 'lucide-react';
+import { Plus, Vault as VaultIcon, Settings, Pause, Play, Wallet, RefreshCw, Code2, Loader2 } from 'lucide-react';
 import { CreateVaultDialog } from '@/components/vault/create-vault-dialog';
 import { VaultSettingsDialog } from '@/components/vault/vault-settings-dialog';
 import { getConnection } from '@/lib/solana/config';
-import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { getVaultAuthorityPDA } from '@/lib/solana/program';
+import { instructions } from '@/lib/solana/instructions';
 
 export default function VaultsPage() {
-  const { publicKey } = useWallet();
+  const wallet = useWallet();
+  const { publicKey, signTransaction } = wallet;
   const { data, isLoading, refetch } = useVaults({ myVaults: true });
   const vaults = data?.data?.items || [];
   
   // Track balances for each vault
   const [balances, setBalances] = useState<Record<string, number>>({});
   const [loadingBalances, setLoadingBalances] = useState(false);
+  
+  // Track which vault is being toggled (for loading state)
+  const [togglingVault, setTogglingVault] = useState<string | null>(null);
   
   // Settings dialog state
   const [selectedVault, setSelectedVault] = useState<any>(null);
@@ -68,11 +73,44 @@ export default function VaultsPage() {
   };
 
   const handlePauseToggle = async (vault: any) => {
+    if (!publicKey || !signTransaction) {
+      toast.error('Please connect your wallet');
+      return;
+    }
+
+    const isPaused = !vault.isActive;
+    const action = isPaused ? 'resume' : 'pause';
+
+    setTogglingVault(vault.id);
     try {
-      // This would call the on-chain pause/resume instruction
-      toast.info('Pause/Resume feature coming soon');
+      const connection: Connection = getConnection();
+      const vaultPubkey = new PublicKey(vault.publicKey);
+      const vaultNonce = BigInt(vault.vaultNonce || '0');
+
+      // Build the appropriate transaction
+      const { transaction } = isPaused
+        ? await instructions.resumeVault(wallet as any, vaultPubkey, vaultNonce)
+        : await instructions.pauseVault(wallet as any, vaultPubkey, vaultNonce);
+
+      transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+      transaction.feePayer = publicKey;
+
+      const signedTx = await signTransaction(transaction);
+      const signature = await connection.sendRawTransaction(signedTx.serialize());
+      await connection.confirmTransaction(signature, 'confirmed');
+
+      // Update backend
+      await api.vaults.update(vault.id, {
+        paused: !isPaused,
+      });
+
+      toast.success(`Vault ${action}d successfully`);
+      refetch();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to toggle vault status');
+      console.error(`Error ${action}ing vault:`, error);
+      toast.error(error.message || `Failed to ${action} vault`);
+    } finally {
+      setTogglingVault(null);
     }
   };
 
@@ -207,8 +245,16 @@ export default function VaultsPage() {
                     variant="outline"
                     className="border-aegis-border"
                     onClick={() => handlePauseToggle(vault)}
+                    disabled={togglingVault === vault.id}
+                    title={vault.isActive ? 'Pause vault' : 'Resume vault'}
                   >
-                    {vault.isActive ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                    {togglingVault === vault.id ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : vault.isActive ? (
+                      <Pause className="w-3 h-3" />
+                    ) : (
+                      <Play className="w-3 h-3" />
+                    )}
                   </Button>
                 </div>
               </CardContent>
