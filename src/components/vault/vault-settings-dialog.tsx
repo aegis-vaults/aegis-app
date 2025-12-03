@@ -700,8 +700,8 @@ export function VaultSettingsDialog({
                 </Button>
               </div>
               <p className="text-xs text-aegis-text-secondary">
-                The agent signer is the AI's key that can propose transactions. Change this to rotate the
-                agent's credentials.
+                The agent signer is the AI&apos;s key that can propose transactions. Change this to rotate the
+                agent&apos;s credentials.
               </p>
             </div>
           </TabsContent>

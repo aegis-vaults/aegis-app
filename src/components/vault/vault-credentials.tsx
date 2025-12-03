@@ -215,7 +215,7 @@ console.log('Transaction:', signature);`}</code>
 
               <div className="p-3 rounded-lg bg-aegis-blue/10 border border-aegis-blue/30">
                 <p className="text-xs text-aegis-text-secondary">
-                  <strong className="text-aegis-blue">Important:</strong> Store your agent's secret key securely in environment variables.
+                  <strong className="text-aegis-blue">Important:</strong> Store your agent&apos;s secret key securely in environment variables.
                   Never commit it to version control or expose it in client-side code.
                 </p>
               </div>

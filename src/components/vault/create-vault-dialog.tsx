@@ -413,7 +413,7 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
                   <Alert className="border-aegis-crimson/30 bg-aegis-crimson/5">
                     <AlertCircle className="w-4 h-4 text-aegis-crimson" />
                     <AlertDescription className="text-xs text-aegis-text-secondary">
-                      <strong className="text-aegis-crimson">Important:</strong> Copy and save the secret key securely. You'll need it to configure your AI agent. This will not be shown again.
+                      <strong className="text-aegis-crimson">Important:</strong> Copy and save the secret key securely. You&apos;ll need it to configure your AI agent. This will not be shown again.
                     </AlertDescription>
                   </Alert>
 
