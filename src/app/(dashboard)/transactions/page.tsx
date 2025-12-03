@@ -5,11 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatSol, formatRelativeTime, formatAddress, getExplorerUrl } from '@/lib/utils';
 import { TransactionStatus } from '@/types/api';
-import { ExternalLink, Search, Filter } from 'lucide-react';
+import { ExternalLink, Search, Filter, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function TransactionsPage() {
-  const { data, isLoading } = useTransactions();
+  // Filter to only show transactions from user's vaults
+  const { data, isLoading, refetch } = useTransactions({ myTransactions: true });
   const transactions = data?.data?.items || [];
 
   const getStatusColor = (status: TransactionStatus) => {
@@ -28,17 +29,25 @@ export default function TransactionsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
         <div>
-          <h1 className="text-3xl font-bold text-aegis-text-primary">Transactions</h1>
-          <p className="text-aegis-text-secondary mt-1">View all vault transactions</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-aegis-text-primary">Transactions</h1>
+          <p className="text-aegis-text-secondary text-sm sm:text-base mt-0.5 sm:mt-1">View your vault transactions</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => refetch()}
+            disabled={isLoading}
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
+          <Button variant="outline" className="hidden sm:flex">
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" className="hidden sm:flex">
             <Search className="w-4 h-4 mr-2" />
             Search
           </Button>

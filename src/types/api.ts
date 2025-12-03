@@ -345,6 +345,7 @@ export interface ListTransactionsParams {
   endDate?: string; // ISO timestamp
   minAmount?: string; // BigInt as string (lamports)
   maxAmount?: string; // BigInt as string (lamports)
+  myTransactions?: boolean; // Filter to only user's vault transactions
 }
 
 export interface ListOverridesParams {
