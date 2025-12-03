@@ -21,6 +21,7 @@ import { getConnection } from '@/lib/solana/config';
 import { LAMPORTS_PER_SOL, TOAST_MESSAGES } from '@/lib/constants';
 import { Loader2, Plus } from 'lucide-react';
 import { api } from '@/lib/api';
+import apiClient from '@/lib/api/client';
 
 interface CreateVaultDialogProps {
   onSuccess?: () => void;
@@ -146,6 +147,9 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
       let linkAttempts = 0;
       const maxLinkAttempts = 10;
       const linkRetryDelay = 2000; // 2 seconds
+
+      // Ensure API client has the latest wallet address before linking
+      apiClient.setUserId(publicKey.toString());
 
       while (linkAttempts < maxLinkAttempts) {
         try {

@@ -2,6 +2,7 @@
 
 import { Sidebar } from '@/components/shared/sidebar';
 import { Header } from '@/components/shared/header';
+import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { useUIStore } from '@/lib/stores/ui';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +15,7 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-aegis-bg-primary">
+      <AuthInitializer />
       <Sidebar />
       <div
         className={cn(

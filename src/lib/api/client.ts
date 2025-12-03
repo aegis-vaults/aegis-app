@@ -3,7 +3,7 @@
  * Base client for communicating with aegis-guardian backend
  */
 
-import { CONFIG } from '@/lib/constants';
+import { CONFIG, STORAGE_KEYS } from '@/lib/constants';
 import { ApiResponse, PaginatedResponse } from '@/types/api';
 import { retry } from '@/lib/utils';
 
@@ -19,12 +19,45 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
+  private isBrowser() {
+    return typeof window !== 'undefined';
+  }
+
+  private persistUserId(userId: string | null) {
+    if (!this.isBrowser()) return;
+
+    if (userId) {
+      window.localStorage.setItem(STORAGE_KEYS.AUTH_USER_ID, userId);
+    } else {
+      window.localStorage.removeItem(STORAGE_KEYS.AUTH_USER_ID);
+    }
+  }
+
+  private resolveUserId(): string | null {
+    if (this.userId) {
+      return this.userId;
+    }
+
+    if (!this.isBrowser()) {
+      return null;
+    }
+
+    const storedUserId = window.localStorage.getItem(STORAGE_KEYS.AUTH_USER_ID);
+    if (storedUserId) {
+      this.userId = storedUserId;
+      return storedUserId;
+    }
+
+    return null;
+  }
+
   /**
    * Set the user ID (wallet public key) for authentication
    * This will be sent as x-user-id header in all requests
    */
   setUserId(userId: string | null) {
     this.userId = userId;
+    this.persistUserId(userId);
   }
 
   private async request<T = any>(
@@ -37,11 +70,12 @@ class ApiClient {
       'Content-Type': 'application/json',
     };
 
-    // Add x-user-id header if userId is set
-    if (this.userId) {
-      defaultHeaders['x-user-id'] = this.userId;
+    const userId = this.resolveUserId();
+    if (userId) {
+      defaultHeaders['x-user-id'] = userId;
     }
 
+    // Add x-user-id header if userId is set
     const config: RequestInit = {
       ...options,
       headers: {

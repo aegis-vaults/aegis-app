@@ -137,6 +137,7 @@ export const STORAGE_KEYS = {
   VAULT_SORT: 'aegis-vault-sort',
   RECENT_SEARCHES: 'aegis-recent-searches',
   DRAFT_VAULT: 'aegis-draft-vault',
+  AUTH_USER_ID: 'aegis-auth-user-id',
 } as const;
 
 // Animation Durations (ms)
