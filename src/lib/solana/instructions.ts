@@ -1,5 +1,8 @@
 /**
  * Aegis Frontend - Solana Instructions
+ * 
+ * All vault-related instructions now require vault_nonce as the first argument
+ * for proper PDA derivation (allows unlimited vaults per user).
  */
 
 import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
@@ -43,57 +46,134 @@ export const instructions = {
     return { transaction: tx, vault, vaultAuthority, nonce: vaultNonce };
   },
 
-  // Execute guarded transaction
+  // Execute guarded transaction (owner-signed)
   executeGuarded: async (
-    authority: PublicKey,
+    wallet: AnchorWallet,
     vault: PublicKey,
     destination: PublicKey,
-    amount: bigint
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('executeGuarded placeholder:', { authority, vault, destination, amount });
-    return transaction;
+    amount: bigint,
+    vaultNonce: bigint
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+    const [vaultAuthority] = getVaultAuthorityPDA(vault);
+    
+    // Fee treasury PDA
+    const [feeTreasury] = PublicKey.findProgramAddressSync(
+      [Buffer.from('treasury')],
+      program.programId
+    );
+
+    const tx = await program.methods
+      .executeGuarded(new BN(vaultNonce.toString()), new BN(amount.toString()))
+      .accounts({
+        vault,
+        authority,
+        vaultAuthority,
+        destination,
+        feeTreasury,
+        systemProgram: SystemProgram.programId,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
+  },
+
+  // Execute agent transaction (agent-signed)
+  executeAgent: async (
+    wallet: AnchorWallet,
+    vault: PublicKey,
+    destination: PublicKey,
+    amount: bigint,
+    vaultNonce: bigint
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const agentSigner = wallet.publicKey;
+    const [vaultAuthority] = getVaultAuthorityPDA(vault);
+    
+    // Fee treasury PDA
+    const [feeTreasury] = PublicKey.findProgramAddressSync(
+      [Buffer.from('treasury')],
+      program.programId
+    );
+
+    const tx = await program.methods
+      .executeAgent(new BN(vaultNonce.toString()), new BN(amount.toString()))
+      .accounts({
+        vault,
+        agentSigner,
+        vaultAuthority,
+        destination,
+        feeTreasury,
+        systemProgram: SystemProgram.programId,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
   },
 
   // Create override request
   createOverride: async (
-    authority: PublicKey,
+    wallet: AnchorWallet,
     vault: PublicKey,
     destination: PublicKey,
     amount: bigint,
-    reason: number
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('createOverride placeholder:', { authority, vault, destination, amount, reason });
-    return transaction;
+    reason: number,
+    vaultNonce: bigint
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    // TODO: Get override nonce from vault account
+    const tx = await program.methods
+      .createOverride(new BN(vaultNonce.toString()), destination, new BN(amount.toString()), { exceededDailyLimit: {} })
+      .accounts({
+        vault,
+        authority,
+        systemProgram: SystemProgram.programId,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
   },
 
   // Approve override
   approveOverride: async (
-    authority: PublicKey,
-    vault: PublicKey,
-    nonce: bigint
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('approveOverride placeholder:', { authority, vault, nonce });
-    return transaction;
-  },
-
-  // Update daily limit
-  updateDailyLimit: async (
     wallet: AnchorWallet,
     vault: PublicKey,
-    newDailyLimit: bigint
+    vaultNonce: bigint
   ) => {
     const connection = getConnection();
     const program = getProgram(connection, wallet);
     const authority = wallet.publicKey;
 
     const tx = await program.methods
-      .updateDailyLimit(new BN(newDailyLimit.toString()))
+      .approveOverride(new BN(vaultNonce.toString()))
+      .accounts({
+        vault,
+        authority,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
+  },
+
+  // Update daily limit
+  updateDailyLimit: async (
+    wallet: AnchorWallet,
+    vault: PublicKey,
+    newDailyLimit: bigint,
+    vaultNonce: bigint
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    const tx = await program.methods
+      .updateDailyLimit(new BN(vaultNonce.toString()), new BN(newDailyLimit.toString()))
       .accounts({
         vault,
         authority,
@@ -107,14 +187,15 @@ export const instructions = {
   addToWhitelist: async (
     wallet: AnchorWallet,
     vault: PublicKey,
-    address: PublicKey
+    address: PublicKey,
+    vaultNonce: bigint
   ) => {
     const connection = getConnection();
     const program = getProgram(connection, wallet);
     const authority = wallet.publicKey;
 
     const tx = await program.methods
-      .addToWhitelist(address)
+      .addToWhitelist(new BN(vaultNonce.toString()), address)
       .accounts({
         vault,
         authority,
@@ -128,14 +209,15 @@ export const instructions = {
   removeFromWhitelist: async (
     wallet: AnchorWallet,
     vault: PublicKey,
-    address: PublicKey
+    address: PublicKey,
+    vaultNonce: bigint
   ) => {
     const connection = getConnection();
     const program = getProgram(connection, wallet);
     const authority = wallet.publicKey;
 
     const tx = await program.methods
-      .removeFromWhitelist(address)
+      .removeFromWhitelist(new BN(vaultNonce.toString()), address)
       .accounts({
         vault,
         authority,
@@ -148,14 +230,15 @@ export const instructions = {
   // Pause vault
   pauseVault: async (
     wallet: AnchorWallet,
-    vault: PublicKey
+    vault: PublicKey,
+    vaultNonce: bigint
   ) => {
     const connection = getConnection();
     const program = getProgram(connection, wallet);
     const authority = wallet.publicKey;
 
     const tx = await program.methods
-      .pauseVault()
+      .pauseVault(new BN(vaultNonce.toString()))
       .accounts({
         vault,
         authority,
@@ -168,14 +251,15 @@ export const instructions = {
   // Resume vault
   resumeVault: async (
     wallet: AnchorWallet,
-    vault: PublicKey
+    vault: PublicKey,
+    vaultNonce: bigint
   ) => {
     const connection = getConnection();
     const program = getProgram(connection, wallet);
     const authority = wallet.publicKey;
 
     const tx = await program.methods
-      .resumeVault()
+      .resumeVault(new BN(vaultNonce.toString()))
       .accounts({
         vault,
         authority,
@@ -189,14 +273,15 @@ export const instructions = {
   updateAgentSigner: async (
     wallet: AnchorWallet,
     vault: PublicKey,
-    newAgentSigner: PublicKey
+    newAgentSigner: PublicKey,
+    vaultNonce: bigint
   ) => {
     const connection = getConnection();
     const program = getProgram(connection, wallet);
     const authority = wallet.publicKey;
 
     const tx = await program.methods
-      .updateAgentSigner(newAgentSigner)
+      .updateAgentSigner(new BN(vaultNonce.toString()), newAgentSigner)
       .accounts({
         vault,
         authority,

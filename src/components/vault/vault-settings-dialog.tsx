@@ -35,6 +35,7 @@ interface VaultSettingsDialogProps {
     whitelistEnabled: boolean;
     whitelist: string[];
     agentSigner?: string;
+    vaultNonce?: string; // BigInt as string - nonce used for PDA derivation
   };
   balance?: number;
   open: boolean;
@@ -139,10 +140,12 @@ export function VaultSettingsDialog({
       const vaultPubkey = new PublicKey(vault.publicKey);
       const newLimitLamports = BigInt(Math.floor(limitValue * LAMPORTS_PER_SOL));
 
+      const vaultNonce = BigInt(vault.vaultNonce || '0');
       const { transaction } = await instructions.updateDailyLimit(
         wallet as any,
         vaultPubkey,
-        newLimitLamports
+        newLimitLamports,
+        vaultNonce
       );
 
       transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
@@ -179,10 +182,11 @@ export function VaultSettingsDialog({
     try {
       const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
+      const vaultNonce = BigInt(vault.vaultNonce || '0');
 
       const { transaction } = isPaused
-        ? await instructions.resumeVault(wallet as any, vaultPubkey)
-        : await instructions.pauseVault(wallet as any, vaultPubkey);
+        ? await instructions.resumeVault(wallet as any, vaultPubkey, vaultNonce)
+        : await instructions.pauseVault(wallet as any, vaultPubkey, vaultNonce);
 
       transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
       transaction.feePayer = wallet.publicKey;
@@ -232,11 +236,13 @@ export function VaultSettingsDialog({
 
       const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
+      const vaultNonce = BigInt(vault.vaultNonce || '0');
 
       const { transaction } = await instructions.addToWhitelist(
         wallet as any,
         vaultPubkey,
-        addressPubkey
+        addressPubkey,
+        vaultNonce
       );
 
       transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
@@ -277,11 +283,13 @@ export function VaultSettingsDialog({
       const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
       const addressPubkey = new PublicKey(address);
+      const vaultNonce = BigInt(vault.vaultNonce || '0');
 
       const { transaction } = await instructions.removeFromWhitelist(
         wallet as any,
         vaultPubkey,
-        addressPubkey
+        addressPubkey,
+        vaultNonce
       );
 
       transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
@@ -328,11 +336,13 @@ export function VaultSettingsDialog({
 
       const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
+      const vaultNonce = BigInt(vault.vaultNonce || '0');
 
       const { transaction } = await instructions.updateAgentSigner(
         wallet as any,
         vaultPubkey,
-        agentSignerPubkey
+        agentSignerPubkey,
+        vaultNonce
       );
 
       transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;

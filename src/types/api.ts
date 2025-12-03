@@ -76,6 +76,7 @@ export interface Vault {
   paused: boolean;
   tier: VaultTier;
   feeBasisPoints: number;
+  vaultNonce: string; // BigInt as string - nonce used for PDA derivation
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
   // Relations (optional, populated when requested)
