@@ -106,6 +106,23 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
         agentSignerPubkey = new PublicKey(generatedKeypair.publicKey);
       }
 
+      const connection = getConnection();
+
+      // Check if vault already exists for this wallet
+      const { getVaultPDA } = await import('@/lib/solana/program');
+      const [existingVaultPDA] = getVaultPDA(publicKey);
+      
+      const existingVaultInfo = await connection.getAccountInfo(existingVaultPDA);
+      if (existingVaultInfo) {
+        toast.error(
+          'You already have a vault! Each wallet can only create one vault. Go to your existing vault instead.',
+          { duration: 6000 }
+        );
+        setLoading(false);
+        setOpen(false);
+        return;
+      }
+
       // Build transaction
       const { transaction, vault, vaultAuthority } = await instructions.initializeVault(
         wallet.adapter as any,
@@ -113,9 +130,6 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
         BigInt(Math.floor(dailyLimitLamports)),
         formData.name
       );
-
-      // Send transaction
-      const connection = getConnection();
 
       // Get fresh blockhash
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
