@@ -112,6 +112,19 @@ export const transactionApi = {
   get: async (id: string): Promise<ApiResponse<Transaction>> => {
     return apiClient.get<ApiResponse<Transaction>>(`${API_ENDPOINTS.TRANSACTIONS}/${id}`);
   },
+
+  // Record a transaction after it's been executed on-chain
+  record: async (data: {
+    signature: string;
+    vaultPublicKey: string;
+    from: string;
+    to: string;
+    amount: string;
+    status: 'PENDING' | 'EXECUTED' | 'BLOCKED' | 'FAILED';
+    blockReason?: string;
+  }): Promise<ApiResponse<Transaction>> => {
+    return apiClient.post<ApiResponse<Transaction>>(API_ENDPOINTS.TRANSACTIONS, data);
+  },
 };
 
 // ============================================================================
