@@ -77,6 +77,14 @@ export function VaultSettingsDialog({
   const [loadingTeam, setLoadingTeam] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
+  // Sync local state when vault prop changes
+  useEffect(() => {
+    setName(vault.name || '');
+    setDailyLimit((Number(vault.dailyLimit) / LAMPORTS_PER_SOL).toString());
+    setIsPaused(!vault.isActive);
+    setWhitelist(vault.whitelist || []);
+  }, [vault.id, vault.name, vault.dailyLimit, vault.isActive, vault.whitelist]);
+
   // Sync vault from blockchain to get correct vaultNonce
   const handleSyncVault = async () => {
     setSyncing(true);

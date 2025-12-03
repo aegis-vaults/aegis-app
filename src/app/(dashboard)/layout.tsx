@@ -20,11 +20,13 @@ export default function DashboardLayout({
       <div
         className={cn(
           'transition-all duration-300',
-          sidebarCollapsed ? 'ml-16' : 'ml-64'
+          // No margin on mobile, margin on desktop based on sidebar state
+          'ml-0 lg:ml-64',
+          sidebarCollapsed && 'lg:ml-16'
         )}
       >
         <Header />
-        <main className="p-6">{children}</main>
+        <main className="p-3 sm:p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

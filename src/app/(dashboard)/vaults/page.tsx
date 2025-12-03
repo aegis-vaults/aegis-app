@@ -115,14 +115,14 @@ export default function VaultsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
         <div>
-          <h1 className="text-3xl font-bold text-aegis-text-primary">Vaults</h1>
-          <p className="text-aegis-text-secondary mt-1">Manage your AI agent vaults</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-aegis-text-primary">Vaults</h1>
+          <p className="text-aegis-text-secondary text-sm sm:text-base mt-0.5 sm:mt-1">Manage your AI agent vaults</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
             size="icon"
@@ -131,7 +131,7 @@ export default function VaultsPage() {
               fetchBalances();
             }}
             disabled={loadingBalances}
-            className="border-aegis-border"
+            className="border-aegis-border h-9 w-9"
           >
             <RefreshCw className={`w-4 h-4 ${loadingBalances ? 'animate-spin' : ''}`} />
           </Button>
@@ -156,62 +156,62 @@ export default function VaultsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {vaults.map((vault) => (
             <Card key={vault.id} className="glass-card hover:border-aegis-blue/50 transition-colors">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">
+              <CardHeader className="p-3 sm:p-4 pb-2 sm:pb-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base sm:text-lg truncate">
                       {vault.name || 'Unnamed Vault'}
                     </CardTitle>
-                    <CardDescription className="font-mono text-xs mt-1">
+                    <CardDescription className="font-mono text-[10px] sm:text-xs mt-0.5 sm:mt-1">
                       {formatAddress(vault.publicKey)}
                     </CardDescription>
                     {vault.agentSigner && (
-                      <CardDescription className="font-mono text-xs mt-1 text-aegis-blue">
+                      <CardDescription className="font-mono text-[10px] sm:text-xs mt-0.5 sm:mt-1 text-aegis-blue">
                         Agent: {formatAddress(vault.agentSigner)}
                       </CardDescription>
                     )}
                   </div>
-                  <Badge variant={vault.isActive ? 'default' : 'outline'}>
+                  <Badge variant={vault.isActive ? 'default' : 'outline'} className="text-[10px] sm:text-xs px-1.5 sm:px-2 shrink-0">
                     {vault.isActive ? 'Active' : 'Paused'}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 pt-0 sm:pt-0">
                 {/* Balance */}
                 <div className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-aegis-emerald" />
+                  <Wallet className="w-4 h-4 text-aegis-emerald shrink-0" />
                   <div>
-                    <div className="text-2xl font-bold text-aegis-text-primary">
+                    <div className="text-xl sm:text-2xl font-bold text-aegis-text-primary">
                       {loadingBalances ? (
-                        <span className="text-aegis-text-tertiary">Loading...</span>
+                        <span className="text-aegis-text-tertiary text-base sm:text-lg">Loading...</span>
                       ) : (
                         <span className="text-aegis-emerald">
                           {(balances[vault.publicKey] || 0).toFixed(4)} SOL
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-aegis-text-tertiary">Vault Balance</div>
+                    <div className="text-[10px] sm:text-xs text-aegis-text-tertiary">Vault Balance</div>
                   </div>
                 </div>
 
                 {/* Daily Limit */}
-                <div className="p-3 rounded-lg bg-aegis-bg-tertiary/50">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-aegis-text-secondary">Daily Limit</span>
-                    <span className="text-sm font-medium text-aegis-text-primary">
+                <div className="p-2 sm:p-3 rounded-lg bg-aegis-bg-tertiary/50">
+                  <div className="flex justify-between items-center mb-1.5 sm:mb-2">
+                    <span className="text-xs sm:text-sm text-aegis-text-secondary">Daily Limit</span>
+                    <span className="text-xs sm:text-sm font-medium text-aegis-text-primary">
                       {formatSol(vault.dailyLimit)} SOL
                     </span>
                   </div>
                   
                   {/* Progress Bar */}
-                  <div className="flex justify-between text-xs text-aegis-text-tertiary mb-1">
+                  <div className="flex justify-between text-[10px] sm:text-xs text-aegis-text-tertiary mb-1">
                     <span>Spent Today</span>
                     <span>{formatSol(vault.dailySpent)} / {formatSol(vault.dailyLimit)}</span>
                   </div>
-                  <div className="h-2 bg-aegis-bg-primary rounded-full overflow-hidden">
+                  <div className="h-1.5 sm:h-2 bg-aegis-bg-primary rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-aegis-emerald to-aegis-blue transition-all"
                       style={{
@@ -222,38 +222,39 @@ export default function VaultsPage() {
                 </div>
 
                 {/* Quick Actions - Always visible */}
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-1.5 sm:gap-2 pt-1 sm:pt-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    className="flex-1 border-aegis-border"
+                    className="flex-1 border-aegis-border text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
                     onClick={() => window.location.href = `/vaults/${vault.id}`}
                   >
-                    <Code2 className="w-3 h-3 mr-1" />
-                    View Details
+                    <Code2 className="w-3 h-3 mr-1 shrink-0" />
+                    <span className="hidden sm:inline">View Details</span>
+                    <span className="sm:hidden">View</span>
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="border-aegis-border"
+                    className="border-aegis-border h-8 w-8 sm:h-9 sm:w-9 p-0"
                     onClick={() => handleOpenSettings(vault)}
                   >
-                    <Settings className="w-3 h-3" />
+                    <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="border-aegis-border"
+                    className="border-aegis-border h-8 w-8 sm:h-9 sm:w-9 p-0"
                     onClick={() => handlePauseToggle(vault)}
                     disabled={togglingVault === vault.id}
                     title={vault.isActive ? 'Pause vault' : 'Resume vault'}
                   >
                     {togglingVault === vault.id ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                     ) : vault.isActive ? (
-                      <Pause className="w-3 h-3" />
+                      <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
                     ) : (
-                      <Play className="w-3 h-3" />
+                      <Play className="w-3 h-3 sm:w-4 sm:h-4" />
                     )}
                   </Button>
                 </div>
