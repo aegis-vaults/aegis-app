@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Check, Eye, EyeOff, Code2, Book, Sparkles } from 'lucide-react';
+import { Copy, Check, Eye, EyeOff, Code2, Book, Sparkles, Wallet, AlertCircle } from 'lucide-react';
 import { formatAddress } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PublicKey } from '@solana/web3.js';
+import { PROGRAM_ID } from '@/lib/solana/config';
 
 interface VaultCredentialsProps {
   vaultAddress: string;
@@ -18,7 +20,23 @@ interface VaultCredentialsProps {
 export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: VaultCredentialsProps) {
   const [showFullAddress, setShowFullAddress] = useState(false);
   const [showFullAgent, setShowFullAgent] = useState(false);
+  const [showFullDeposit, setShowFullDeposit] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [depositAddress, setDepositAddress] = useState<string>('');
+
+  // Calculate the vault authority PDA (deposit address)
+  useEffect(() => {
+    try {
+      const vaultPubkey = new PublicKey(vaultAddress);
+      const [vaultAuthority] = PublicKey.findProgramAddressSync(
+        [Buffer.from('vault_authority'), vaultPubkey.toBuffer()],
+        PROGRAM_ID
+      );
+      setDepositAddress(vaultAuthority.toBase58());
+    } catch (e) {
+      console.error('Error calculating deposit address:', e);
+    }
+  }, [vaultAddress]);
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
@@ -33,6 +51,7 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
 
   const displayVaultAddress = showFullAddress ? vaultAddress : formatAddress(vaultAddress, 8);
   const displayAgentSigner = showFullAgent ? agentSigner : formatAddress(agentSigner, 8);
+  const displayDepositAddress = showFullDeposit ? depositAddress : formatAddress(depositAddress, 8);
 
   return (
     <Card className="glass-card border-aegis-blue/30">
@@ -46,12 +65,55 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Vault Address */}
+        {/* DEPOSIT ADDRESS - Most Important */}
+        {depositAddress && (
+          <div className="p-4 rounded-lg bg-aegis-emerald/10 border-2 border-aegis-emerald/30 space-y-3">
+            <div className="flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-aegis-emerald" />
+              <span className="text-sm font-bold text-aegis-emerald">Deposit Address</span>
+              <Badge className="bg-aegis-emerald text-white text-xs">Send SOL Here</Badge>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-aegis-bg-primary border border-aegis-emerald/30">
+              <code className="flex-1 text-sm font-mono text-aegis-emerald break-all">
+                {displayDepositAddress}
+              </code>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFullDeposit(!showFullDeposit)}
+                className="h-8 w-8 p-0 flex-shrink-0"
+              >
+                {showFullDeposit ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => copyToClipboard(depositAddress, 'Deposit Address')}
+                className="h-8 w-8 p-0 flex-shrink-0"
+              >
+                {copiedField === 'Deposit Address' ? (
+                  <Check className="w-4 h-4 text-aegis-emerald" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+            <div className="flex items-start gap-2 text-xs text-aegis-text-secondary">
+              <AlertCircle className="w-4 h-4 text-aegis-amber flex-shrink-0 mt-0.5" />
+              <span>
+                <strong>Important:</strong> Send SOL to this address to fund your vault. 
+                Do NOT send to the Vault Address below—that&apos;s for configuration only.
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Vault Address (Config) */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-aegis-text-secondary">Vault Address</span>
-              <Badge variant="outline" className="text-xs">Required</Badge>
+              <span className="text-sm font-medium text-aegis-text-secondary">Vault Config Address</span>
+              <Badge variant="outline" className="text-xs">For SDK</Badge>
             </div>
             <Button
               variant="ghost"
@@ -73,7 +135,7 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
             </Button>
           </div>
           <div className="flex items-center gap-2 p-3 rounded-lg bg-aegis-bg-tertiary/50 border border-aegis-border">
-            <code className="flex-1 text-sm font-mono text-aegis-emerald break-all">
+            <code className="flex-1 text-sm font-mono text-aegis-text-primary break-all">
               {displayVaultAddress}
             </code>
             <Button
@@ -89,6 +151,9 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
               )}
             </Button>
           </div>
+          <p className="text-xs text-aegis-text-tertiary">
+            Used by the SDK to reference your vault. Do not send funds here.
+          </p>
         </div>
 
         {/* Agent Signer */}
