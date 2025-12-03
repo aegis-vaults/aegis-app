@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { useParams } from 'next/navigation';
 import { useVault } from '@/lib/hooks/use-vaults';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,15 +13,13 @@ import Link from 'next/link';
 import { LAMPORTS_PER_SOL } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import { getConnection } from '@/lib/solana/config';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, Connection } from '@solana/web3.js';
 import { getVaultAuthorityPDA } from '@/lib/solana/program';
 
-interface VaultDetailPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function VaultDetailPage({ params }: VaultDetailPageProps) {
-  const { id } = use(params);
+export default function VaultDetailPage() {
+  const params = useParams();
+  const id = params?.id as string;
+  
   const { data: vaultData, isLoading } = useVault(id);
   const vault = vaultData?.data;
 
@@ -35,7 +33,7 @@ export default function VaultDetailPage({ params }: VaultDetailPageProps) {
 
       setLoadingBalance(true);
       try {
-        const connection = getConnection();
+        const connection: Connection = getConnection();
         const vaultPubkey = new PublicKey(vault.publicKey);
         const [vaultAuthority] = getVaultAuthorityPDA(vaultPubkey);
         const bal = await connection.getBalance(vaultAuthority);
@@ -49,6 +47,20 @@ export default function VaultDetailPage({ params }: VaultDetailPageProps) {
 
     fetchBalance();
   }, [vault]);
+
+  if (!id) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold text-aegis-text-primary mb-4">Invalid Vault ID</h2>
+        <Link href="/vaults">
+          <Button variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Vaults
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -98,7 +110,7 @@ export default function VaultDetailPage({ params }: VaultDetailPageProps) {
             {vault.isActive ? 'Active' : 'Paused'}
           </Badge>
           <Badge variant="outline" className="text-sm">
-            {vault.tier}
+            {vault.tier || 'PERSONAL'}
           </Badge>
         </div>
       </div>
@@ -194,7 +206,7 @@ export default function VaultDetailPage({ params }: VaultDetailPageProps) {
             <CardContent>
               {vault.transactions && vault.transactions.length > 0 ? (
                 <div className="space-y-2">
-                  {vault.transactions.map((tx) => (
+                  {vault.transactions.map((tx: any) => (
                     <div
                       key={tx.id}
                       className="flex items-center justify-between p-3 rounded-lg bg-aegis-bg-tertiary/50 border border-aegis-border"
@@ -288,7 +300,7 @@ export default function VaultDetailPage({ params }: VaultDetailPageProps) {
                 <div>
                   <div className="text-sm font-medium text-aegis-text-primary">Whitelist</div>
                   <div className="text-xs text-aegis-text-tertiary mt-1">
-                    {vault.whitelist.length} addresses whitelisted
+                    {vault.whitelist?.length || 0} addresses whitelisted
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
