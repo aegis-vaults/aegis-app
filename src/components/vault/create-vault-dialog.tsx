@@ -92,15 +92,25 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
       // Get blockhash before sending so we can use it for confirmation
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+      
+      // Set blockhash on transaction
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = publicKey;
+
+      console.log('Sending transaction to:', connection.rpcEndpoint);
+      console.log('Vault PDA:', vault.toBase58());
+      console.log('Fee payer:', publicKey.toBase58());
 
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: false,
         preflightCommitment: 'confirmed',
       });
 
+      console.log('Signature received:', signature);
       toast.loading('Confirming transaction...', { id: signature });
 
       // Wait for confirmation using the blockhash from before we sent
+      let confirmed = false;
       try {
         const confirmation = await connection.confirmTransaction(
           {
@@ -112,11 +122,12 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
         );
 
         if (confirmation.value.err) {
-          throw new Error('Transaction failed');
+          throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
         }
-
-        toast.success(TOAST_MESSAGES.VAULT_CREATED, { id: signature });
+        confirmed = true;
+        console.log('Transaction confirmed!');
       } catch (confirmError: any) {
+        console.error('Confirmation error:', confirmError);
         // If confirmation times out or block height exceeded, provide helpful info
         if (
           confirmError.message?.includes('timeout') ||
@@ -132,6 +143,31 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
           throw confirmError;
         }
       }
+
+      // CRITICAL: Verify the vault account actually exists on-chain
+      console.log('Verifying vault account on-chain...');
+      let vaultExists = false;
+      for (let i = 0; i < 5; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const vaultInfo = await connection.getAccountInfo(vault);
+        if (vaultInfo) {
+          vaultExists = true;
+          console.log('✅ Vault account verified on-chain, size:', vaultInfo.data.length);
+          break;
+        }
+        console.log(`Vault verification attempt ${i + 1} - not found yet...`);
+      }
+
+      if (!vaultExists) {
+        // Transaction didn't actually land on chain
+        toast.error(
+          'Transaction did not land on-chain. This may be an RPC issue. Please try again.',
+          { id: signature, duration: 10000 }
+        );
+        throw new Error('Vault account not created on-chain despite signature');
+      }
+
+      toast.success(TOAST_MESSAGES.VAULT_CREATED, { id: signature });
 
       // Log vault details
       console.log('Vault created:', {
