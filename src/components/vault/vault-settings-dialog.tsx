@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
 import {
   Dialog,
   DialogContent,
@@ -135,7 +135,7 @@ export function VaultSettingsDialog({
 
     setLoading(true);
     try {
-      const connection = getConnection();
+      const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
       const newLimitLamports = BigInt(Math.floor(limitValue * LAMPORTS_PER_SOL));
 
@@ -177,7 +177,7 @@ export function VaultSettingsDialog({
 
     setLoading(true);
     try {
-      const connection = getConnection();
+      const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
 
       const { transaction } = isPaused
@@ -230,7 +230,7 @@ export function VaultSettingsDialog({
 
       setLoading(true);
 
-      const connection = getConnection();
+      const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
 
       const { transaction } = await instructions.addToWhitelist(
@@ -274,7 +274,7 @@ export function VaultSettingsDialog({
 
     setLoading(true);
     try {
-      const connection = getConnection();
+      const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
       const addressPubkey = new PublicKey(address);
 
@@ -326,7 +326,7 @@ export function VaultSettingsDialog({
 
       setLoading(true);
 
-      const connection = getConnection();
+      const connection: Connection = getConnection();
       const vaultPubkey = new PublicKey(vault.publicKey);
 
       const { transaction } = await instructions.updateAgentSigner(
