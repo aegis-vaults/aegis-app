@@ -9,24 +9,29 @@ import { getProgram, getVaultPDA, getVaultAuthorityPDA } from './program';
 import { getConnection } from './config';
 
 export const instructions = {
-  // Initialize vault instruction
+  // Initialize vault instruction with nonce for unlimited vaults
   initializeVault: async (
     wallet: AnchorWallet,
     agentSigner: PublicKey,
     dailyLimit: bigint,
-    name: string
+    name: string,
+    nonce?: bigint
   ) => {
     const connection = getConnection();
     const program = getProgram(connection, wallet);
     const authority = wallet.publicKey;
 
-    // Derive PDAs
-    const [vault] = getVaultPDA(authority);
+    // Generate a unique nonce if not provided (allows unlimited vaults)
+    const { generateVaultNonce } = await import('./program');
+    const vaultNonce = nonce ?? generateVaultNonce();
+
+    // Derive PDAs with nonce
+    const [vault] = getVaultPDA(authority, vaultNonce);
     const [vaultAuthority] = getVaultAuthorityPDA(vault);
 
-    // Build instruction
+    // Build instruction with nonce as first argument
     const tx = await program.methods
-      .initializeVault(agentSigner, new BN(dailyLimit.toString()), name)
+      .initializeVault(new BN(vaultNonce.toString()), agentSigner, new BN(dailyLimit.toString()), name)
       .accounts({
         vault,
         vaultAuthority,
@@ -35,7 +40,7 @@ export const instructions = {
       })
       .transaction();
 
-    return { transaction: tx, vault, vaultAuthority };
+    return { transaction: tx, vault, vaultAuthority, nonce: vaultNonce };
   },
 
   // Execute guarded transaction

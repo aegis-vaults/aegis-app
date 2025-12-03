@@ -108,28 +108,15 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
       const connection = getConnection();
 
-      // Check if vault already exists for this wallet
-      const { getVaultPDA } = await import('@/lib/solana/program');
-      const [existingVaultPDA] = getVaultPDA(publicKey);
-      
-      const existingVaultInfo = await connection.getAccountInfo(existingVaultPDA);
-      if (existingVaultInfo) {
-        toast.error(
-          'You already have a vault! Each wallet can only create one vault. Go to your existing vault instead.',
-          { duration: 6000 }
-        );
-        setLoading(false);
-        setOpen(false);
-        return;
-      }
-
-      // Build transaction
-      const { transaction, vault, vaultAuthority } = await instructions.initializeVault(
+      // Build transaction (nonce is auto-generated for unique vault PDAs)
+      const { transaction, vault, vaultAuthority, nonce } = await instructions.initializeVault(
         wallet.adapter as any,
         agentSignerPubkey,
         BigInt(Math.floor(dailyLimitLamports)),
         formData.name
       );
+
+      console.log('Creating vault with nonce:', nonce?.toString());
 
       // Get fresh blockhash
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');

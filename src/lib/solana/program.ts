@@ -25,13 +25,26 @@ export function getProgram(
 }
 
 /**
- * Derive vault PDA
+ * Derive vault PDA with nonce for unlimited vaults
  */
-export function getVaultPDA(authority: PublicKey): [PublicKey, number] {
+export function getVaultPDA(authority: PublicKey, nonce: bigint = BigInt(0)): [PublicKey, number] {
+  const nonceBuffer = Buffer.alloc(8);
+  nonceBuffer.writeBigUInt64LE(nonce);
+  
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('vault'), authority.toBuffer()],
+    [Buffer.from('vault'), authority.toBuffer(), nonceBuffer],
     PROGRAM_ID
   );
+}
+
+/**
+ * Generate a random nonce for new vault creation
+ */
+export function generateVaultNonce(): bigint {
+  // Use current timestamp + random to ensure uniqueness
+  const timestamp = BigInt(Date.now());
+  const random = BigInt(Math.floor(Math.random() * 1000000));
+  return timestamp * BigInt(1000000) + random;
 }
 
 /**
