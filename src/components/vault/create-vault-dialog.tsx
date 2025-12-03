@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, Keypair } from '@solana/web3.js';
+import { PublicKey, Keypair, ComputeBudgetProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -90,8 +90,19 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
       // Send transaction
       const connection = getConnection();
 
-      // Get blockhash before sending so we can use it for confirmation
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+      // Get fresh blockhash
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+      
+      // Add priority fees to ensure transaction lands quickly
+      const priorityFeeIx = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 50000, // 0.00005 SOL per compute unit - helps transaction land faster
+      });
+      const computeLimitIx = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 200000,
+      });
+      
+      // Prepend priority fee instructions
+      transaction.instructions = [priorityFeeIx, computeLimitIx, ...transaction.instructions];
       
       // Set blockhash on transaction
       transaction.recentBlockhash = blockhash;
@@ -100,10 +111,13 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
       console.log('Sending transaction to:', connection.rpcEndpoint);
       console.log('Vault PDA:', vault.toBase58());
       console.log('Fee payer:', publicKey.toBase58());
+      console.log('Using blockhash:', blockhash);
+      console.log('Last valid block height:', lastValidBlockHeight);
 
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: false,
-        preflightCommitment: 'confirmed',
+        preflightCommitment: 'processed', // Use 'processed' for faster initial response
+        maxRetries: 3,
       });
 
       console.log('Signature received:', signature);
