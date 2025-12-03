@@ -61,6 +61,41 @@ export const vaultApi = {
       vaultPublicKey,
     });
   },
+
+  // Team management
+  team: {
+    // List team members for a vault
+    list: async (vaultId: string): Promise<ApiResponse<any[]>> => {
+      return apiClient.get<ApiResponse<any[]>>(`${API_ENDPOINTS.VAULTS}/${vaultId}/team`);
+    },
+
+    // Add team member to a vault
+    add: async (
+      vaultId: string,
+      data: { userWalletAddress: string; role: 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER' }
+    ): Promise<ApiResponse<any>> => {
+      return apiClient.post<ApiResponse<any>>(`${API_ENDPOINTS.VAULTS}/${vaultId}/team`, data);
+    },
+
+    // Update team member role
+    updateRole: async (
+      vaultId: string,
+      memberId: string,
+      role: 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER'
+    ): Promise<ApiResponse<any>> => {
+      return apiClient.patch<ApiResponse<any>>(
+        `${API_ENDPOINTS.VAULTS}/${vaultId}/team/${memberId}`,
+        { role }
+      );
+    },
+
+    // Remove team member
+    remove: async (vaultId: string, memberId: string): Promise<ApiResponse<void>> => {
+      return apiClient.delete<ApiResponse<void>>(
+        `${API_ENDPOINTS.VAULTS}/${vaultId}/team/${memberId}`
+      );
+    },
+  },
 };
 
 // ============================================================================

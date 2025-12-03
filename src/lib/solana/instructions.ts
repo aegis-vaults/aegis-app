@@ -79,60 +79,126 @@ export const instructions = {
 
   // Update daily limit
   updateDailyLimit: async (
-    authority: PublicKey,
+    wallet: AnchorWallet,
     vault: PublicKey,
     newDailyLimit: bigint
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('updateDailyLimit placeholder:', { authority, vault, newDailyLimit });
-    return transaction;
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    const tx = await program.methods
+      .updateDailyLimit(new BN(newDailyLimit.toString()))
+      .accounts({
+        vault,
+        authority,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
   },
 
   // Add to whitelist
   addToWhitelist: async (
-    authority: PublicKey,
+    wallet: AnchorWallet,
     vault: PublicKey,
     address: PublicKey
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('addToWhitelist placeholder:', { authority, vault, address });
-    return transaction;
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    const tx = await program.methods
+      .addToWhitelist(address)
+      .accounts({
+        vault,
+        authority,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
   },
 
   // Remove from whitelist
   removeFromWhitelist: async (
-    authority: PublicKey,
+    wallet: AnchorWallet,
     vault: PublicKey,
     address: PublicKey
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('removeFromWhitelist placeholder:', { authority, vault, address });
-    return transaction;
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    const tx = await program.methods
+      .removeFromWhitelist(address)
+      .accounts({
+        vault,
+        authority,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
   },
 
   // Pause vault
   pauseVault: async (
-    authority: PublicKey,
+    wallet: AnchorWallet,
     vault: PublicKey
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('pauseVault placeholder:', { authority, vault });
-    return transaction;
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    const tx = await program.methods
+      .pauseVault()
+      .accounts({
+        vault,
+        authority,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
   },
 
   // Resume vault
   resumeVault: async (
-    authority: PublicKey,
+    wallet: AnchorWallet,
     vault: PublicKey
-  ): Promise<Transaction> => {
-    // TODO: Implement with Anchor
-    const transaction = new Transaction();
-    console.log('resumeVault placeholder:', { authority, vault });
-    return transaction;
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    const tx = await program.methods
+      .resumeVault()
+      .accounts({
+        vault,
+        authority,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
+  },
+
+  // Update agent signer
+  updateAgentSigner: async (
+    wallet: AnchorWallet,
+    vault: PublicKey,
+    newAgentSigner: PublicKey
+  ) => {
+    const connection = getConnection();
+    const program = getProgram(connection, wallet);
+    const authority = wallet.publicKey;
+
+    const tx = await program.methods
+      .updateAgentSigner(newAgentSigner)
+      .accounts({
+        vault,
+        authority,
+      })
+      .transaction();
+
+    return { transaction: tx, vault };
   },
 };
 

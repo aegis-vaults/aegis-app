@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatSol, formatAddress } from '@/lib/utils';
-import { Plus, Vault as VaultIcon, Settings, Pause, Play, Wallet, RefreshCw } from 'lucide-react';
+import { Plus, Vault as VaultIcon, Settings, Pause, Play, Wallet, RefreshCw, Code2 } from 'lucide-react';
 import { CreateVaultDialog } from '@/components/vault/create-vault-dialog';
 import { VaultSettingsDialog } from '@/components/vault/vault-settings-dialog';
 import { getConnection } from '@/lib/solana/config';
@@ -130,6 +130,11 @@ export default function VaultsPage() {
                     <CardDescription className="font-mono text-xs mt-1">
                       {formatAddress(vault.publicKey)}
                     </CardDescription>
+                    {vault.agentSigner && (
+                      <CardDescription className="font-mono text-xs mt-1 text-aegis-blue">
+                        Agent: {formatAddress(vault.agentSigner)}
+                      </CardDescription>
+                    )}
                   </div>
                   <Badge variant={vault.isActive ? 'default' : 'outline'}>
                     {vault.isActive ? 'Active' : 'Paused'}
@@ -180,17 +185,25 @@ export default function VaultsPage() {
 
                 {/* Quick Actions - Always visible */}
                 <div className="flex gap-2 pt-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    size="sm"
+                    variant="outline"
                     className="flex-1 border-aegis-border"
+                    onClick={() => window.location.href = `/vaults/${vault.id}`}
+                  >
+                    <Code2 className="w-3 h-3 mr-1" />
+                    View Details
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-aegis-border"
                     onClick={() => handleOpenSettings(vault)}
                   >
-                    <Settings className="w-3 h-3 mr-1" />
-                    Settings
+                    <Settings className="w-3 h-3" />
                   </Button>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     variant="outline"
                     className="border-aegis-border"
                     onClick={() => handlePauseToggle(vault)}

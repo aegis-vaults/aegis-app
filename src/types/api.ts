@@ -62,6 +62,7 @@ export interface Vault {
   publicKey: string;
   owner: string;
   guardian: string;
+  agentSigner: string; // AI agent public key authorized to propose transactions
   userId: string | null;
   name: string | null;
   dailyLimit: string; // BigInt as string

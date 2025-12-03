@@ -19,7 +19,8 @@ import { Label } from '@/components/ui/label';
 import { instructions } from '@/lib/solana/instructions';
 import { getConnection } from '@/lib/solana/config';
 import { LAMPORTS_PER_SOL, TOAST_MESSAGES } from '@/lib/constants';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, Sparkles, AlertCircle, Copy, Check } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { api } from '@/lib/api';
 import apiClient from '@/lib/api/client';
 
@@ -37,6 +38,31 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
     dailyLimit: '',
     agentSigner: '',
   });
+  const [generatedKeypair, setGeneratedKeypair] = useState<{ publicKey: string; secretKey: string } | null>(null);
+  const [copiedSecret, setCopiedSecret] = useState(false);
+
+  const handleGenerateKeypair = () => {
+    const keypair = Keypair.generate();
+    const generated = {
+      publicKey: keypair.publicKey.toBase58(),
+      secretKey: JSON.stringify(Array.from(keypair.secretKey)),
+    };
+    setGeneratedKeypair(generated);
+    setFormData({ ...formData, agentSigner: generated.publicKey });
+    toast.success('Agent keypair generated! Make sure to save the secret key.');
+  };
+
+  const copySecretKey = async () => {
+    if (!generatedKeypair) return;
+    try {
+      await navigator.clipboard.writeText(generatedKeypair.secretKey);
+      setCopiedSecret(true);
+      toast.success('Secret key copied to clipboard');
+      setTimeout(() => setCopiedSecret(false), 2000);
+    } catch (error) {
+      toast.error('Failed to copy secret key');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,12 +97,13 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
           return;
         }
       } else {
-        // Generate a new keypair for the agent
-        const agentKeypair = Keypair.generate();
-        agentSignerPubkey = agentKeypair.publicKey;
-        // TODO: Store this keypair securely or allow user to provide their own
-        console.log('Generated agent signer:', agentSignerPubkey.toBase58());
-        console.log('Agent signer secret (SAVE THIS):', Buffer.from(agentKeypair.secretKey).toString('base64'));
+        // Use the generated keypair
+        if (!generatedKeypair) {
+          toast.error('Please generate or provide an agent signer public key');
+          setLoading(false);
+          return;
+        }
+        agentSignerPubkey = new PublicKey(generatedKeypair.publicKey);
       }
 
       // Build transaction
@@ -233,6 +260,8 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
       // Reset form and close dialog
       setFormData({ name: '', dailyLimit: '', agentSigner: '' });
+      setGeneratedKeypair(null);
+      setCopiedSecret(false);
       setOpen(false);
 
       // Call success callback
@@ -307,18 +336,102 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
             <div className="grid gap-2">
               <Label htmlFor="agentSigner">
-                Agent Signer Public Key <span className="text-aegis-text-tertiary">(optional)</span>
+                Agent Signer Public Key <span className="text-aegis-crimson">*</span>
               </Label>
-              <Input
-                id="agentSigner"
-                placeholder="Leave empty to generate automatically"
-                value={formData.agentSigner}
-                onChange={(e) => setFormData({ ...formData, agentSigner: e.target.value })}
-                disabled={loading}
-              />
-              <p className="text-xs text-aegis-text-tertiary">
-                The AI agent public key authorized to propose transactions
-              </p>
+
+              {!generatedKeypair ? (
+                <div className="space-y-2">
+                  <Alert className="border-aegis-blue/30 bg-aegis-blue/5">
+                    <AlertCircle className="w-4 h-4 text-aegis-blue" />
+                    <AlertDescription className="text-xs text-aegis-text-secondary">
+                      Your AI agent needs a keypair to interact with this vault. You can generate one now or provide an existing public key.
+                    </AlertDescription>
+                  </Alert>
+
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleGenerateKeypair}
+                      disabled={loading}
+                      className="flex-1"
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate Keypair
+                    </Button>
+                    <span className="text-xs text-aegis-text-tertiary self-center">or</span>
+                    <Input
+                      id="agentSigner"
+                      placeholder="Paste existing public key"
+                      value={formData.agentSigner}
+                      onChange={(e) => setFormData({ ...formData, agentSigner: e.target.value })}
+                      disabled={loading}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="p-3 rounded-lg bg-aegis-emerald/10 border border-aegis-emerald/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="w-4 h-4 text-aegis-emerald" />
+                      <span className="text-xs font-medium text-aegis-emerald">Keypair Generated</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-xs text-aegis-text-tertiary mb-1">Public Key:</p>
+                        <code className="text-xs font-mono text-aegis-text-primary block break-all">
+                          {generatedKeypair.publicKey}
+                        </code>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-aegis-text-tertiary mb-1">Secret Key (Save this securely!):</p>
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs font-mono text-aegis-text-primary block break-all flex-1 bg-aegis-bg-primary p-2 rounded border border-aegis-border">
+                            {generatedKeypair.secretKey.substring(0, 50)}...
+                          </code>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={copySecretKey}
+                            className="flex-shrink-0"
+                          >
+                            {copiedSecret ? (
+                              <Check className="w-3 h-3 text-aegis-emerald" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Alert className="border-aegis-crimson/30 bg-aegis-crimson/5">
+                    <AlertCircle className="w-4 h-4 text-aegis-crimson" />
+                    <AlertDescription className="text-xs text-aegis-text-secondary">
+                      <strong className="text-aegis-crimson">Important:</strong> Copy and save the secret key securely. You'll need it to configure your AI agent. This will not be shown again.
+                    </AlertDescription>
+                  </Alert>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setGeneratedKeypair(null);
+                      setFormData({ ...formData, agentSigner: '' });
+                    }}
+                    disabled={loading}
+                    className="text-xs"
+                  >
+                    Generate Different Keypair
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
