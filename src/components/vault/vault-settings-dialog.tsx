@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Copy, ExternalLink, Plus, Trash2, Save } from 'lucide-react';
+import { Loader2, Copy, ExternalLink, Plus, Trash2, Save, RefreshCw } from 'lucide-react';
 import { api } from '@/lib/api';
 import { instructions } from '@/lib/solana/instructions';
 import { formatSol, formatAddress } from '@/lib/utils';
@@ -75,6 +75,24 @@ export function VaultSettingsDialog({
   const [newMemberAddress, setNewMemberAddress] = useState('');
   const [newMemberRole, setNewMemberRole] = useState<'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER'>('MEMBER');
   const [loadingTeam, setLoadingTeam] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
+  // Sync vault from blockchain to get correct vaultNonce
+  const handleSyncVault = async () => {
+    setSyncing(true);
+    try {
+      await api.vaults.sync(vault.publicKey);
+      toast.success('Vault synced from blockchain! Please close and reopen settings.');
+      if (onUpdate) {
+        onUpdate();
+      }
+    } catch (error: any) {
+      console.error('Error syncing vault:', error);
+      toast.error(error.message || 'Failed to sync vault');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   // Load team members when dialog opens or tab changes to team
   useEffect(() => {
@@ -526,6 +544,39 @@ export function VaultSettingsDialog({
                     <Copy className="h-3 w-3" />
                   </Button>
                 </div>
+              </div>
+
+              {/* Vault Nonce */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-aegis-text-secondary">Vault Nonce</span>
+                <span className="text-xs font-mono text-aegis-text-tertiary">
+                  {vault.vaultNonce || '0'}
+                </span>
+              </div>
+            </div>
+
+            {/* Sync from Blockchain */}
+            <div className="p-4 rounded-lg bg-aegis-blue/10 border border-aegis-blue/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-medium text-aegis-blue">Sync from Blockchain</h4>
+                  <p className="text-xs text-aegis-text-tertiary mt-1">
+                    Update vault data from on-chain state (fixes nonce mismatch errors)
+                  </p>
+                </div>
+                <Button
+                  onClick={handleSyncVault}
+                  disabled={syncing}
+                  variant="outline"
+                  className="border-aegis-blue text-aegis-blue hover:bg-aegis-blue/20"
+                >
+                  {syncing ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                  )}
+                  Sync
+                </Button>
               </div>
             </div>
           </TabsContent>
