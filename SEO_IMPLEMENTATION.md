@@ -305,3 +305,4 @@ export function VaultDetails({ vault }) {
 - [Schema.org](https://schema.org/)
 - [Web.dev SEO Guide](https://web.dev/lighthouse-seo/)
 
+

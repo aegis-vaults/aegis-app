@@ -12,3 +12,4 @@ export const contentType = 'image/png';
 // Reuse the same image as OpenGraph
 export { default } from './opengraph-image';
 
+

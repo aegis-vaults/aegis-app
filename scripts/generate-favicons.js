@@ -77,3 +77,4 @@ generateFavicons().catch(err => {
   process.exit(1);
 });
 
+

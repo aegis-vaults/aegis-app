@@ -100,3 +100,4 @@ export function NotificationPreferences({ user, onUpdate }: NotificationPreferen
   );
 }
 
+

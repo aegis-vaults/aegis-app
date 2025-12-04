@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Check, Eye, EyeOff, Code2, Book, Sparkles, Wallet, AlertCircle } from 'lucide-react';
@@ -24,7 +23,6 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [depositAddress, setDepositAddress] = useState<string>('');
 
-  // Calculate the vault authority PDA (deposit address)
   useEffect(() => {
     try {
       const vaultPubkey = new PublicKey(vaultAddress);
@@ -54,34 +52,37 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
   const displayDepositAddress = showFullDeposit ? depositAddress : formatAddress(depositAddress, 8);
 
   return (
-    <Card className="glass-card border-aegis-blue/30">
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <Code2 className="w-5 h-5 text-aegis-blue" />
-          <CardTitle>Vault Credentials & Integration</CardTitle>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="p-6 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-caldera-orange/10 flex items-center justify-center">
+            <Code2 className="w-5 h-5 text-caldera-orange" />
+          </div>
+          <div>
+            <h3 className="text-lg font-display font-bold text-caldera-black">Vault Credentials & Integration</h3>
+            <p className="text-sm text-caldera-text-muted">Use these credentials to integrate your AI agent with this vault</p>
+          </div>
         </div>
-        <CardDescription>
-          Use these credentials to integrate your AI agent with this vault
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      </div>
+
+      <div className="p-6 space-y-6">
         {/* DEPOSIT ADDRESS - Most Important */}
         {depositAddress && (
-          <div className="p-4 rounded-lg bg-aegis-emerald/10 border-2 border-aegis-emerald/30 space-y-3">
+          <div className="p-4 rounded-xl bg-caldera-success/5 border border-caldera-success/20 space-y-3">
             <div className="flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-aegis-emerald" />
-              <span className="text-sm font-bold text-aegis-emerald">Deposit Address</span>
-              <Badge className="bg-aegis-emerald text-white text-xs">Send SOL Here</Badge>
+              <Wallet className="w-5 h-5 text-caldera-success" />
+              <span className="text-sm font-bold text-caldera-success">Deposit Address</span>
+              <Badge className="bg-caldera-success text-white text-xs rounded-full px-2">Send SOL Here</Badge>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-aegis-bg-primary border border-aegis-emerald/30">
-              <code className="flex-1 text-sm font-mono text-aegis-emerald break-all">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-white border border-caldera-success/20">
+              <code className="flex-1 text-sm font-mono text-caldera-success break-all">
                 {displayDepositAddress}
               </code>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowFullDeposit(!showFullDeposit)}
-                className="h-8 w-8 p-0 flex-shrink-0"
+                className="h-8 w-8 p-0 flex-shrink-0 rounded-lg"
               >
                 {showFullDeposit ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </Button>
@@ -89,19 +90,19 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(depositAddress, 'Deposit Address')}
-                className="h-8 w-8 p-0 flex-shrink-0"
+                className="h-8 w-8 p-0 flex-shrink-0 rounded-lg"
               >
                 {copiedField === 'Deposit Address' ? (
-                  <Check className="w-4 h-4 text-aegis-emerald" />
+                  <Check className="w-4 h-4 text-caldera-success" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
               </Button>
             </div>
-            <div className="flex items-start gap-2 text-xs text-aegis-text-secondary">
-              <AlertCircle className="w-4 h-4 text-aegis-amber flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 text-xs text-caldera-text-muted">
+              <AlertCircle className="w-4 h-4 text-caldera-yellow flex-shrink-0 mt-0.5" />
               <span>
-                <strong>Important:</strong> Send SOL to this address to fund your vault. 
+                <strong className="text-caldera-black">Important:</strong> Send SOL to this address to fund your vault. 
                 Do NOT send to the Vault Address below—that&apos;s for configuration only.
               </span>
             </div>
@@ -112,14 +113,14 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-aegis-text-secondary">Vault Config Address</span>
-              <Badge variant="outline" className="text-xs">For SDK</Badge>
+              <span className="text-sm font-medium text-caldera-text-secondary">Vault Config Address</span>
+              <Badge variant="outline" className="text-xs rounded-full border-gray-200">For SDK</Badge>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowFullAddress(!showFullAddress)}
-              className="h-7 text-xs"
+              className="h-7 text-xs rounded-lg"
             >
               {showFullAddress ? (
                 <>
@@ -134,24 +135,24 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
               )}
             </Button>
           </div>
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-aegis-bg-tertiary/50 border border-aegis-border">
-            <code className="flex-1 text-sm font-mono text-aegis-text-primary break-all">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+            <code className="flex-1 text-sm font-mono text-caldera-black break-all">
               {displayVaultAddress}
             </code>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => copyToClipboard(vaultAddress, 'Vault Address')}
-              className="h-8 w-8 p-0 flex-shrink-0"
+              className="h-8 w-8 p-0 flex-shrink-0 rounded-lg"
             >
               {copiedField === 'Vault Address' ? (
-                <Check className="w-4 h-4 text-aegis-emerald" />
+                <Check className="w-4 h-4 text-caldera-success" />
               ) : (
                 <Copy className="w-4 h-4" />
               )}
             </Button>
           </div>
-          <p className="text-xs text-aegis-text-tertiary">
+          <p className="text-xs text-caldera-text-muted">
             Used by the SDK to reference your vault. Do not send funds here.
           </p>
         </div>
@@ -160,14 +161,14 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-aegis-text-secondary">Agent Public Key</span>
-              <Badge variant="outline" className="text-xs">Required</Badge>
+              <span className="text-sm font-medium text-caldera-text-secondary">Agent Public Key</span>
+              <Badge variant="outline" className="text-xs rounded-full border-gray-200">Required</Badge>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowFullAgent(!showFullAgent)}
-              className="h-7 text-xs"
+              className="h-7 text-xs rounded-lg"
             >
               {showFullAgent ? (
                 <>
@@ -182,56 +183,56 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
               )}
             </Button>
           </div>
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-aegis-bg-tertiary/50 border border-aegis-border">
-            <code className="flex-1 text-sm font-mono text-aegis-blue break-all">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+            <code className="flex-1 text-sm font-mono text-caldera-orange break-all">
               {displayAgentSigner}
             </code>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => copyToClipboard(agentSigner, 'Agent Public Key')}
-              className="h-8 w-8 p-0 flex-shrink-0"
+              className="h-8 w-8 p-0 flex-shrink-0 rounded-lg"
             >
               {copiedField === 'Agent Public Key' ? (
-                <Check className="w-4 h-4 text-aegis-emerald" />
+                <Check className="w-4 h-4 text-caldera-success" />
               ) : (
                 <Copy className="w-4 h-4" />
               )}
             </Button>
           </div>
-          <p className="text-xs text-aegis-text-tertiary">
+          <p className="text-xs text-caldera-text-muted">
             This is the public key of the AI agent authorized to propose transactions for this vault.
           </p>
         </div>
 
         {/* Integration Tabs */}
-        <div className="pt-4 border-t border-aegis-border">
+        <div className="pt-4 border-t border-gray-100">
           <Tabs defaultValue="quickstart" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-aegis-bg-tertiary/50">
-              <TabsTrigger value="quickstart">
+            <TabsList className="grid w-full grid-cols-3 bg-gray-100 rounded-xl p-1">
+              <TabsTrigger value="quickstart" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
                 <Sparkles className="w-3 h-3 mr-1.5" />
                 Quick Start
               </TabsTrigger>
-              <TabsTrigger value="openai">OpenAI</TabsTrigger>
-              <TabsTrigger value="langchain">LangChain</TabsTrigger>
+              <TabsTrigger value="openai" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">OpenAI</TabsTrigger>
+              <TabsTrigger value="langchain" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">LangChain</TabsTrigger>
             </TabsList>
 
             {/* Quick Start */}
-            <TabsContent value="quickstart" className="space-y-3 mt-4">
+            <TabsContent value="quickstart" className="space-y-4 mt-4">
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-aegis-text-primary">1. Install the SDK</h4>
+                <h4 className="text-sm font-semibold text-caldera-black">1. Install the SDK</h4>
                 <div className="relative">
-                  <pre className="p-3 rounded-lg bg-aegis-bg-primary border border-aegis-border overflow-x-auto">
-                    <code className="text-xs font-mono text-aegis-text-primary">npm install @aegis-vaults/sdk @solana/web3.js @coral-xyz/anchor bn.js</code>
+                  <pre className="p-4 rounded-xl bg-caldera-black border border-gray-800 overflow-x-auto">
+                    <code className="text-xs font-mono text-green-400">npm install @aegis-vaults/sdk @solana/web3.js @coral-xyz/anchor bn.js</code>
                   </pre>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard('npm install @aegis-vaults/sdk @solana/web3.js @coral-xyz/anchor bn.js', 'Command')}
-                    className="absolute top-2 right-2 h-7 w-7 p-0"
+                    className="absolute top-2 right-2 h-7 w-7 p-0 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg"
                   >
                     {copiedField === 'Command' ? (
-                      <Check className="w-3 h-3 text-aegis-emerald" />
+                      <Check className="w-3 h-3 text-caldera-success" />
                     ) : (
                       <Copy className="w-3 h-3" />
                     )}
@@ -240,10 +241,10 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: Vault
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-aegis-text-primary">2. Initialize the client</h4>
+                <h4 className="text-sm font-semibold text-caldera-black">2. Initialize the client</h4>
                 <div className="relative">
-                  <pre className="p-3 rounded-lg bg-aegis-bg-primary border border-aegis-border overflow-x-auto">
-                    <code className="text-xs font-mono text-aegis-text-primary whitespace-pre">{`import { AegisClient } from '@aegis-vaults/sdk';
+                  <pre className="p-4 rounded-xl bg-caldera-black border border-gray-800 overflow-x-auto">
+                    <code className="text-xs font-mono text-gray-300 whitespace-pre">{`import { AegisClient } from '@aegis-vaults/sdk';
 import { Keypair } from '@solana/web3.js';
 
 // Load your agent's keypair from environment
@@ -262,10 +263,10 @@ client.setWallet(agentKeypair);`}</code>
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-aegis-text-primary">3. Execute transactions</h4>
+                <h4 className="text-sm font-semibold text-caldera-black">3. Execute transactions</h4>
                 <div className="relative">
-                  <pre className="p-3 rounded-lg bg-aegis-bg-primary border border-aegis-border overflow-x-auto">
-                    <code className="text-xs font-mono text-aegis-text-primary whitespace-pre">{`// Check vault balance first
+                  <pre className="p-4 rounded-xl bg-caldera-black border border-gray-800 overflow-x-auto">
+                    <code className="text-xs font-mono text-gray-300 whitespace-pre">{`// Check vault balance first
 const balance = await client.getVaultBalance('${vaultAddress}');
 console.log('Balance:', balance / 1e9, 'SOL');
 
@@ -285,27 +286,27 @@ try {
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-aegis-emerald/10 border border-aegis-emerald/30">
-                <p className="text-xs text-aegis-text-secondary">
-                  <strong className="text-aegis-emerald">Deposit Address:</strong> Send SOL to <code className="bg-aegis-bg-tertiary px-1 rounded">{depositAddress ? formatAddress(depositAddress, 8) : '...'}</code> to fund this vault.
+              <div className="p-3 rounded-xl bg-caldera-success/5 border border-caldera-success/20">
+                <p className="text-xs text-caldera-text-secondary">
+                  <strong className="text-caldera-success">Deposit Address:</strong> Send SOL to <code className="bg-white px-1 py-0.5 rounded text-caldera-success">{depositAddress ? formatAddress(depositAddress, 8) : '...'}</code> to fund this vault.
                 </p>
               </div>
 
-              <div className="p-3 rounded-lg bg-aegis-blue/10 border border-aegis-blue/30">
-                <p className="text-xs text-aegis-text-secondary">
-                  <strong className="text-aegis-blue">Security:</strong> Store your agent&apos;s secret key in environment variables.
+              <div className="p-3 rounded-xl bg-caldera-info/5 border border-caldera-info/20">
+                <p className="text-xs text-caldera-text-secondary">
+                  <strong className="text-caldera-info">Security:</strong> Store your agent&apos;s secret key in environment variables.
                   Never commit it to version control or expose it in client-side code.
                 </p>
               </div>
             </TabsContent>
 
             {/* OpenAI */}
-            <TabsContent value="openai" className="space-y-3 mt-4">
+            <TabsContent value="openai" className="space-y-4 mt-4">
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-aegis-text-primary">OpenAI Function Calling Integration</h4>
+                <h4 className="text-sm font-semibold text-caldera-black">OpenAI Function Calling Integration</h4>
                 <div className="relative">
-                  <pre className="p-3 rounded-lg bg-aegis-bg-primary border border-aegis-border overflow-x-auto">
-                    <code className="text-xs font-mono text-aegis-text-primary whitespace-pre">{`import OpenAI from 'openai';
+                  <pre className="p-4 rounded-xl bg-caldera-black border border-gray-800 overflow-x-auto max-h-[400px]">
+                    <code className="text-xs font-mono text-gray-300 whitespace-pre">{`import OpenAI from 'openai';
 import { AegisClient } from '@aegis-vaults/sdk';
 import { Keypair } from '@solana/web3.js';
 
@@ -362,12 +363,12 @@ if (response.choices[0].message.tool_calls) {
             </TabsContent>
 
             {/* LangChain */}
-            <TabsContent value="langchain" className="space-y-3 mt-4">
+            <TabsContent value="langchain" className="space-y-4 mt-4">
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-aegis-text-primary">LangChain Tool Integration</h4>
+                <h4 className="text-sm font-semibold text-caldera-black">LangChain Tool Integration</h4>
                 <div className="relative">
-                  <pre className="p-3 rounded-lg bg-aegis-bg-primary border border-aegis-border overflow-x-auto">
-                    <code className="text-xs font-mono text-aegis-text-primary whitespace-pre">{`import { DynamicStructuredTool } from '@langchain/core/tools';
+                  <pre className="p-4 rounded-xl bg-caldera-black border border-gray-800 overflow-x-auto max-h-[400px]">
+                    <code className="text-xs font-mono text-gray-300 whitespace-pre">{`import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { AegisClient } from '@aegis-vaults/sdk';
 
@@ -421,14 +422,14 @@ const result = await executor.invoke({
         </div>
 
         {/* Documentation Link */}
-        <div className="flex items-center justify-between pt-4 border-t border-aegis-border">
-          <div className="flex items-center gap-2 text-xs text-aegis-text-tertiary">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div className="flex items-center gap-2 text-xs text-caldera-text-muted">
             <Book className="w-3 h-3" />
             <span>Need more help?</span>
           </div>
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" size="sm" className="rounded-xl border-gray-200" asChild>
             <a
-              href="https://github.com/aegis/aegis-sdk/tree/main/examples"
+              href="https://docs.aegis-vaults.xyz"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs"
@@ -437,7 +438,7 @@ const result = await executor.invoke({
             </a>
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

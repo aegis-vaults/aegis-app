@@ -187,3 +187,4 @@ If you continue to have issues:
 3. Verify your wallet is connected to devnet (not mainnet)
 4. Check you have sufficient SOL for transaction fees (~0.001 SOL)
 
+

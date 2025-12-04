@@ -24,7 +24,7 @@ export function Sidebar() {
       {/* Mobile Overlay */}
       {mobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -32,47 +32,70 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-50 h-screen bg-aegis-bg-secondary border-r border-white/5 transition-all duration-300',
-          // Desktop: show based on collapsed state
+          'fixed left-0 top-0 z-50 h-screen bg-white border-r border-gray-200 transition-all duration-300 shadow-sm',
           'hidden lg:block',
           sidebarCollapsed ? 'lg:w-16' : 'lg:w-64',
-          // Mobile: slide in from left when open
           mobileMenuOpen && 'block w-72'
         )}
       >
         {/* Logo */}
-        <div className="flex h-14 sm:h-16 items-center justify-between px-4 border-b border-white/5">
+        <div className={cn(
+          "flex h-16 items-center border-b border-gray-100",
+          sidebarCollapsed && !mobileMenuOpen ? "justify-center px-2" : "justify-between px-4"
+        )}>
           {(!sidebarCollapsed || mobileMenuOpen) && (
             <Link href="/dashboard" className="flex items-center gap-2">
-              <Shield className="w-6 h-6 text-aegis-blue" />
-              <span className="text-xl font-bold gradient-text">AEGIS</span>
+              <div className="w-9 h-9 rounded-full bg-caldera-orange flex items-center justify-center shadow-md">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-display font-black text-caldera-black">AEGIS</span>
+            </Link>
+          )}
+          
+          {sidebarCollapsed && !mobileMenuOpen && (
+            <Link href="/dashboard" className="flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-caldera-orange flex items-center justify-center shadow-md">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
             </Link>
           )}
           
           {/* Desktop collapse toggle */}
-          <button
-            onClick={toggleSidebar}
-            className="hidden lg:flex rounded-lg p-2 hover:bg-white/5 transition-colors"
-            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {sidebarCollapsed ? (
-              <ChevronRight className="w-4 h-4 text-aegis-text-secondary" />
-            ) : (
-              <ChevronLeft className="w-4 h-4 text-aegis-text-secondary" />
-            )}
-          </button>
+          {!sidebarCollapsed && (
+            <button
+              onClick={toggleSidebar}
+              className="hidden lg:flex rounded-lg p-2 hover:bg-gray-100 transition-colors"
+              title="Collapse sidebar"
+            >
+              <ChevronLeft className="w-4 h-4 text-caldera-text-secondary" />
+            </button>
+          )}
 
           {/* Mobile close button */}
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="lg:hidden rounded-lg p-2 hover:bg-white/5 transition-colors"
+            className="lg:hidden rounded-lg p-2 hover:bg-gray-100 transition-colors"
           >
-            <X className="w-5 h-5 text-aegis-text-secondary" />
+            <X className="w-5 h-5 text-caldera-text-secondary" />
           </button>
         </div>
 
+        {/* Expand button when collapsed - outside header */}
+        {sidebarCollapsed && !mobileMenuOpen && (
+          <button
+            onClick={toggleSidebar}
+            className="hidden lg:flex absolute -right-3 top-5 rounded-full p-1.5 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors z-10"
+            title="Expand sidebar"
+          >
+            <ChevronRight className="w-3 h-3 text-caldera-text-secondary" />
+          </button>
+        )}
+
         {/* Navigation */}
-        <nav className="p-3 sm:p-4 space-y-1.5 sm:space-y-2">
+        <nav className={cn(
+          "space-y-1",
+          sidebarCollapsed && !mobileMenuOpen ? "p-2" : "p-3"
+        )}>
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -83,10 +106,13 @@ export function Sidebar() {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 sm:py-2 rounded-lg transition-all duration-200',
+                  'flex items-center rounded-xl transition-all duration-200',
+                  sidebarCollapsed && !mobileMenuOpen 
+                    ? 'justify-center p-2.5' 
+                    : 'gap-3 px-3 py-2.5',
                   isActive
-                    ? 'bg-aegis-blue/20 text-aegis-blue border border-aegis-blue/30'
-                    : 'text-aegis-text-secondary hover:bg-white/5 hover:text-aegis-text-primary'
+                    ? 'bg-caldera-orange text-white font-semibold shadow-md shadow-caldera-orange/20'
+                    : 'text-caldera-text-secondary hover:bg-gray-100 hover:text-caldera-text-primary'
                 )}
                 title={sidebarCollapsed && !mobileMenuOpen ? item.name : undefined}
               >
@@ -99,12 +125,14 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Mobile footer */}
-        <div className="lg:hidden absolute bottom-0 left-0 right-0 p-4 border-t border-white/5">
-          <p className="text-xs text-aegis-text-tertiary text-center">
-            © 2024 Aegis Vaults
-          </p>
-        </div>
+        {/* Footer */}
+        {(!sidebarCollapsed || mobileMenuOpen) && (
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
+            <p className="text-xs text-caldera-text-muted text-center">
+              © 2024 Aegis Vaults
+            </p>
+          </div>
+        )}
       </aside>
     </>
   );

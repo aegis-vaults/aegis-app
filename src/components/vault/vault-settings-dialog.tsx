@@ -454,28 +454,28 @@ export function VaultSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-aegis-bg-secondary border-aegis-border">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-aegis-text-primary">Vault Settings</DialogTitle>
-          <DialogDescription className="text-aegis-text-secondary">
+          <DialogTitle>Vault Settings</DialogTitle>
+          <DialogDescription>
             Manage your vault configuration and policies.
           </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-aegis-bg-tertiary">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="policy">Policy</TabsTrigger>
-            <TabsTrigger value="whitelist">Whitelist</TabsTrigger>
-            <TabsTrigger value="agent">Agent</TabsTrigger>
-            <TabsTrigger value="team">Team</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100 rounded-xl p-1">
+            <TabsTrigger value="general" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">General</TabsTrigger>
+            <TabsTrigger value="policy" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Policy</TabsTrigger>
+            <TabsTrigger value="whitelist" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Whitelist</TabsTrigger>
+            <TabsTrigger value="agent" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Agent</TabsTrigger>
+            <TabsTrigger value="team" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Team</TabsTrigger>
           </TabsList>
 
           {/* General Tab */}
           <TabsContent value="general" className="space-y-4 mt-4">
             {/* Vault Name */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-aegis-text-secondary">
+              <Label htmlFor="name" className="text-caldera-text-secondary">
                 Vault Name
               </Label>
               <div className="flex gap-2">
@@ -484,12 +484,11 @@ export function VaultSettingsDialog({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="My AI Agent Vault"
-                  className="bg-aegis-bg-tertiary border-aegis-border text-aegis-text-primary"
                 />
                 <Button
                   onClick={handleSaveName}
                   disabled={loading || name === vault.name}
-                  className="bg-aegis-blue hover:bg-aegis-blue/90"
+                  className="bg-caldera-orange hover:bg-caldera-orange-secondary rounded-xl"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 </Button>
@@ -497,20 +496,20 @@ export function VaultSettingsDialog({
             </div>
 
             {/* Vault Details */}
-            <div className="space-y-3 p-4 rounded-lg bg-aegis-bg-tertiary">
-              <h4 className="text-sm font-medium text-aegis-text-primary">Vault Details</h4>
+            <div className="space-y-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+              <h4 className="text-sm font-semibold text-caldera-black">Vault Details</h4>
 
               {/* Public Key */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-aegis-text-secondary">Address</span>
+                <span className="text-sm text-caldera-text-secondary">Address</span>
                 <div className="flex items-center gap-2">
-                  <code className="text-xs text-aegis-text-primary font-mono">
+                  <code className="text-xs text-caldera-black font-mono">
                     {formatAddress(vault.publicKey)}
                   </code>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6"
+                    className="h-6 w-6 rounded-lg"
                     onClick={() => handleCopy(vault.publicKey, 'Address')}
                   >
                     <Copy className="h-3 w-3" />
@@ -519,7 +518,7 @@ export function VaultSettingsDialog({
                     href={explorerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-aegis-blue hover:text-aegis-blue/80"
+                    className="text-caldera-orange hover:text-caldera-orange-secondary"
                   >
                     <ExternalLink className="h-3 w-3" />
                   </a>
@@ -529,8 +528,8 @@ export function VaultSettingsDialog({
               {/* Balance */}
               {balance !== undefined && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-aegis-text-secondary">Balance</span>
-                  <span className="text-sm font-medium text-aegis-emerald">
+                  <span className="text-sm text-caldera-text-secondary">Balance</span>
+                  <span className="text-sm font-medium text-caldera-success">
                     {balance.toFixed(4)} SOL
                   </span>
                 </div>
@@ -538,15 +537,15 @@ export function VaultSettingsDialog({
 
               {/* Owner */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-aegis-text-secondary">Owner</span>
+                <span className="text-sm text-caldera-text-secondary">Owner</span>
                 <div className="flex items-center gap-2">
-                  <code className="text-xs text-aegis-text-primary font-mono">
+                  <code className="text-xs text-caldera-black font-mono">
                     {formatAddress(vault.owner)}
                   </code>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6"
+                    className="h-6 w-6 rounded-lg"
                     onClick={() => handleCopy(vault.owner, 'Owner')}
                   >
                     <Copy className="h-3 w-3" />
@@ -556,19 +555,19 @@ export function VaultSettingsDialog({
 
               {/* Vault Nonce */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-aegis-text-secondary">Vault Nonce</span>
-                <span className="text-xs font-mono text-aegis-text-tertiary">
+                <span className="text-sm text-caldera-text-secondary">Vault Nonce</span>
+                <span className="text-xs font-mono text-caldera-text-muted">
                   {vault.vaultNonce || '0'}
                 </span>
               </div>
             </div>
 
             {/* Sync from Blockchain */}
-            <div className="p-4 rounded-lg bg-aegis-blue/10 border border-aegis-blue/30">
+            <div className="p-4 rounded-xl bg-caldera-info/5 border border-caldera-info/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-aegis-blue">Sync from Blockchain</h4>
-                  <p className="text-xs text-aegis-text-tertiary mt-1">
+                  <h4 className="text-sm font-semibold text-caldera-info">Sync from Blockchain</h4>
+                  <p className="text-xs text-caldera-text-muted mt-1">
                     Update vault data from on-chain state (fixes nonce mismatch errors)
                   </p>
                 </div>
@@ -576,7 +575,7 @@ export function VaultSettingsDialog({
                   onClick={handleSyncVault}
                   disabled={syncing}
                   variant="outline"
-                  className="border-aegis-blue text-aegis-blue hover:bg-aegis-blue/20"
+                  className="border-caldera-info text-caldera-info hover:bg-caldera-info/10 rounded-xl"
                 >
                   {syncing ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -593,7 +592,7 @@ export function VaultSettingsDialog({
           <TabsContent value="policy" className="space-y-4 mt-4">
             {/* Daily Limit */}
             <div className="space-y-2">
-              <Label htmlFor="dailyLimit" className="text-aegis-text-secondary">
+              <Label htmlFor="dailyLimit" className="text-caldera-text-secondary">
                 Daily Spending Limit (SOL)
               </Label>
               <div className="flex gap-2">
@@ -604,7 +603,6 @@ export function VaultSettingsDialog({
                   value={dailyLimit}
                   onChange={(e) => setDailyLimit(e.target.value)}
                   placeholder="0.00"
-                  className="bg-aegis-bg-tertiary border-aegis-border text-aegis-text-primary"
                 />
                 <Button
                   onClick={handleUpdateDailyLimit}
@@ -612,29 +610,29 @@ export function VaultSettingsDialog({
                     loading ||
                     dailyLimit === (Number(vault.dailyLimit) / LAMPORTS_PER_SOL).toString()
                   }
-                  className="bg-aegis-blue hover:bg-aegis-blue/90"
+                  className="bg-caldera-orange hover:bg-caldera-orange-secondary rounded-xl"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 </Button>
               </div>
-              <p className="text-xs text-aegis-text-secondary">
+              <p className="text-xs text-caldera-text-muted">
                 Current: {formatSol(vault.dailyLimit)} SOL | Spent today: {formatSol(vault.dailySpent)}{' '}
                 SOL
               </p>
             </div>
 
             {/* Pause/Resume Toggle */}
-            <div className="flex items-center justify-between p-4 rounded-lg bg-aegis-bg-tertiary">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
               <div className="space-y-0.5">
-                <Label className="text-sm font-medium text-aegis-text-primary">Vault Status</Label>
-                <p className="text-xs text-aegis-text-secondary">
+                <Label className="text-sm font-semibold text-caldera-black">Vault Status</Label>
+                <p className="text-xs text-caldera-text-muted">
                   {isPaused ? 'Vault is paused. All transactions are blocked.' : 'Vault is active.'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <span
                   className={`text-sm font-medium ${
-                    isPaused ? 'text-aegis-crimson' : 'text-aegis-emerald'
+                    isPaused ? 'text-red-500' : 'text-caldera-success'
                   }`}
                 >
                   {isPaused ? 'Paused' : 'Active'}
@@ -652,7 +650,7 @@ export function VaultSettingsDialog({
           <TabsContent value="whitelist" className="space-y-4 mt-4">
             {/* Add Address */}
             <div className="space-y-2">
-              <Label htmlFor="whitelistAddress" className="text-aegis-text-secondary">
+              <Label htmlFor="whitelistAddress" className="text-caldera-text-secondary">
                 Add Address to Whitelist
               </Label>
               <div className="flex gap-2">
@@ -661,28 +659,27 @@ export function VaultSettingsDialog({
                   value={whitelistAddress}
                   onChange={(e) => setWhitelistAddress(e.target.value)}
                   placeholder="Enter Solana address"
-                  className="bg-aegis-bg-tertiary border-aegis-border text-aegis-text-primary"
                 />
                 <Button
                   onClick={handleAddToWhitelist}
                   disabled={loading || !whitelistAddress.trim()}
-                  className="bg-aegis-blue hover:bg-aegis-blue/90"
+                  className="bg-caldera-orange hover:bg-caldera-orange-secondary rounded-xl"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 </Button>
               </div>
-              <p className="text-xs text-aegis-text-secondary">
+              <p className="text-xs text-caldera-text-muted">
                 Maximum 20 addresses. Only whitelisted addresses can receive transactions.
               </p>
             </div>
 
             {/* Whitelist */}
             <div className="space-y-2">
-              <Label className="text-aegis-text-secondary">
+              <Label className="text-caldera-text-secondary">
                 Whitelisted Addresses ({whitelist.length}/20)
               </Label>
               {whitelist.length === 0 ? (
-                <div className="text-sm text-aegis-text-secondary p-4 rounded-lg bg-aegis-bg-tertiary text-center">
+                <div className="text-sm text-caldera-text-secondary p-4 rounded-xl bg-gray-50 border border-gray-100 text-center">
                   No addresses in whitelist
                 </div>
               ) : (
@@ -690,16 +687,16 @@ export function VaultSettingsDialog({
                   {whitelist.map((address) => (
                     <div
                       key={address}
-                      className="flex items-center justify-between p-3 rounded-lg bg-aegis-bg-tertiary"
+                      className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100"
                     >
-                      <code className="text-xs text-aegis-text-primary font-mono">
+                      <code className="text-xs text-caldera-black font-mono">
                         {formatAddress(address)}
                       </code>
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6"
+                          className="h-6 w-6 rounded-lg"
                           onClick={() => handleCopy(address, 'Address')}
                         >
                           <Copy className="h-3 w-3" />
@@ -707,7 +704,7 @@ export function VaultSettingsDialog({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 text-aegis-crimson hover:text-aegis-crimson/80"
+                          className="h-6 w-6 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-50"
                           onClick={() => handleRemoveFromWhitelist(address)}
                           disabled={loading}
                         >
@@ -725,31 +722,31 @@ export function VaultSettingsDialog({
           <TabsContent value="agent" className="space-y-4 mt-4">
             {/* Current Agent Signer */}
             <div className="space-y-2">
-              <Label className="text-aegis-text-secondary">Current Agent Signer</Label>
-              <div className="p-3 rounded-lg bg-aegis-bg-tertiary">
+              <Label className="text-caldera-text-secondary">Current Agent Signer</Label>
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
                 {vault.agentSigner ? (
                   <div className="flex items-center justify-between">
-                    <code className="text-xs text-aegis-text-primary font-mono">
+                    <code className="text-xs text-caldera-black font-mono">
                       {formatAddress(vault.agentSigner)}
                     </code>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6"
+                      className="h-6 w-6 rounded-lg"
                       onClick={() => handleCopy(vault.agentSigner!, 'Agent Signer')}
                     >
                       <Copy className="h-3 w-3" />
                     </Button>
                   </div>
                 ) : (
-                  <p className="text-sm text-aegis-text-secondary">No agent signer configured</p>
+                  <p className="text-sm text-caldera-text-muted">No agent signer configured</p>
                 )}
               </div>
             </div>
 
             {/* Update Agent Signer */}
             <div className="space-y-2">
-              <Label htmlFor="newAgentSigner" className="text-aegis-text-secondary">
+              <Label htmlFor="newAgentSigner" className="text-caldera-text-secondary">
                 Update Agent Signer
               </Label>
               <div className="flex gap-2">
@@ -758,17 +755,16 @@ export function VaultSettingsDialog({
                   value={newAgentSigner}
                   onChange={(e) => setNewAgentSigner(e.target.value)}
                   placeholder="Enter new agent signer address"
-                  className="bg-aegis-bg-tertiary border-aegis-border text-aegis-text-primary"
                 />
                 <Button
                   onClick={handleUpdateAgentSigner}
                   disabled={loading || !newAgentSigner.trim()}
-                  className="bg-aegis-blue hover:bg-aegis-blue/90"
+                  className="bg-caldera-orange hover:bg-caldera-orange-secondary rounded-xl"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 </Button>
               </div>
-              <p className="text-xs text-aegis-text-secondary">
+              <p className="text-xs text-caldera-text-muted">
                 The agent signer is the AI&apos;s key that can propose transactions. Change this to rotate the
                 agent&apos;s credentials.
               </p>
@@ -779,18 +775,18 @@ export function VaultSettingsDialog({
           <TabsContent value="team" className="space-y-4 mt-4">
             {/* Add Team Member */}
             <div className="space-y-2">
-              <Label className="text-aegis-text-secondary">Add Team Member</Label>
+              <Label className="text-caldera-text-secondary">Add Team Member</Label>
               <div className="flex gap-2">
                 <Input
                   value={newMemberAddress}
                   onChange={(e) => setNewMemberAddress(e.target.value)}
                   placeholder="Enter wallet address"
-                  className="flex-1 bg-aegis-bg-tertiary border-aegis-border text-aegis-text-primary"
+                  className="flex-1"
                 />
                 <select
                   value={newMemberRole}
                   onChange={(e) => setNewMemberRole(e.target.value as any)}
-                  className="px-3 py-2 rounded-md bg-aegis-bg-tertiary border border-aegis-border text-aegis-text-primary"
+                  className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-caldera-black text-sm focus:outline-none focus:ring-2 focus:ring-caldera-orange focus:ring-offset-2"
                 >
                   <option value="MEMBER">Member</option>
                   <option value="ADMIN">Admin</option>
@@ -800,27 +796,27 @@ export function VaultSettingsDialog({
                 <Button
                   onClick={handleAddTeamMember}
                   disabled={loadingTeam || !newMemberAddress.trim()}
-                  className="bg-aegis-blue hover:bg-aegis-blue/90"
+                  className="bg-caldera-orange hover:bg-caldera-orange-secondary rounded-xl"
                 >
                   {loadingTeam ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 </Button>
               </div>
-              <p className="text-xs text-aegis-text-secondary">
+              <p className="text-xs text-caldera-text-muted">
                 Team members can view vault activity. Admins can modify settings.
               </p>
             </div>
 
             {/* Team Members List */}
             <div className="space-y-2">
-              <Label className="text-aegis-text-secondary">
+              <Label className="text-caldera-text-secondary">
                 Team Members ({teamMembers.length})
               </Label>
               {loadingTeam && teamMembers.length === 0 ? (
-                <div className="text-sm text-aegis-text-secondary p-4 rounded-lg bg-aegis-bg-tertiary text-center">
+                <div className="text-sm text-caldera-text-muted p-4 rounded-xl bg-gray-50 border border-gray-100 text-center">
                   <Loader2 className="w-4 h-4 animate-spin mx-auto" />
                 </div>
               ) : teamMembers.length === 0 ? (
-                <div className="text-sm text-aegis-text-secondary p-4 rounded-lg bg-aegis-bg-tertiary text-center">
+                <div className="text-sm text-caldera-text-muted p-4 rounded-xl bg-gray-50 border border-gray-100 text-center">
                   No team members yet
                 </div>
               ) : (
@@ -828,24 +824,24 @@ export function VaultSettingsDialog({
                   {teamMembers.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-aegis-bg-tertiary"
+                      className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <code className="text-xs text-aegis-text-primary font-mono">
+                          <code className="text-xs text-caldera-black font-mono">
                             {formatAddress(member.user.walletAddress)}
                           </code>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-5 w-5"
+                            className="h-5 w-5 rounded-md"
                             onClick={() => handleCopy(member.user.walletAddress, 'Wallet Address')}
                           >
                             <Copy className="h-3 w-3" />
                           </Button>
                         </div>
                         {member.user.email && (
-                          <p className="text-xs text-aegis-text-secondary mt-1">{member.user.email}</p>
+                          <p className="text-xs text-caldera-text-muted mt-1">{member.user.email}</p>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
@@ -853,7 +849,7 @@ export function VaultSettingsDialog({
                           value={member.role}
                           onChange={(e) => handleUpdateMemberRole(member.id, e.target.value)}
                           disabled={loadingTeam}
-                          className="px-2 py-1 text-sm rounded-md bg-aegis-bg-secondary border border-aegis-border text-aegis-text-primary"
+                          className="px-2 py-1 text-sm rounded-lg bg-white border border-gray-200 text-caldera-black focus:outline-none focus:ring-2 focus:ring-caldera-orange"
                         >
                           <option value="MEMBER">Member</option>
                           <option value="ADMIN">Admin</option>
@@ -863,7 +859,7 @@ export function VaultSettingsDialog({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 text-aegis-crimson hover:text-aegis-crimson/80"
+                          className="h-6 w-6 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-50"
                           onClick={() => handleRemoveTeamMember(member.id)}
                           disabled={loadingTeam}
                         >
@@ -877,13 +873,13 @@ export function VaultSettingsDialog({
             </div>
 
             {/* Role Descriptions */}
-            <div className="p-3 rounded-lg bg-aegis-bg-tertiary">
-              <h4 className="text-sm font-medium text-aegis-text-primary mb-2">Role Permissions</h4>
-              <div className="space-y-1 text-xs text-aegis-text-secondary">
-                <p><strong>Owner:</strong> Full control over vault and team</p>
-                <p><strong>Admin:</strong> Can modify policies and manage team members</p>
-                <p><strong>Member:</strong> Can view vault activity and approve overrides</p>
-                <p><strong>Viewer:</strong> Read-only access to vault information</p>
+            <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
+              <h4 className="text-sm font-semibold text-caldera-black mb-2">Role Permissions</h4>
+              <div className="space-y-1 text-xs text-caldera-text-muted">
+                <p><strong className="text-caldera-black">Owner:</strong> Full control over vault and team</p>
+                <p><strong className="text-caldera-black">Admin:</strong> Can modify policies and manage team members</p>
+                <p><strong className="text-caldera-black">Member:</strong> Can view vault activity and approve overrides</p>
+                <p><strong className="text-caldera-black">Viewer:</strong> Read-only access to vault information</p>
               </div>
             </div>
           </TabsContent>

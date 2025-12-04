@@ -1,6 +1,5 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -20,86 +19,101 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold text-aegis-text-primary">Settings</h1>
-        <p className="text-aegis-text-secondary mt-1">Manage your account and preferences</p>
+        <h1 className="text-3xl font-display font-black text-caldera-black">Settings</h1>
+        <p className="text-caldera-text-secondary mt-1">Manage your account and preferences</p>
       </div>
 
       {/* Account Settings */}
-      <Card className="glass-card">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-aegis-blue" />
-            <CardTitle>Account</CardTitle>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-caldera-info/10 flex items-center justify-center">
+              <Wallet className="w-5 h-5 text-caldera-info" />
+            </div>
+            <div>
+              <h2 className="text-lg font-display font-bold text-caldera-black">Account</h2>
+              <p className="text-sm text-caldera-text-muted">Your wallet and account information</p>
+            </div>
           </div>
-          <CardDescription>Your wallet and account information</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </div>
+        <div className="p-6">
           <div>
-            <label className="text-sm font-medium text-aegis-text-secondary">Wallet Address</label>
-            <div className="mt-1 flex items-center gap-2">
-              <code className="flex-1 px-3 py-2 bg-aegis-bg-tertiary rounded-lg text-sm font-mono">
+            <label className="text-sm font-medium text-caldera-text-secondary">Wallet Address</label>
+            <div className="mt-2 flex items-center gap-3">
+              <code className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-sm font-mono text-caldera-black">
                 {connected && publicKey ? formatAddress(publicKey.toString(), 8) : 'Not connected'}
               </code>
-              <Badge variant={connected ? 'default' : 'outline'}>
+              <Badge 
+                className={connected 
+                  ? 'bg-caldera-success/10 text-caldera-success border-caldera-success/20' 
+                  : 'bg-gray-100 text-caldera-text-muted border-gray-200'
+                }
+              >
                 {connected ? 'Connected' : 'Disconnected'}
               </Badge>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Notification Settings */}
-      <Card className="glass-card">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-aegis-purple" />
-            <CardTitle>Notifications</CardTitle>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
+              <Bell className="w-5 h-5 text-caldera-purple" />
+            </div>
+            <div>
+              <h2 className="text-lg font-display font-bold text-caldera-black">Notifications</h2>
+              <p className="text-sm text-caldera-text-muted">
+                Configure how and when you receive notifications about your vaults
+              </p>
+            </div>
           </div>
-          <CardDescription>
-            Configure how and when you receive notifications about your vaults
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="p-6">
           {!connected ? (
-            <div className="text-center py-8 text-aegis-text-tertiary">
-              <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>Connect your wallet to manage notification settings</p>
+            <div className="text-center py-12">
+              <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <Wallet className="w-8 h-8 text-caldera-text-muted" />
+              </div>
+              <p className="text-caldera-text-secondary">Connect your wallet to manage notification settings</p>
             </div>
           ) : profileLoading ? (
-            <div className="text-center py-8">
-              <Loader2 className="w-8 h-8 mx-auto animate-spin text-aegis-blue" />
-              <p className="text-sm text-aegis-text-tertiary mt-2">Loading settings...</p>
+            <div className="text-center py-12">
+              <Loader2 className="w-10 h-10 mx-auto animate-spin text-caldera-orange" />
+              <p className="text-sm text-caldera-text-muted mt-3">Loading settings...</p>
             </div>
           ) : (
             <div className="space-y-6">
               {/* Notification Channels */}
               <div>
-                <h3 className="font-semibold text-aegis-text-primary mb-4">
+                <h3 className="font-semibold text-caldera-black mb-4">
                   Notification Channels
                 </h3>
                 <div className="space-y-6">
                   <EmailSetup user={profile} onUpdate={refresh} />
-                  <div className="border-t border-aegis-border" />
+                  <div className="border-t border-gray-100" />
                   <TelegramSetup user={profile} onUpdate={refresh} />
-                  <div className="border-t border-aegis-border" />
+                  <div className="border-t border-gray-100" />
                   <DiscordSetup user={profile} onUpdate={refresh} />
                 </div>
               </div>
 
               {/* Notification Preferences */}
-              <div className="border-t border-aegis-border pt-6">
-                <h3 className="font-semibold text-aegis-text-primary mb-4">
+              <div className="border-t border-gray-100 pt-6">
+                <h3 className="font-semibold text-caldera-black mb-4">
                   Notification Preferences
                 </h3>
-                <p className="text-sm text-aegis-text-tertiary mb-4">
+                <p className="text-sm text-caldera-text-muted mb-4">
                   Choose which events trigger notifications across all your channels
                 </p>
                 <NotificationPreferences user={profile} onUpdate={refresh} />
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* API Keys */}
       {connected && publicKey && (
@@ -107,44 +121,55 @@ export default function SettingsPage() {
       )}
 
       {/* Security Settings */}
-      <Card className="glass-card">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-aegis-emerald" />
-            <CardTitle>Security</CardTitle>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-caldera-success/10 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-caldera-success" />
+            </div>
+            <div>
+              <h2 className="text-lg font-display font-bold text-caldera-black">Security</h2>
+              <p className="text-sm text-caldera-text-muted">Security and privacy settings</p>
+            </div>
           </div>
-          <CardDescription>Security and privacy settings</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </div>
+        <div className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-aegis-text-primary">Two-Factor Authentication</div>
-              <div className="text-sm text-aegis-text-tertiary">Add an extra layer of security</div>
+              <p className="font-medium text-caldera-black">Two-Factor Authentication</p>
+              <p className="text-sm text-caldera-text-muted mt-0.5">Add an extra layer of security</p>
             </div>
-            <Button variant="outline" size="sm">Setup</Button>
+            <Button variant="outline" size="sm" className="rounded-xl border-gray-200 hover:bg-gray-100">
+              Setup
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Appearance */}
-      <Card className="glass-card">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Palette className="w-5 h-5 text-aegis-amber" />
-            <CardTitle>Appearance</CardTitle>
-          </div>
-          <CardDescription>Customize how Aegis looks</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <label className="text-sm font-medium text-aegis-text-secondary">Theme</label>
-            <div className="mt-2">
-              <Badge>Dark (Default)</Badge>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-caldera-orange/10 flex items-center justify-center">
+              <Palette className="w-5 h-5 text-caldera-orange" />
+            </div>
+            <div>
+              <h2 className="text-lg font-display font-bold text-caldera-black">Appearance</h2>
+              <p className="text-sm text-caldera-text-muted">Customize how Aegis looks</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="p-6">
+          <div>
+            <label className="text-sm font-medium text-caldera-text-secondary">Theme</label>
+            <div className="mt-2">
+              <Badge className="bg-caldera-orange/10 text-caldera-orange border-caldera-orange/20">
+                Light (Default)
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-

@@ -86,7 +86,6 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
     setLoading(true);
 
     try {
-      // Generate agent signer if not provided
       let agentSignerPubkey: PublicKey;
       if (formData.agentSigner.trim()) {
         try {
@@ -97,7 +96,6 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
           return;
         }
       } else {
-        // Use the generated keypair
         if (!generatedKeypair) {
           toast.error('Please generate or provide an agent signer public key');
           setLoading(false);
@@ -108,7 +106,6 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
       const connection = getConnection();
 
-      // Build transaction (nonce is auto-generated for unique vault PDAs)
       const { transaction, vault, vaultAuthority, nonce } = await instructions.initializeVault(
         wallet.adapter as any,
         agentSignerPubkey,
@@ -118,48 +115,31 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
 
       console.log('Creating vault with nonce:', nonce?.toString());
 
-      // Get fresh blockhash
       const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
       
-      // Add priority fees to ensure transaction lands quickly
       const priorityFeeIx = ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: 50000, // 0.00005 SOL per compute unit - helps transaction land faster
+        microLamports: 50000,
       });
       const computeLimitIx = ComputeBudgetProgram.setComputeUnitLimit({
         units: 200000,
       });
       
-      // Prepend priority fee instructions
       transaction.instructions = [priorityFeeIx, computeLimitIx, ...transaction.instructions];
-      
-      // Set blockhash on transaction
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
-      console.log('Sending transaction to:', connection.rpcEndpoint);
-      console.log('Vault PDA:', vault.toBase58());
-      console.log('Fee payer:', publicKey.toBase58());
-      console.log('Using blockhash:', blockhash);
-      console.log('Last valid block height:', lastValidBlockHeight);
-
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: false,
-        preflightCommitment: 'processed', // Use 'processed' for faster initial response
+        preflightCommitment: 'processed',
         maxRetries: 3,
       });
 
-      console.log('Signature received:', signature);
       toast.loading('Confirming transaction...', { id: signature });
 
-      // Wait for confirmation using the blockhash from before we sent
       let confirmed = false;
       try {
         const confirmation = await connection.confirmTransaction(
-          {
-            signature,
-            blockhash,
-            lastValidBlockHeight,
-          },
+          { signature, blockhash, lastValidBlockHeight },
           'confirmed'
         );
 
@@ -167,10 +147,7 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
           throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
         }
         confirmed = true;
-        console.log('Transaction confirmed!');
       } catch (confirmError: any) {
-        console.error('Confirmation error:', confirmError);
-        // If confirmation times out or block height exceeded, provide helpful info
         if (
           confirmError.message?.includes('timeout') ||
           confirmError.message?.includes('not confirmed') ||
@@ -180,92 +157,58 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
             `Transaction sent but confirmation unclear. Check signature: ${signature.slice(0, 8)}...`,
             { id: signature, duration: 10000 }
           );
-          console.log('Check transaction:', `https://explorer.solana.com/tx/${signature}?cluster=devnet`);
         } else {
           throw confirmError;
         }
       }
 
-      // CRITICAL: Verify the vault account actually exists on-chain
-      console.log('Verifying vault account on-chain...');
       let vaultExists = false;
       for (let i = 0; i < 5; i++) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const vaultInfo = await connection.getAccountInfo(vault);
         if (vaultInfo) {
           vaultExists = true;
-          console.log('✅ Vault account verified on-chain, size:', vaultInfo.data.length);
           break;
         }
-        console.log(`Vault verification attempt ${i + 1} - not found yet...`);
       }
 
       if (!vaultExists) {
-        // Transaction didn't actually land on chain
-        toast.error(
-          'Transaction did not land on-chain. This may be an RPC issue. Please try again.',
-          { id: signature, duration: 10000 }
-        );
+        toast.error('Transaction did not land on-chain. Please try again.', { id: signature, duration: 10000 });
         throw new Error('Vault account not created on-chain despite signature');
       }
 
       toast.success(TOAST_MESSAGES.VAULT_CREATED, { id: signature });
-
-      // Log vault details
-      console.log('Vault created:', {
-        vault: vault.toBase58(),
-        vaultAuthority: vaultAuthority.toBase58(),
-        signature,
-      });
-
-      // Link vault to user account
-      // Wait a bit for the event listener to process the vault creation
       toast.loading('Linking vault to your account...', { id: 'link-vault' });
 
-      let linkAttempts = 0;
-      const maxLinkAttempts = 5;
-      const linkRetryDelay = 2000; // 2 seconds
-
-      // Ensure API client has the latest wallet address before linking
       apiClient.setUserId(publicKey.toString());
 
       let linked = false;
-      while (linkAttempts < maxLinkAttempts && !linked) {
+      let linkAttempts = 0;
+      while (linkAttempts < 5 && !linked) {
         try {
-          await new Promise((resolve) => setTimeout(resolve, linkRetryDelay));
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           await api.vaults.link(vault.toBase58(), formData.name);
           toast.success('Vault linked successfully', { id: 'link-vault' });
           linked = true;
         } catch (error: any) {
           linkAttempts++;
-          console.log(`Link attempt ${linkAttempts} failed:`, error.message);
-          // Continue retrying
         }
       }
 
-      // If linking failed, try syncing directly from blockchain
       if (!linked) {
-        toast.loading('Syncing vault from blockchain...', { id: 'link-vault' });
         try {
           await api.vaults.sync(vault.toBase58());
           toast.success('Vault synced and linked successfully', { id: 'link-vault' });
-          linked = true;
         } catch (syncError: any) {
-          console.error('Failed to sync vault:', syncError);
-          toast.warning(
-            'Vault created but linking failed. Try refreshing the page or manually syncing later.',
-            { id: 'link-vault', duration: 5000 }
-          );
+          toast.warning('Vault created but linking failed. Try refreshing.', { id: 'link-vault', duration: 5000 });
         }
       }
 
-      // Reset form and close dialog
       setFormData({ name: '', dailyLimit: '', agentSigner: '' });
       setGeneratedKeypair(null);
       setCopiedSecret(false);
       setOpen(false);
 
-      // Call success callback
       if (onSuccess) {
         onSuccess();
       }
@@ -281,7 +224,7 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="bg-aegis-blue hover:bg-aegis-blue/90">
+          <Button className="bg-caldera-orange hover:bg-caldera-orange-secondary rounded-xl shadow-md shadow-caldera-orange/20">
             <Plus className="w-4 h-4 mr-2" />
             Create Vault
           </Button>
@@ -296,10 +239,10 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 py-6">
             <div className="grid gap-2">
-              <Label htmlFor="name">
-                Vault Name <span className="text-aegis-crimson">*</span>
+              <Label htmlFor="name" className="text-caldera-black font-medium">
+                Vault Name <span className="text-caldera-orange">*</span>
               </Label>
               <Input
                 id="name"
@@ -310,14 +253,14 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
                 disabled={loading}
                 required
               />
-              <p className="text-xs text-aegis-text-tertiary">
+              <p className="text-xs text-caldera-text-muted">
                 A friendly name for your vault (max 50 characters)
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="dailyLimit">
-                Daily Spending Limit (SOL) <span className="text-aegis-crimson">*</span>
+              <Label htmlFor="dailyLimit" className="text-caldera-black font-medium">
+                Daily Spending Limit (SOL) <span className="text-caldera-orange">*</span>
               </Label>
               <Input
                 id="dailyLimit"
@@ -330,21 +273,21 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
                 disabled={loading}
                 required
               />
-              <p className="text-xs text-aegis-text-tertiary">
+              <p className="text-xs text-caldera-text-muted">
                 Maximum SOL that can be spent per day
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="agentSigner">
-                Agent Signer Public Key <span className="text-aegis-crimson">*</span>
+              <Label htmlFor="agentSigner" className="text-caldera-black font-medium">
+                Agent Signer Public Key <span className="text-caldera-orange">*</span>
               </Label>
 
               {!generatedKeypair ? (
-                <div className="space-y-2">
-                  <Alert className="border-aegis-blue/30 bg-aegis-blue/5">
-                    <AlertCircle className="w-4 h-4 text-aegis-blue" />
-                    <AlertDescription className="text-xs text-aegis-text-secondary">
+                <div className="space-y-3">
+                  <Alert className="border-caldera-info/30 bg-caldera-info/5 rounded-xl">
+                    <AlertCircle className="w-4 h-4 text-caldera-info" />
+                    <AlertDescription className="text-xs text-caldera-text-secondary">
                       Your AI agent needs a keypair to interact with this vault. You can generate one now or provide an existing public key.
                     </AlertDescription>
                   </Alert>
@@ -355,12 +298,12 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
                       variant="outline"
                       onClick={handleGenerateKeypair}
                       disabled={loading}
-                      className="flex-1"
+                      className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50"
                     >
                       <Sparkles className="w-4 h-4 mr-2" />
                       Generate Keypair
                     </Button>
-                    <span className="text-xs text-aegis-text-tertiary self-center">or</span>
+                    <span className="text-xs text-caldera-text-muted self-center px-2">or</span>
                     <Input
                       id="agentSigner"
                       placeholder="Paste existing public key"
@@ -373,24 +316,24 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="p-3 rounded-lg bg-aegis-emerald/10 border border-aegis-emerald/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="w-4 h-4 text-aegis-emerald" />
-                      <span className="text-xs font-medium text-aegis-emerald">Keypair Generated</span>
+                  <div className="p-4 rounded-xl bg-caldera-success/10 border border-caldera-success/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles className="w-4 h-4 text-caldera-success" />
+                      <span className="text-sm font-semibold text-caldera-success">Keypair Generated</span>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div>
-                        <p className="text-xs text-aegis-text-tertiary mb-1">Public Key:</p>
-                        <code className="text-xs font-mono text-aegis-text-primary block break-all">
+                        <p className="text-xs text-caldera-text-muted mb-1">Public Key:</p>
+                        <code className="text-xs font-mono text-caldera-black block break-all bg-white/60 p-2 rounded-lg">
                           {generatedKeypair.publicKey}
                         </code>
                       </div>
 
                       <div>
-                        <p className="text-xs text-aegis-text-tertiary mb-1">Secret Key (Save this securely!):</p>
+                        <p className="text-xs text-caldera-text-muted mb-1">Secret Key (Save this securely!):</p>
                         <div className="flex items-center gap-2">
-                          <code className="text-xs font-mono text-aegis-text-primary block break-all flex-1 bg-aegis-bg-primary p-2 rounded border border-aegis-border">
+                          <code className="text-xs font-mono text-caldera-black block break-all flex-1 bg-white/60 p-2 rounded-lg">
                             {generatedKeypair.secretKey.substring(0, 50)}...
                           </code>
                           <Button
@@ -398,10 +341,10 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
                             variant="outline"
                             size="sm"
                             onClick={copySecretKey}
-                            className="flex-shrink-0"
+                            className="flex-shrink-0 rounded-lg"
                           >
                             {copiedSecret ? (
-                              <Check className="w-3 h-3 text-aegis-emerald" />
+                              <Check className="w-3 h-3 text-caldera-success" />
                             ) : (
                               <Copy className="w-3 h-3" />
                             )}
@@ -411,10 +354,10 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
                     </div>
                   </div>
 
-                  <Alert className="border-aegis-crimson/30 bg-aegis-crimson/5">
-                    <AlertCircle className="w-4 h-4 text-aegis-crimson" />
-                    <AlertDescription className="text-xs text-aegis-text-secondary">
-                      <strong className="text-aegis-crimson">Important:</strong> Copy and save the secret key securely. You&apos;ll need it to configure your AI agent. This will not be shown again.
+                  <Alert className="border-red-200 bg-red-50 rounded-xl">
+                    <AlertCircle className="w-4 h-4 text-red-500" />
+                    <AlertDescription className="text-xs text-caldera-text-secondary">
+                      <strong className="text-red-600">Important:</strong> Copy and save the secret key securely. You&apos;ll need it to configure your AI agent. This will not be shown again.
                     </AlertDescription>
                   </Alert>
 
@@ -427,7 +370,7 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
                       setFormData({ ...formData, agentSigner: '' });
                     }}
                     disabled={loading}
-                    className="text-xs"
+                    className="text-xs text-caldera-text-muted hover:text-caldera-text-primary"
                   >
                     Generate Different Keypair
                   </Button>
@@ -436,18 +379,19 @@ export function CreateVaultDialog({ onSuccess, trigger }: CreateVaultDialogProps
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={loading}
+              className="rounded-xl border-gray-200"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-aegis-blue hover:bg-aegis-blue/90"
+              className="bg-caldera-orange hover:bg-caldera-orange-secondary rounded-xl"
               disabled={loading || !publicKey}
             >
               {loading ? (

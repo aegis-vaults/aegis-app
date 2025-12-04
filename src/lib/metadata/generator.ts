@@ -85,8 +85,8 @@ export function generateMetadata(options: MetadataOptions = {}): Metadata {
 
     // Additional metadata
     other: {
-      'msapplication-TileColor': '#0ea5e9',
-      'theme-color': '#0a0f1e',
+      'msapplication-TileColor': '#fc5000',
+      'theme-color': '#f7f6f2',
     },
   };
 }
@@ -162,4 +162,5 @@ export function generateOrganizationData() {
     },
   };
 }
+
 

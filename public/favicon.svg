@@ -1,18 +1,6 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" rx="12" fill="#0a0f1e"/>
-  <path d="M32 8L48 20V36C48 44.8366 40.8366 52 32 52C23.1634 52 16 44.8366 16 36V20L32 8Z" fill="url(#gradient1)"/>
-  <path d="M32 16L42 24V36C42 41.5228 37.5228 46 32 46C26.4772 46 22 41.5228 22 36V24L32 16Z" fill="url(#gradient2)"/>
-  <path d="M28 32L30 34L36 28" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <defs>
-    <linearGradient id="gradient1" x1="16" y1="8" x2="48" y2="52" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0ea5e9"/>
-      <stop offset="0.5" stop-color="#8b5cf6"/>
-      <stop offset="1" stop-color="#10b981"/>
-    </linearGradient>
-    <linearGradient id="gradient2" x1="22" y1="16" x2="42" y2="46" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0ea5e9" stop-opacity="0.8"/>
-      <stop offset="1" stop-color="#8b5cf6" stop-opacity="0.6"/>
-    </linearGradient>
-  </defs>
+  <rect width="64" height="64" rx="16" fill="#fc5000"/>
+  <path d="M32 12L46 22V34C46 42.2843 39.2843 49 31 49H32C24.268 49 18 42.732 18 35V22L32 12Z" fill="white" fill-opacity="0.25"/>
+  <path d="M32 16L44 24.5V35C44 41.6274 38.6274 47 32 47C25.3726 47 20 41.6274 20 35V24.5L32 16Z" fill="white"/>
+  <path d="M28 33L31 36L38 29" stroke="#fc5000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-

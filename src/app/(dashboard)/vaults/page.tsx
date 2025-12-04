@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useVaults } from '@/lib/hooks/use-vaults';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatSol, formatAddress } from '@/lib/utils';
@@ -23,18 +22,12 @@ export default function VaultsPage() {
   const { data, isLoading, refetch } = useVaults({ myVaults: true });
   const vaults = data?.data?.items || [];
   
-  // Track balances for each vault
   const [balances, setBalances] = useState<Record<string, number>>({});
   const [loadingBalances, setLoadingBalances] = useState(false);
-  
-  // Track which vault is being toggled (for loading state)
   const [togglingVault, setTogglingVault] = useState<string | null>(null);
-  
-  // Settings dialog state
   const [selectedVault, setSelectedVault] = useState<any>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  // Fetch vault balances
   const fetchBalances = async () => {
     if (vaults.length === 0) return;
     
@@ -44,10 +37,8 @@ export default function VaultsPage() {
     
     for (const vault of vaults) {
       try {
-        // Get the vault authority PDA which holds the actual funds
         const vaultPubkey = new PublicKey(vault.publicKey);
         const [vaultAuthority] = getVaultAuthorityPDA(vaultPubkey);
-        
         const balance = await connection.getBalance(vaultAuthority);
         newBalances[vault.publicKey] = balance / LAMPORTS_PER_SOL;
       } catch (error) {
@@ -60,7 +51,6 @@ export default function VaultsPage() {
     setLoadingBalances(false);
   };
 
-  // Fetch balances when vaults change
   useEffect(() => {
     if (vaults.length > 0) {
       fetchBalances();
@@ -87,7 +77,6 @@ export default function VaultsPage() {
       const vaultPubkey = new PublicKey(vault.publicKey);
       const vaultNonce = BigInt(vault.vaultNonce || '0');
 
-      // Build the appropriate transaction
       const { transaction } = isPaused
         ? await instructions.resumeVault(wallet as any, vaultPubkey, vaultNonce)
         : await instructions.pauseVault(wallet as any, vaultPubkey, vaultNonce);
@@ -99,7 +88,6 @@ export default function VaultsPage() {
       const signature = await connection.sendRawTransaction(signedTx.serialize());
       await connection.confirmTransaction(signature, 'confirmed');
 
-      // Update backend
       await api.vaults.update(vault.id, {
         paused: !isPaused,
       });
@@ -115,14 +103,14 @@ export default function VaultsPage() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-aegis-text-primary">Vaults</h1>
-          <p className="text-aegis-text-secondary text-sm sm:text-base mt-0.5 sm:mt-1">Manage your AI agent vaults</p>
+          <h1 className="text-3xl font-display font-black text-caldera-black">Vaults</h1>
+          <p className="text-caldera-text-secondary mt-1">Manage your AI agent vaults</p>
         </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-3">
           <Button
             variant="outline"
             size="icon"
@@ -131,7 +119,7 @@ export default function VaultsPage() {
               fetchBalances();
             }}
             disabled={loadingBalances}
-            className="border-aegis-border h-9 w-9"
+            className="rounded-xl border-gray-200 hover:bg-gray-100"
           >
             <RefreshCw className={`w-4 h-4 ${loadingBalances ? 'animate-spin' : ''}`} />
           </Button>
@@ -141,79 +129,86 @@ export default function VaultsPage() {
 
       {/* Vaults Grid */}
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-aegis-blue border-t-transparent"></div>
+        <div className="flex justify-center py-16">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-caldera-orange/20 border-t-caldera-orange" />
         </div>
       ) : vaults.length === 0 ? (
-        <Card className="glass-card">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <VaultIcon className="w-12 h-12 text-aegis-text-tertiary mb-4" />
-            <h3 className="text-lg font-medium text-aegis-text-primary mb-2">No vaults yet</h3>
-            <p className="text-aegis-text-secondary text-center mb-6 max-w-md">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12">
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
+              <VaultIcon className="w-10 h-10 text-caldera-text-muted" />
+            </div>
+            <h3 className="text-xl font-display font-bold text-caldera-black mb-2">No vaults yet</h3>
+            <p className="text-caldera-text-secondary max-w-md mb-6">
               Create your first vault to start managing AI agent transactions with programmable guardrails.
             </p>
             <CreateVaultDialog onSuccess={() => refetch()} />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {vaults.map((vault) => (
-            <Card key={vault.id} className="glass-card hover:border-aegis-blue/50 transition-colors">
-              <CardHeader className="p-3 sm:p-4 pb-2 sm:pb-3">
-                <div className="flex items-start justify-between gap-2">
+            <div 
+              key={vault.id} 
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:border-caldera-orange/20 transition-all"
+            >
+              <div className="p-6">
+                <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base sm:text-lg truncate">
+                    <h3 className="text-lg font-display font-bold text-caldera-black truncate">
                       {vault.name || 'Unnamed Vault'}
-                    </CardTitle>
-                    <CardDescription className="font-mono text-[10px] sm:text-xs mt-0.5 sm:mt-1">
+                    </h3>
+                    <p className="font-mono text-xs text-caldera-text-muted mt-1">
                       {formatAddress(vault.publicKey)}
-                    </CardDescription>
+                    </p>
                     {vault.agentSigner && (
-                      <CardDescription className="font-mono text-[10px] sm:text-xs mt-0.5 sm:mt-1 text-aegis-blue">
+                      <p className="font-mono text-xs text-caldera-purple mt-1">
                         Agent: {formatAddress(vault.agentSigner)}
-                      </CardDescription>
+                      </p>
                     )}
                   </div>
-                  <Badge variant={vault.isActive ? 'default' : 'outline'} className="text-[10px] sm:text-xs px-1.5 sm:px-2 shrink-0">
+                  <Badge 
+                    className={vault.isActive 
+                      ? 'bg-caldera-success/10 text-caldera-success border-caldera-success/20' 
+                      : 'bg-gray-100 text-caldera-text-muted border-gray-200'
+                    }
+                  >
                     {vault.isActive ? 'Active' : 'Paused'}
                   </Badge>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 pt-0 sm:pt-0">
+
                 {/* Balance */}
-                <div className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-aegis-emerald shrink-0" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-caldera-success/10 flex items-center justify-center">
+                    <Wallet className="w-5 h-5 text-caldera-success" />
+                  </div>
                   <div>
-                    <div className="text-xl sm:text-2xl font-bold text-aegis-text-primary">
+                    <div className="text-2xl font-display font-black text-caldera-success">
                       {loadingBalances ? (
-                        <span className="text-aegis-text-tertiary text-base sm:text-lg">Loading...</span>
+                        <span className="text-caldera-text-muted text-lg">Loading...</span>
                       ) : (
-                        <span className="text-aegis-emerald">
-                          {(balances[vault.publicKey] || 0).toFixed(4)} SOL
-                        </span>
+                        <>{(balances[vault.publicKey] || 0).toFixed(4)} SOL</>
                       )}
                     </div>
-                    <div className="text-[10px] sm:text-xs text-aegis-text-tertiary">Vault Balance</div>
+                    <p className="text-xs text-caldera-text-muted">Vault Balance</p>
                   </div>
                 </div>
 
                 {/* Daily Limit */}
-                <div className="p-2 sm:p-3 rounded-lg bg-aegis-bg-tertiary/50">
-                  <div className="flex justify-between items-center mb-1.5 sm:mb-2">
-                    <span className="text-xs sm:text-sm text-aegis-text-secondary">Daily Limit</span>
-                    <span className="text-xs sm:text-sm font-medium text-aegis-text-primary">
+                <div className="p-4 rounded-xl bg-gray-50 mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-caldera-text-secondary">Daily Limit</span>
+                    <span className="text-sm font-medium text-caldera-black">
                       {formatSol(vault.dailyLimit)} SOL
                     </span>
                   </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="flex justify-between text-[10px] sm:text-xs text-aegis-text-tertiary mb-1">
+                  <div className="flex justify-between text-xs text-caldera-text-muted mb-2">
                     <span>Spent Today</span>
                     <span>{formatSol(vault.dailySpent)} / {formatSol(vault.dailyLimit)}</span>
                   </div>
-                  <div className="h-1.5 sm:h-2 bg-aegis-bg-primary rounded-full overflow-hidden">
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-aegis-emerald to-aegis-blue transition-all"
+                      className="h-full bg-gradient-to-r from-caldera-orange to-caldera-purple transition-all rounded-full"
                       style={{
                         width: `${Math.min((Number(vault.dailySpent) / Number(vault.dailyLimit)) * 100, 100)}%`
                       }}
@@ -221,45 +216,44 @@ export default function VaultsPage() {
                   </div>
                 </div>
 
-                {/* Quick Actions - Always visible */}
-                <div className="flex gap-1.5 sm:gap-2 pt-1 sm:pt-2">
+                {/* Actions */}
+                <div className="flex gap-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    className="flex-1 border-aegis-border text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
+                    className="flex-1 rounded-xl border-gray-200 hover:bg-gray-100 hover:border-caldera-orange/30"
                     onClick={() => window.location.href = `/vaults/${vault.id}`}
                   >
-                    <Code2 className="w-3 h-3 mr-1 shrink-0" />
-                    <span className="hidden sm:inline">View Details</span>
-                    <span className="sm:hidden">View</span>
+                    <Code2 className="w-4 h-4 mr-2" />
+                    Details
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="border-aegis-border h-8 w-8 sm:h-9 sm:w-9 p-0"
+                    className="rounded-xl border-gray-200 hover:bg-gray-100 px-3"
                     onClick={() => handleOpenSettings(vault)}
                   >
-                    <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Settings className="w-4 h-4" />
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="border-aegis-border h-8 w-8 sm:h-9 sm:w-9 p-0"
+                    className="rounded-xl border-gray-200 hover:bg-gray-100 px-3"
                     onClick={() => handlePauseToggle(vault)}
                     disabled={togglingVault === vault.id}
                     title={vault.isActive ? 'Pause vault' : 'Resume vault'}
                   >
                     {togglingVault === vault.id ? (
-                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : vault.isActive ? (
-                      <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <Pause className="w-4 h-4" />
                     ) : (
-                      <Play className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <Play className="w-4 h-4" />
                     )}
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}

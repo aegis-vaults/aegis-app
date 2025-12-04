@@ -2,40 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* Import Fonts - Bold, Distinctive Typography */
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Chakra+Petch:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
-    --background: 222 47% 11%; /* #0A0E27 */
-    --foreground: 228 100% 97%; /* #F0F4FF */
+    /* Light theme - Caldera inspired */
+    --background: 0 0% 96%; /* #f7f6f2 */
+    --foreground: 0 0% 5%; /* #151317 */
 
-    --card: 227 38% 18%; /* #1E2749 */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 0 0% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
+
+    --primary: 14 100% 49%; /* #fc5000 Orange */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 242 87% 61%; /* #524ae9 Purple */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 87%; /* #dfdedb */
+    --muted-foreground: 0 0% 31%; /* #4f4e4e */
+
+    --accent: 14 100% 49%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 86% 49%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 87%;
+    --input: 0 0% 87%;
+    --ring: 14 100% 49%;
+
+    --radius: 24px;
+
+    /* Custom font variable */
+    --font-heading: 'Orbitron', sans-serif;
+    --font-display: 'Orbitron', sans-serif;
+  }
+
+  .dark {
+    /* Keep dark theme option available for dashboard */
+    --background: 222 47% 11%;
+    --foreground: 228 100% 97%;
+    --card: 227 38% 18%;
     --card-foreground: 228 100% 97%;
-
     --popover: 227 38% 18%;
     --popover-foreground: 228 100% 97%;
-
-    --primary: 193 100% 50%; /* #00D4FF Electric Blue */
-    --primary-foreground: 222 47% 11%;
-
-    --secondary: 281 100% 57%; /* #B026FF Neon Purple */
+    --primary: 14 100% 49%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 242 87% 61%;
     --secondary-foreground: 228 100% 97%;
-
     --muted: 227 23% 26%;
     --muted-foreground: 222 19% 56%;
-
-    --accent: 167 100% 50%; /* #00FFA3 Emerald */
-    --accent-foreground: 222 47% 11%;
-
-    --destructive: 349 100% 61%; /* #FF3366 Crimson */
+    --accent: 14 100% 49%;
+    --accent-foreground: 0 0% 5%;
+    --destructive: 349 100% 61%;
     --destructive-foreground: 228 100% 97%;
-
     --border: 227 23% 26%;
     --input: 227 23% 26%;
-    --ring: 193 100% 50%;
-
-    --radius: 0.5rem;
+    --ring: 14 100% 49%;
   }
 }
 
@@ -43,42 +71,324 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-aegis-bg-primary text-aegis-text-primary font-sans;
+    @apply bg-background text-foreground font-body antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     font-variant-numeric: tabular-nums;
   }
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
+    @apply font-heading font-black tracking-tight;
   }
+
+  h1 {
+    @apply text-hero-sm md:text-hero-md lg:text-hero;
+  }
+
+  h2 {
+    @apply text-display;
+  }
+
+  h3 {
+    @apply text-headline;
+  }
+
   code, pre {
     @apply font-mono;
   }
 }
 
 @layer components {
-  /* Glassmorphic Card */
-  .glass-card {
-    @apply bg-aegis-bg-secondary/50 backdrop-blur-md border border-white/5;
+  /* ===== HALFTONE & DOT PATTERN BACKGROUNDS ===== */
+  
+  /* Grey Halftone Dot Grid - like Caldera's section backgrounds */
+  .halftone-dots {
+    background-image: radial-gradient(circle, #c4c4c4 2px, transparent 2px);
+    background-size: 16px 16px;
   }
 
-  /* Glow Effect */
+  .halftone-dots-lg {
+    background-image: radial-gradient(circle, #d1d1d1 3px, transparent 3px);
+    background-size: 24px 24px;
+  }
+
+  .halftone-dots-sm {
+    background-image: radial-gradient(circle, #c4c4c4 1.5px, transparent 1.5px);
+    background-size: 12px 12px;
+  }
+
+  /* Colorful Halftone Gradient Blob */
+  .halftone-blob {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .halftone-blob::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: 
+      radial-gradient(ellipse at 30% 40%, rgba(252, 80, 0, 0.8) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(82, 74, 233, 0.8) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(230, 50, 150, 0.6) 0%, transparent 40%);
+    filter: blur(60px);
+    z-index: 0;
+  }
+
+  .halftone-blob::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1.5px, transparent 1.5px);
+    background-size: 8px 8px;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  /* Hero Gradient Blob - Orange/Purple/Magenta */
+  .hero-blob {
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    top: -20%;
+    left: -20%;
+    background: 
+      radial-gradient(ellipse 60% 50% at 25% 35%, rgba(252, 80, 0, 0.7) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 75% 65%, rgba(82, 74, 233, 0.7) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(200, 50, 180, 0.5) 0%, transparent 50%);
+    filter: blur(80px);
+    z-index: 0;
+  }
+
+  .hero-dots-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(0,0,0,0.08) 2px, transparent 2px);
+    background-size: 12px 12px;
+    z-index: 1;
+  }
+
+  /* Card Thumbnail Halftone - for news cards */
+  .card-halftone-thumb {
+    position: relative;
+    background: #151317;
+    overflow: hidden;
+  }
+
+  .card-halftone-thumb::before {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background: 
+      radial-gradient(ellipse at 60% 50%, rgba(252, 80, 0, 0.9) 0%, transparent 50%),
+      radial-gradient(ellipse at 40% 60%, rgba(82, 74, 233, 0.9) 0%, transparent 50%);
+    filter: blur(30px);
+  }
+
+  .card-halftone-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.12) 2px, transparent 2px);
+    background-size: 6px 6px;
+  }
+
+  /* ===== SUPERELLIPSE / PILL CARDS ===== */
+  
+  .superellipse {
+    border-radius: 32px;
+  }
+
+  .superellipse-lg {
+    border-radius: 40px;
+  }
+
+  .superellipse-xl {
+    border-radius: 48px;
+  }
+
+  .pill-card {
+    @apply bg-white rounded-[32px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300;
+  }
+
+  .pill-card:hover {
+    @apply shadow-[0_8px_40px_rgba(0,0,0,0.1)] translate-y-[-2px];
+  }
+
+  .pill-card-orange {
+    @apply bg-caldera-orange rounded-[32px] shadow-[0_4px_24px_rgba(252,80,0,0.2)] transition-all duration-300;
+  }
+
+  .pill-card-orange:hover {
+    @apply shadow-[0_8px_40px_rgba(252,80,0,0.3)];
+  }
+
+  /* Connected Stat Cards */
+  .stat-cards-container {
+    @apply flex flex-wrap lg:flex-nowrap gap-0;
+  }
+
+  .stat-card-connected {
+    @apply bg-caldera-orange flex-1 min-w-[200px];
+  }
+
+  .stat-card-connected:first-child {
+    @apply rounded-l-[32px];
+  }
+
+  .stat-card-connected:last-child {
+    @apply rounded-r-[32px];
+  }
+
+  .stat-card-connected:not(:last-child) {
+    border-right: 1px solid rgba(255,255,255,0.2);
+  }
+
+  @media (max-width: 1024px) {
+    .stat-card-connected {
+      @apply rounded-[24px] !important;
+    }
+    .stat-card-connected:not(:last-child) {
+      border-right: none;
+    }
+  }
+
+  /* ===== PARTNER LOGO STRIP ===== */
+  .partner-strip {
+    @apply bg-white rounded-[32px] py-6 px-8 flex items-center justify-between gap-8 overflow-x-auto;
+  }
+
+  .partner-logo {
+    @apply h-8 opacity-60 hover:opacity-100 transition-opacity flex-shrink-0;
+  }
+
+  /* ===== NEWS CARDS HORIZONTAL SCROLL ===== */
+  .news-scroll-container {
+    @apply flex gap-6 overflow-x-auto pb-4 -mx-6 px-6;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .news-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .news-card {
+    @apply bg-white rounded-[32px] flex-shrink-0 w-[340px] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300;
+    scroll-snap-align: start;
+  }
+
+  .news-card:hover {
+    @apply shadow-[0_12px_48px_rgba(0,0,0,0.12)] translate-y-[-4px];
+  }
+
+  /* ===== COMMUNITY STATS CARDS ===== */
+  .community-card {
+    @apply bg-white rounded-[40px] p-10 shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300;
+  }
+
+  .community-card:hover {
+    @apply shadow-[0_12px_48px_rgba(0,0,0,0.1)] translate-y-[-4px];
+  }
+
+  .community-icon {
+    @apply w-16 h-16 rounded-full flex items-center justify-center mb-6;
+  }
+
+  /* ===== DASHED BORDER BUTTONS ===== */
+  .btn-dashed {
+    @apply relative px-8 py-4 bg-transparent font-semibold transition-all duration-300;
+  }
+
+  .btn-dashed::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px dashed currentColor;
+    border-radius: 9999px;
+    opacity: 0.5;
+  }
+
+  .btn-dashed:hover::before {
+    opacity: 1;
+  }
+
+  /* ===== HOLOGRAPHIC & GLASS EFFECTS ===== */
+  .glass-card {
+    background: linear-gradient(135deg, rgba(30, 39, 73, 0.6) 0%, rgba(42, 52, 86, 0.4) 100%);
+    @apply backdrop-blur-lg border border-aegis-blue/20 relative overflow-hidden;
+  }
+
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+  }
+
+  /* Enhanced Glow Effects */
   .glow-blue {
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.4), 0 0 60px rgba(0, 212, 255, 0.2);
   }
 
   .glow-purple {
-    box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+    box-shadow: 0 0 30px rgba(176, 38, 255, 0.4), 0 0 60px rgba(176, 38, 255, 0.2);
   }
 
   .glow-emerald {
-    box-shadow: 0 0 20px rgba(0, 255, 163, 0.3);
+    box-shadow: 0 0 30px rgba(0, 255, 163, 0.4), 0 0 60px rgba(0, 255, 163, 0.2);
   }
 
-  /* Gradient Text */
+  /* Holographic Gradient Text */
   .gradient-text {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #00D4FF 0%, #B026FF 100%);
+    background-image: linear-gradient(135deg, #00D4FF 0%, #B026FF 50%, #00FFA3 100%);
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  /* Data Stream Effect */
+  .data-stream {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .data-stream::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+    animation: stream-flow 2s linear infinite;
+  }
+
+  /* Scan Line Effect */
+  .scan-line {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scan-line::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.8), transparent);
+    animation: scan 2s linear infinite;
+  }
+
+  /* Terminal Flicker */
+  .terminal-flicker {
+    animation: flicker 0.15s infinite alternate;
   }
 
   /* Animated Border */
@@ -115,14 +425,15 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-aegis-blue/30 rounded-full;
+    background-color: rgba(0, 212, 255, 0.3);
+    @apply rounded-full;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-aegis-blue/50;
+    background-color: rgba(0, 212, 255, 0.5);
   }
 
-  /* Number Counter Animation */
+  /* ===== ANIMATIONS ===== */
   @keyframes counter {
     from {
       opacity: 0;
@@ -138,7 +449,6 @@
     animation: counter 0.3s ease-out;
   }
 
-  /* Pulse Animation for Live Data */
   @keyframes pulse-glow {
     0%, 100% {
       opacity: 1;
@@ -154,7 +464,6 @@
     animation: pulse-glow 2s ease-in-out infinite;
   }
 
-  /* Matrix-style cascade */
   @keyframes cascade {
     0% {
       opacity: 0;
@@ -177,6 +486,105 @@
   .cascade-number {
     animation: cascade 1s ease-out;
   }
+
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes stream-flow {
+    0% {
+      top: -100%;
+    }
+    100% {
+      top: 100%;
+    }
+  }
+
+  @keyframes scan {
+    0% {
+      top: 0%;
+    }
+    100% {
+      top: 100%;
+    }
+  }
+
+  @keyframes flicker {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.98;
+    }
+  }
+
+  @keyframes glitch {
+    0%, 100% {
+      transform: translate(0);
+    }
+    20% {
+      transform: translate(-2px, 2px);
+    }
+    40% {
+      transform: translate(-2px, -2px);
+    }
+    60% {
+      transform: translate(2px, 2px);
+    }
+    80% {
+      transform: translate(2px, -2px);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Staggered fade-in animations */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.6s ease-out forwards;
+    opacity: 0;
+  }
 }
 
 @layer utilities {
@@ -194,6 +602,264 @@
 
   /* Terminal-style monospace */
   .terminal {
-    @apply font-mono text-sm bg-black/50 p-4 rounded border border-aegis-blue/20;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    @apply font-mono text-sm p-4 rounded;
   }
+
+  /* Section backgrounds */
+  .section-dots {
+    @apply relative;
+  }
+
+  .section-dots::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #c4c4c4 2px, transparent 2px);
+    background-size: 20px 20px;
+    pointer-events: none;
+  }
+}
+
+/* ===== WALLET ADAPTER OVERRIDES ===== */
+.wallet-adapter-button {
+  background-color: #fc5000 !important;
+  border-radius: 9999px !important;
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  height: auto !important;
+  padding: 10px 20px !important;
+  font-size: 14px !important;
+  line-height: 1.25 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 14px rgba(252, 80, 0, 0.25) !important;
+}
+
+/* Hero wallet button - matches "Go to Dashboard" button */
+.hero-wallet-button,
+.hero-wallet-button.wallet-adapter-button,
+.wallet-adapter-button.hero-wallet-button {
+  height: 56px !important;
+  padding: 0 40px !important;
+  font-size: 18px !important;
+  box-shadow: 0 10px 25px -5px rgba(252, 80, 0, 0.3) !important;
+}
+
+.wallet-adapter-button:not([disabled]):hover {
+  background-color: #eb4a00 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(252, 80, 0, 0.35) !important;
+}
+
+.wallet-adapter-button-trigger {
+  background-color: #fc5000 !important;
+}
+
+.wallet-adapter-button-start-icon {
+  margin-right: 8px !important;
+}
+
+.wallet-adapter-button-start-icon img,
+.wallet-adapter-button-start-icon svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Modal wrapper - dark overlay and centering */
+.wallet-adapter-modal-wrapper {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+}
+
+/* Modal container - white background and centered */
+.wallet-adapter-modal-container {
+  background: white !important;
+  background-color: white !important;
+  border-radius: 24px !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  max-width: 420px !important;
+  width: 90% !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+
+/* Override ALL possible modal backgrounds */
+.wallet-adapter-modal,
+.wallet-adapter-modal-container,
+.wallet-adapter-modal-wrapper .wallet-adapter-modal,
+.wallet-adapter-modal-wrapper .wallet-adapter-modal-container,
+div[class*="wallet-adapter-modal"],
+[class*="WalletModal"] {
+  background: white !important;
+  background-color: white !important;
+}
+
+/* Fix for the inner wrapper that might have dark background */
+.wallet-adapter-modal > div,
+.wallet-adapter-modal-container > div,
+.wallet-adapter-modal-wrapper > div > div {
+  background: white !important;
+  background-color: white !important;
+}
+
+/* Modal title */
+.wallet-adapter-modal-title {
+  color: #151317 !important;
+  font-weight: 700 !important;
+  font-size: 20px !important;
+  padding: 24px 24px 16px !important;
+  margin: 0 !important;
+  text-align: center !important;
+  background: white !important;
+  background-color: white !important;
+}
+
+/* Wallet list wrapper */
+.wallet-adapter-modal-list-wrapper,
+.wallet-adapter-modal ul {
+  background: white !important;
+  background-color: white !important;
+}
+
+/* Wallet list container */
+.wallet-adapter-modal-list {
+  margin: 0 !important;
+  padding: 0 16px 24px !important;
+  background: white !important;
+  background-color: white !important;
+}
+
+/* Individual wallet items */
+.wallet-adapter-modal-list li {
+  background-color: #fc5000 !important;
+  border-radius: 16px !important;
+  margin-bottom: 8px !important;
+  overflow: hidden !important;
+}
+
+.wallet-adapter-modal-list li:last-child {
+  margin-bottom: 0 !important;
+}
+
+.wallet-adapter-modal-list li:hover {
+  background-color: #eb4a00 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Wallet button inside list */
+.wallet-adapter-modal-list .wallet-adapter-button {
+  width: 100% !important;
+  justify-content: flex-start !important;
+  padding: 16px 20px !important;
+  border-radius: 16px !important;
+  font-size: 16px !important;
+  box-shadow: none !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  transform: none !important;
+}
+
+/* "More options" text */
+.wallet-adapter-modal-list-more {
+  color: #fc5000 !important;
+  font-weight: 600 !important;
+  padding: 12px !important;
+  text-align: center !important;
+}
+
+/* Close button */
+.wallet-adapter-modal-button-close {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  background-color: #f7f6f2 !important;
+  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-modal-button-close:hover {
+  background-color: #dfdedb !important;
+}
+
+.wallet-adapter-modal-button-close svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: #151317 !important;
+}
+
+/* Collapse button */
+.wallet-adapter-collapse-button {
+  background-color: transparent !important;
+  color: #fc5000 !important;
+  padding: 12px !important;
+}
+
+/* Middle section for "Getting Started" */
+.wallet-adapter-modal-middle {
+  background-color: white !important;
+  padding: 16px 24px !important;
+}
+
+.wallet-adapter-modal-middle-button {
+  background-color: #fc5000 !important;
+  color: white !important;
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-modal-middle-button:hover {
+  background-color: #eb4a00 !important;
+}
+
+/* Dropdown styles */
+.wallet-adapter-dropdown {
+  background-color: white !important;
+  border-radius: 16px !important;
+  border: 1px solid #dfdedb !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+.wallet-adapter-dropdown-list {
+  background-color: white !important;
+  border-radius: 16px !important;
+  padding: 8px !important;
+}
+
+.wallet-adapter-dropdown-list-item {
+  border-radius: 12px !important;
+  color: #151317 !important;
+  padding: 10px 16px !important;
+  font-weight: 500 !important;
+}
+
+.wallet-adapter-dropdown-list-item:hover {
+  background-color: #f7f6f2 !important;
 }

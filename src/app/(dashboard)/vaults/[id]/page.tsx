@@ -2,14 +2,13 @@
 
 import { useParams } from 'next/navigation';
 import { useVault } from '@/lib/hooks/use-vaults';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VaultCredentials } from '@/components/vault/vault-credentials';
 import { VaultSettingsDialog } from '@/components/vault/vault-settings-dialog';
 import { formatSol, formatAddress } from '@/lib/utils';
-import { ArrowLeft, Wallet, TrendingUp, History, Settings, Pause, Play, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Wallet, TrendingUp, History, Settings, Pause, Play, Loader2, RefreshCw, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { LAMPORTS_PER_SOL } from '@/lib/constants';
 import { useState, useEffect } from 'react';
@@ -34,7 +33,6 @@ export default function VaultDetailPage() {
   const [togglingPause, setTogglingPause] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  // Fetch vault balance
   useEffect(() => {
     async function fetchBalance() {
       if (!vault) return;
@@ -71,7 +69,6 @@ export default function VaultDetailPage() {
       const vaultPubkey = new PublicKey(vault.publicKey);
       const vaultNonce = BigInt(vault.vaultNonce || '0');
 
-      // Build the appropriate transaction
       const { transaction } = isPaused
         ? await instructions.resumeVault(wallet as any, vaultPubkey, vaultNonce)
         : await instructions.pauseVault(wallet as any, vaultPubkey, vaultNonce);
@@ -83,7 +80,6 @@ export default function VaultDetailPage() {
       const signature = await connection.sendRawTransaction(signedTx.serialize());
       await connection.confirmTransaction(signature, 'confirmed');
 
-      // Update backend
       await api.vaults.update(vault.id, {
         paused: !isPaused,
       });
@@ -101,9 +97,12 @@ export default function VaultDetailPage() {
   if (!id) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <h2 className="text-xl sm:text-2xl font-bold text-aegis-text-primary mb-4">Invalid Vault ID</h2>
+        <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
+          <Shield className="w-10 h-10 text-caldera-text-muted" />
+        </div>
+        <h2 className="text-xl font-display font-bold text-caldera-black mb-2">Invalid Vault ID</h2>
         <Link href="/vaults">
-          <Button variant="outline">
+          <Button variant="outline" className="rounded-xl mt-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Vaults
           </Button>
@@ -115,7 +114,7 @@ export default function VaultDetailPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="h-10 w-10 sm:h-12 sm:w-12 animate-spin rounded-full border-4 border-aegis-blue border-t-transparent"></div>
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-caldera-orange/20 border-t-caldera-orange" />
       </div>
     );
   }
@@ -123,9 +122,12 @@ export default function VaultDetailPage() {
   if (!vault) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <h2 className="text-xl sm:text-2xl font-bold text-aegis-text-primary mb-4">Vault Not Found</h2>
+        <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
+          <Shield className="w-10 h-10 text-caldera-text-muted" />
+        </div>
+        <h2 className="text-xl font-display font-bold text-caldera-black mb-2">Vault Not Found</h2>
         <Link href="/vaults">
-          <Button variant="outline">
+          <Button variant="outline" className="rounded-xl mt-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Vaults
           </Button>
@@ -137,35 +139,40 @@ export default function VaultDetailPage() {
   const spentPercentage = (Number(vault.dailySpent) / Number(vault.dailyLimit)) * 100;
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-        <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
           <Link href="/vaults">
-            <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
-              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Button variant="ghost" size="icon" className="rounded-xl hover:bg-gray-100">
+              <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-aegis-text-primary truncate">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-display font-black text-caldera-black">
               {vault.name || 'Unnamed Vault'}
             </h1>
-            <p className="text-aegis-text-secondary text-xs sm:text-sm mt-0.5 sm:mt-1">
+            <p className="text-caldera-text-secondary text-sm mt-1">
               Created {new Date(vault.createdAt).toLocaleDateString()}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 pl-10 sm:pl-0">
-          <Badge variant={vault.isActive ? 'default' : 'outline'} className="text-xs sm:text-sm">
+        <div className="flex items-center gap-2 pl-12 sm:pl-0">
+          <Badge 
+            className={vault.isActive 
+              ? 'bg-caldera-success/10 text-caldera-success border-caldera-success/20' 
+              : 'bg-gray-100 text-caldera-text-muted border-gray-200'
+            }
+          >
             {vault.isActive ? 'Active' : 'Paused'}
           </Badge>
-          <Badge variant="outline" className="text-xs sm:text-sm">
+          <Badge variant="outline" className="border-gray-200">
             {vault.tier || 'PERSONAL'}
           </Badge>
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="rounded-xl border-gray-200 hover:bg-gray-100"
             onClick={() => refetch()}
           >
             <RefreshCw className="w-4 h-4" />
@@ -174,77 +181,67 @@ export default function VaultDetailPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <Card className="glass-card">
-          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
-            <CardDescription className="flex items-center gap-2 text-xs sm:text-sm">
-              <Wallet className="w-3 h-3 sm:w-4 sm:h-4" />
-              Balance
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-4 pt-0">
-            <div className="text-xl sm:text-2xl font-bold text-aegis-emerald">
-              {loadingBalance ? (
-                <span className="text-aegis-text-tertiary text-base sm:text-lg">Loading...</span>
-              ) : (
-                `${balance.toFixed(4)} SOL`
-              )}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-caldera-success/10 flex items-center justify-center">
+              <Wallet className="w-5 h-5 text-caldera-success" />
             </div>
-          </CardContent>
-        </Card>
+            <span className="text-caldera-text-secondary text-sm">Balance</span>
+          </div>
+          <div className="text-2xl font-display font-black text-caldera-success">
+            {loadingBalance ? 'Loading...' : `${balance.toFixed(4)} SOL`}
+          </div>
+        </div>
 
-        <Card className="glass-card">
-          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
-            <CardDescription className="flex items-center gap-2 text-xs sm:text-sm">
-              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
-              Daily Limit
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-4 pt-0">
-            <div className="text-xl sm:text-2xl font-bold text-aegis-text-primary">
-              {formatSol(vault.dailyLimit)} SOL
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-caldera-orange/10 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-caldera-orange" />
             </div>
-            <div className="text-[10px] sm:text-xs text-aegis-text-tertiary mt-1">
-              {formatSol(vault.dailySpent)} spent today ({spentPercentage.toFixed(1)}%)
-            </div>
-            <div className="h-1.5 sm:h-2 bg-aegis-bg-primary rounded-full overflow-hidden mt-2">
-              <div
-                className="h-full bg-gradient-to-r from-aegis-emerald to-aegis-blue transition-all"
-                style={{ width: `${Math.min(spentPercentage, 100)}%` }}
-              />
-            </div>
-          </CardContent>
-        </Card>
+            <span className="text-caldera-text-secondary text-sm">Daily Limit</span>
+          </div>
+          <div className="text-2xl font-display font-black text-caldera-black">
+            {formatSol(vault.dailyLimit)} SOL
+          </div>
+          <div className="text-xs text-caldera-text-muted mt-2">
+            {formatSol(vault.dailySpent)} spent today ({spentPercentage.toFixed(1)}%)
+          </div>
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden mt-2">
+            <div
+              className="h-full bg-gradient-to-r from-caldera-orange to-caldera-purple rounded-full transition-all"
+              style={{ width: `${Math.min(spentPercentage, 100)}%` }}
+            />
+          </div>
+        </div>
 
-        <Card className="glass-card">
-          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4">
-            <CardDescription className="flex items-center gap-2 text-xs sm:text-sm">
-              <History className="w-3 h-3 sm:w-4 sm:h-4" />
-              Transactions
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-4 pt-0">
-            <div className="text-xl sm:text-2xl font-bold text-aegis-text-primary">
-              {vault.transactions?.length || 0}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
+              <History className="w-5 h-5 text-caldera-purple" />
             </div>
-            <div className="text-[10px] sm:text-xs text-aegis-text-tertiary mt-1">
-              All time
-            </div>
-          </CardContent>
-        </Card>
+            <span className="text-caldera-text-secondary text-sm">Transactions</span>
+          </div>
+          <div className="text-2xl font-display font-black text-caldera-black">
+            {vault.transactions?.length || 0}
+          </div>
+          <div className="text-xs text-caldera-text-muted mt-2">
+            All time
+          </div>
+        </div>
       </div>
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="integration" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-aegis-bg-tertiary/50 h-9 sm:h-10">
-          <TabsTrigger value="integration" className="text-xs sm:text-sm">Integration</TabsTrigger>
-          <TabsTrigger value="transactions" className="text-xs sm:text-sm">Transactions</TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
-          <TabsTrigger value="settings" className="text-xs sm:text-sm">Settings</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 bg-gray-100 rounded-xl p-1 h-12">
+          <TabsTrigger value="integration" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Integration</TabsTrigger>
+          <TabsTrigger value="transactions" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Transactions</TabsTrigger>
+          <TabsTrigger value="analytics" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Analytics</TabsTrigger>
+          <TabsTrigger value="settings" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Settings</TabsTrigger>
         </TabsList>
 
         {/* Integration Tab */}
-        <TabsContent value="integration" className="space-y-4 mt-4 sm:mt-6">
+        <TabsContent value="integration" className="space-y-4 mt-6">
           <VaultCredentials
             vaultAddress={vault.publicKey}
             agentSigner={vault.agentSigner || 'Not set'}
@@ -253,35 +250,38 @@ export default function VaultDetailPage() {
         </TabsContent>
 
         {/* Transactions Tab */}
-        <TabsContent value="transactions" className="space-y-4 mt-4 sm:mt-6">
-          <Card className="glass-card">
-            <CardHeader className="p-3 sm:p-4">
-              <CardTitle className="text-base sm:text-lg">Transaction History</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                All transactions executed through this vault
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-3 sm:p-4 pt-0">
+        <TabsContent value="transactions" className="space-y-4 mt-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-display font-bold text-caldera-black">Transaction History</h3>
+              <p className="text-sm text-caldera-text-muted">All transactions executed through this vault</p>
+            </div>
+            <div className="p-6">
               {vault.transactions && vault.transactions.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {vault.transactions.map((tx: any) => (
                     <div
                       key={tx.id}
-                      className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-aegis-bg-tertiary/50 border border-aegis-border"
+                      className="flex items-center justify-between p-4 rounded-xl bg-gray-50"
                     >
-                      <div className="min-w-0">
-                        <div className="text-xs sm:text-sm font-medium text-aegis-text-primary truncate">
+                      <div>
+                        <div className="font-medium text-caldera-black">
                           {formatAddress(tx.to)}
                         </div>
-                        <div className="text-[10px] sm:text-xs text-aegis-text-tertiary">
+                        <div className="text-xs text-caldera-text-muted mt-1">
                           {new Date(tx.createdAt).toLocaleString()}
                         </div>
                       </div>
-                      <div className="text-right shrink-0 ml-2">
-                        <div className="text-xs sm:text-sm font-medium text-aegis-text-primary">
+                      <div className="text-right">
+                        <div className="font-semibold text-caldera-black">
                           {(Number(tx.amount) / LAMPORTS_PER_SOL).toFixed(4)} SOL
                         </div>
-                        <Badge variant={tx.status === 'EXECUTED' ? 'default' : 'outline'} className="text-[10px] sm:text-xs">
+                        <Badge 
+                          className={tx.status === 'EXECUTED' 
+                            ? 'bg-caldera-success/10 text-caldera-success border-caldera-success/20' 
+                            : 'bg-gray-100 text-caldera-text-muted border-gray-200'
+                          }
+                        >
                           {tx.status}
                         </Badge>
                       </div>
@@ -289,74 +289,74 @@ export default function VaultDetailPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 sm:py-12">
-                  <History className="w-10 h-10 sm:w-12 sm:h-12 text-aegis-text-tertiary mx-auto mb-3 sm:mb-4" />
-                  <p className="text-aegis-text-secondary text-sm">No transactions yet</p>
-                  <p className="text-[10px] sm:text-xs text-aegis-text-tertiary mt-1">
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <History className="w-8 h-8 text-caldera-text-muted" />
+                  </div>
+                  <p className="text-caldera-text-secondary font-medium">No transactions yet</p>
+                  <p className="text-xs text-caldera-text-muted mt-1">
                     Transactions will appear here once your agent starts using the vault
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-4 mt-4 sm:mt-6">
-          <Card className="glass-card">
-            <CardHeader className="p-3 sm:p-4">
-              <CardTitle className="text-base sm:text-lg">Vault Analytics</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                Spending patterns and insights
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-3 sm:p-4 pt-0">
-              <div className="text-center py-8 sm:py-12">
-                <TrendingUp className="w-10 h-10 sm:w-12 sm:h-12 text-aegis-text-tertiary mx-auto mb-3 sm:mb-4" />
-                <p className="text-aegis-text-secondary text-sm">Analytics coming soon</p>
-                <p className="text-[10px] sm:text-xs text-aegis-text-tertiary mt-1">
+        <TabsContent value="analytics" className="space-y-4 mt-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-display font-bold text-caldera-black">Vault Analytics</h3>
+              <p className="text-sm text-caldera-text-muted">Spending patterns and insights</p>
+            </div>
+            <div className="p-6">
+              <div className="text-center py-12">
+                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-8 h-8 text-caldera-text-muted" />
+                </div>
+                <p className="text-caldera-text-secondary font-medium">Analytics coming soon</p>
+                <p className="text-xs text-caldera-text-muted mt-1">
                   Track spending patterns, success rates, and more
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         {/* Settings Tab */}
-        <TabsContent value="settings" className="space-y-4 mt-4 sm:mt-6">
-          <Card className="glass-card">
-            <CardHeader className="p-3 sm:p-4">
-              <CardTitle className="text-base sm:text-lg">Vault Settings</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                Manage vault configuration and policies
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 pt-0">
+        <TabsContent value="settings" className="space-y-4 mt-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-display font-bold text-caldera-black">Vault Settings</h3>
+              <p className="text-sm text-caldera-text-muted">Manage vault configuration and policies</p>
+            </div>
+            <div className="p-6 space-y-4">
               {/* Pause/Resume */}
-              <div className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-aegis-bg-tertiary/50 border border-aegis-border">
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium text-aegis-text-primary">Vault Status</div>
-                  <div className="text-[10px] sm:text-xs text-aegis-text-tertiary mt-0.5 sm:mt-1">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
+                <div>
+                  <p className="font-medium text-caldera-black">Vault Status</p>
+                  <p className="text-xs text-caldera-text-muted mt-1">
                     {!vault.isActive ? 'All transactions are currently blocked' : 'Vault is active and processing transactions'}
-                  </div>
+                  </p>
                 </div>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={handleTogglePause}
                   disabled={togglingPause}
-                  className="shrink-0 ml-2 text-xs sm:text-sm h-8 sm:h-9"
+                  className="rounded-xl border-gray-200"
                 >
                   {togglingPause ? (
-                    <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : !vault.isActive ? (
                     <>
-                      <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <Play className="w-4 h-4 mr-2" />
                       Resume
                     </>
                   ) : (
                     <>
-                      <Pause className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <Pause className="w-4 h-4 mr-2" />
                       Pause
                     </>
                   )}
@@ -364,56 +364,56 @@ export default function VaultDetailPage() {
               </div>
 
               {/* Whitelist */}
-              <div className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-aegis-bg-tertiary/50 border border-aegis-border">
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium text-aegis-text-primary">Whitelist</div>
-                  <div className="text-[10px] sm:text-xs text-aegis-text-tertiary mt-0.5 sm:mt-1">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
+                <div>
+                  <p className="font-medium text-caldera-black">Whitelist</p>
+                  <p className="text-xs text-caldera-text-muted mt-1">
                     {vault.whitelist?.length || 0} addresses whitelisted
-                  </div>
+                  </p>
                 </div>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => setSettingsOpen(true)}
-                  className="shrink-0 ml-2 text-xs sm:text-sm h-8 sm:h-9"
+                  className="rounded-xl border-gray-200"
                 >
-                  <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <Settings className="w-4 h-4 mr-2" />
                   Manage
                 </Button>
               </div>
 
               {/* Daily Limit */}
-              <div className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-aegis-bg-tertiary/50 border border-aegis-border">
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium text-aegis-text-primary">Daily Limit</div>
-                  <div className="text-[10px] sm:text-xs text-aegis-text-tertiary mt-0.5 sm:mt-1">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
+                <div>
+                  <p className="font-medium text-caldera-black">Daily Limit</p>
+                  <p className="text-xs text-caldera-text-muted mt-1">
                     Current limit: {formatSol(vault.dailyLimit)} SOL
-                  </div>
+                  </p>
                 </div>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => setSettingsOpen(true)}
-                  className="shrink-0 ml-2 text-xs sm:text-sm h-8 sm:h-9"
+                  className="rounded-xl border-gray-200"
                 >
-                  <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <Settings className="w-4 h-4 mr-2" />
                   Update
                 </Button>
               </div>
 
               {/* Open Full Settings */}
-              <div className="pt-2 sm:pt-4">
+              <div className="pt-4">
                 <Button 
                   variant="outline" 
-                  className="w-full"
+                  className="w-full rounded-xl border-gray-200"
                   onClick={() => setSettingsOpen(true)}
                 >
                   <Settings className="w-4 h-4 mr-2" />
                   Open Full Settings
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
 

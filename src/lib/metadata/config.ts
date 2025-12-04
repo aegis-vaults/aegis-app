@@ -8,7 +8,7 @@ export const siteConfig = {
   title: 'Aegis - On-Chain Operating System for AI Finance',
   description:
     'Aegis is a production-grade on-chain operating system that gives AI agents secure access to financial operations with customizable guardrails, spending limits, and human override controls on Solana.',
-  tagline: 'Guard Your AI Agents With Programmable Safety',
+  tagline: 'Guard Your AI Agents',
   keywords: [
     'AI agents',
     'Solana',
@@ -79,4 +79,5 @@ export const pages = {
 };
 
 export type PageKey = keyof typeof pages;
+
 
