@@ -18,6 +18,7 @@ import {
   TrendingUp,
   Globe,
   Github,
+  BookOpen,
   Menu,
   X
 } from 'lucide-react';
@@ -48,7 +49,10 @@ export default function LandingPage() {
               <Link href="#how-it-works" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors">
                 How It Works
               </Link>
-              <Link href="https://github.com/aegis-vaults" target="_blank" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors">
+              <Link href="https://docs.aegis-vaults.xyz/" target="_blank" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors" title="Documentation">
+                <BookOpen className="w-5 h-5" />
+              </Link>
+              <Link href="https://github.com/aegis-vaults" target="_blank" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors" title="GitHub">
                 <Github className="w-5 h-5" />
               </Link>
               {connected ? (
@@ -86,6 +90,14 @@ export default function LandingPage() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 How It Works
+              </Link>
+              <Link 
+                href="https://docs.aegis-vaults.xyz/" 
+                target="_blank" 
+                className="flex items-center gap-2 py-2 text-aegis-text-secondary hover:text-aegis-text-primary transition-colors"
+              >
+                <BookOpen className="w-5 h-5" />
+                Docs
               </Link>
               <Link 
                 href="https://github.com/aegis-vaults" 
@@ -389,7 +401,7 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="flex items-center gap-4 sm:gap-6">
-              <Link href="https://docs.aegis.fi" target="_blank" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors text-sm">
+              <Link href="https://docs.aegis-vaults.xyz/" target="_blank" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors text-sm">
                 Docs
               </Link>
               <Link href="https://github.com/aegis-vaults" target="_blank" className="text-aegis-text-secondary hover:text-aegis-text-primary transition-colors text-sm">
