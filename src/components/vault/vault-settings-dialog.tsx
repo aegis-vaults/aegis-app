@@ -107,6 +107,7 @@ export function VaultSettingsDialog({
     if (open && activeTab === 'team') {
       loadTeamMembers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, activeTab]);
 
   const loadTeamMembers = async () => {

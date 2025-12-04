@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { TrendingUp, Activity, DollarSign, Wallet, Shield, AlertTriangle, CheckCircle, BarChart3 } from 'lucide-react';
 import { useVaults } from '@/lib/hooks/use-vaults';
 import { getConnection } from '@/lib/solana/config';
@@ -10,7 +10,7 @@ import { formatSol } from '@/lib/utils';
 
 export default function AnalyticsPage() {
   const { data: vaultsData, isLoading } = useVaults({ myVaults: true });
-  const vaults = vaultsData?.data?.items || [];
+  const vaults = useMemo(() => vaultsData?.data?.items || [], [vaultsData?.data?.items]);
 
   const [totalBalance, setTotalBalance] = useState<number>(0);
   const [loadingBalance, setLoadingBalance] = useState(true);

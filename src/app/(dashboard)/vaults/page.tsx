@@ -55,6 +55,7 @@ export default function VaultsPage() {
     if (vaults.length > 0) {
       fetchBalances();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vaults.length]);
 
   const handleOpenSettings = (vault: any) => {

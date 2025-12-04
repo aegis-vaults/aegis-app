@@ -17,7 +17,7 @@ interface SecurityCheck {
 
 export default function SecurityPage() {
   const { data: vaultsData, isLoading } = useVaults({ myVaults: true });
-  const vaults = vaultsData?.data?.items || [];
+  const vaults = useMemo(() => vaultsData?.data?.items || [], [vaultsData?.data?.items]);
 
   const securityAnalysis = useMemo(() => {
     const checks: SecurityCheck[] = [];

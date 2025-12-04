@@ -28,7 +28,7 @@ export default function DashboardPage() {
           Welcome Back
         </h1>
         <p className="text-caldera-text-secondary mt-1">
-          Here's what's happening with your vaults today.
+          Here&apos;s what&apos;s happening with your vaults today.
         </p>
       </div>
 
