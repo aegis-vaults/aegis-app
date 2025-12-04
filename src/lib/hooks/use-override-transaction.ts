@@ -72,7 +72,7 @@ export function useOverrideTransaction(
       setStatus(OverrideStatus.BUILDING);
       setError(null);
 
-      const buildResponse = await fetch(`${CONFIG.GUARDIAN_API_URL}/api/override/build`, {
+      const buildResponse = await fetch(`${CONFIG.GUARDIAN_API_URL}/api/override/transaction`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
