@@ -772,15 +772,15 @@ const tools = createAnthropicTools(aegisClient);`,
       {/* ===== FINAL CTA WITH HALFTONE BLOB ===== */}
       <section className="px-6 py-32">
         <div className="container mx-auto max-w-5xl">
-          <div className="relative halftone-blob superellipse-lg overflow-hidden animate-scale-in">
+          <div className="relative halftone-blob superellipse-lg overflow-hidden">
             <div className="relative z-10 p-16 text-center">
-              <h2 className="font-display font-black text-4xl md:text-6xl text-white mb-6 uppercase animate-reveal">
+              <h2 className="font-display font-black text-4xl md:text-6xl text-white mb-6 uppercase">
                 Ready to Secure Your AI Agents?
               </h2>
-              <p className="text-xl text-white/90 mb-10 font-body max-w-2xl mx-auto animate-reveal" style={{ animationDelay: '100ms' }}>
+              <p className="text-xl text-white/90 mb-10 font-body max-w-2xl mx-auto">
                 Connect your wallet and start building with Aegis today. Enterprise-grade security for AI finance on Solana.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-reveal" style={{ animationDelay: '200ms' }}>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 {connected ? (
                   <Link href="/dashboard">
                     <Button size="lg" className="rounded-full px-10 py-7 bg-white text-caldera-orange hover:bg-gray-100 text-lg font-bold shadow-lg btn-ripple group transition-transform duration-300 hover:scale-105">

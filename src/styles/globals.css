@@ -125,7 +125,8 @@
   .halftone-blob {
     position: relative;
     overflow: hidden;
-    background: #151317;
+    background: white;
+    min-height: 300px;
   }
 
   .halftone-blob::before {
