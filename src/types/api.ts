@@ -79,6 +79,9 @@ export interface Vault {
   vaultNonce: string; // BigInt as string - nonce used for PDA derivation
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
+  // Counts (from list endpoint)
+  transactionCount?: number;
+  overrideCount?: number;
   // Relations (optional, populated when requested)
   transactions?: Transaction[];
   overrides?: Override[];

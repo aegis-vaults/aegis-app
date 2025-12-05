@@ -330,6 +330,8 @@ export default function AnalyticsPage() {
                 const vaultSpentPercent = Number(vault.dailyLimit) > 0
                   ? ((Number(vault.dailySpent) / Number(vault.dailyLimit)) * 100).toFixed(1)
                   : '0';
+                // Use transactionCount from API if available, otherwise count from fetched transactions
+                const vaultTxCount = vault.transactionCount ?? allTransactions.filter(tx => tx.vaultId === vault.id).length;
 
                 return (
                   <div key={vault.id} className="p-4 rounded-2xl bg-gray-50">
@@ -345,7 +347,7 @@ export default function AnalyticsPage() {
                         )}
                       </div>
                       <span className="text-sm text-caldera-text-secondary font-medium">
-                        {vault.transactions?.length || 0} tx
+                        {vaultTxCount} tx
                       </span>
                     </div>
                     <div className="flex justify-between text-xs text-caldera-text-muted mb-2 font-medium">
