@@ -13,6 +13,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { VaultCredentials } from '@/components/vault/vault-credentials';
 import { VaultSettingsDialog } from '@/components/vault/vault-settings-dialog';
+import { FundVaultDialog } from '@/components/vault/fund-vault-dialog';
+import { FundAgentDialog } from '@/components/vault/fund-agent-dialog';
 import { formatSol, formatAddress, formatRelativeTime, lamportsToSol, solToLamports, isValidSolanaAddress, calculatePercentage, cn } from '@/lib/utils';
 import { ArrowLeft, Wallet, TrendingUp, History, Settings, Pause, Play, Loader2, RefreshCw, Shield,
   DollarSign, AlertTriangle, CheckCircle, XCircle, Clock, Activity, BarChart3, PieChart,
@@ -49,6 +51,8 @@ export default function VaultDetailPage() {
   const [loadingBalance, setLoadingBalance] = useState(false);
   const [togglingPause, setTogglingPause] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [fundVaultOpen, setFundVaultOpen] = useState(false);
+  const [fundAgentOpen, setFundAgentOpen] = useState(false);
   const [fundAgentAmount, setFundAgentAmount] = useState('0.01');
   const [fundingAgent, setFundingAgent] = useState(false);
   const [newWhitelistAddress, setNewWhitelistAddress] = useState('');
@@ -380,10 +384,7 @@ export default function VaultDetailPage() {
             <Button
               size="sm"
               className="rounded-xl bg-caldera-success hover:bg-caldera-success/90"
-              onClick={() => {
-                // Fund vault action
-                toast.info('Fund Vault feature coming soon');
-              }}
+              onClick={() => setFundVaultOpen(true)}
             >
               <DollarSign className="w-4 h-4 mr-2" />
               Fund Vault
@@ -392,7 +393,8 @@ export default function VaultDetailPage() {
               size="sm"
               variant="outline"
               className="rounded-xl border-caldera-orange text-caldera-orange hover:bg-caldera-orange/10"
-              onClick={() => setFundAgentAmount('0.01')}
+              onClick={() => setFundAgentOpen(true)}
+              disabled={!vault?.agentSigner}
             >
               <Fuel className="w-4 h-4 mr-2" />
               Fund Agent
@@ -1315,6 +1317,42 @@ export default function VaultDetailPage() {
           onOpenChange={setSettingsOpen}
           onUpdate={() => refetch()}
         />
+
+        {/* Fund Vault Dialog */}
+        <FundVaultDialog
+          vault={{
+            publicKey: vault.publicKey,
+            name: vault.name,
+          }}
+          currentBalance={balance}
+          open={fundVaultOpen}
+          onOpenChange={setFundVaultOpen}
+          onSuccess={() => {
+            refetch();
+            // Refresh balance after funding
+            const fetchBalance = async () => {
+              const connection: Connection = getConnection();
+              const vaultPubkey = new PublicKey(vault.publicKey);
+              const [vaultAuthority] = getVaultAuthorityPDA(vaultPubkey);
+              const bal = await connection.getBalance(vaultAuthority);
+              setBalance(bal / LAMPORTS_PER_SOL);
+            };
+            fetchBalance();
+          }}
+        />
+
+        {/* Fund Agent Dialog */}
+        {vault.agentSigner && agentBalance && (
+          <FundAgentDialog
+            agentSigner={vault.agentSigner}
+            vaultName={vault.name}
+            currentBalance={agentBalance.balance}
+            estimatedTransactions={agentBalance.estimatedTransactions}
+            open={fundAgentOpen}
+            onOpenChange={setFundAgentOpen}
+            onSuccess={() => refetchAgentBalance()}
+          />
+        )}
       </div>
     </TooltipProvider>
   );
