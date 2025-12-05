@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -133,16 +132,21 @@ export function ApiKeysSection({ userId }: { userId: string }) {
   };
 
   return (
-    <Card className="glass-card">
-      <CardHeader>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="p-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Key className="w-5 h-5 text-aegis-blue" />
-            <CardTitle>API Keys</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-caldera-info/10 flex items-center justify-center">
+              <Key className="w-5 h-5 text-caldera-info" />
+            </div>
+            <div>
+              <h2 className="text-lg font-display font-bold text-caldera-black">API Keys</h2>
+              <p className="text-sm text-caldera-text-muted">Manage API keys for SDK access to your vaults</p>
+            </div>
           </div>
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-aegis-blue hover:bg-aegis-blue/90">
+              <Button size="sm" className="bg-caldera-info hover:bg-caldera-info/90 rounded-xl">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Key
               </Button>
@@ -160,12 +164,13 @@ export function ApiKeysSection({ userId }: { userId: string }) {
                     <div className="space-y-2">
                       <Label>Your API Key</Label>
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 px-3 py-2 bg-aegis-bg-tertiary rounded-lg font-mono text-sm overflow-hidden">
+                        <div className="flex-1 px-3 py-2 bg-gray-50 rounded-xl font-mono text-sm overflow-hidden text-caldera-black">
                           {showCreatedKey ? createdKey : '•'.repeat(48)}
                         </div>
                         <Button
                           size="sm"
                           variant="outline"
+                          className="rounded-xl"
                           onClick={() => setShowCreatedKey(!showCreatedKey)}
                         >
                           {showCreatedKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -173,20 +178,21 @@ export function ApiKeysSection({ userId }: { userId: string }) {
                         <Button
                           size="sm"
                           variant="outline"
+                          className="rounded-xl"
                           onClick={() => copyToClipboard(createdKey)}
                         >
                           <Copy className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                    <div className="p-3 bg-aegis-amber/10 border border-aegis-amber/30 rounded-lg">
-                      <p className="text-sm text-aegis-text-secondary">
+                    <div className="p-3 bg-caldera-yellow/10 border border-caldera-yellow/30 rounded-xl">
+                      <p className="text-sm text-caldera-text-secondary">
                         <strong>Important:</strong> Store this key securely. You won&apos;t be able to view it again after closing this dialog.
                       </p>
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button onClick={handleCloseCreateDialog}>
+                    <Button onClick={handleCloseCreateDialog} className="rounded-xl">
                       I&apos;ve saved my key
                     </Button>
                   </DialogFooter>
@@ -208,8 +214,9 @@ export function ApiKeysSection({ userId }: { userId: string }) {
                         value={newKeyName}
                         onChange={(e) => setNewKeyName(e.target.value)}
                         disabled={createMutation.isPending}
+                        className="rounded-xl"
                       />
-                      <p className="text-xs text-aegis-text-tertiary">
+                      <p className="text-xs text-caldera-text-muted">
                         A friendly name to help you identify this key
                       </p>
                     </div>
@@ -219,13 +226,14 @@ export function ApiKeysSection({ userId }: { userId: string }) {
                       variant="outline"
                       onClick={() => setCreateDialogOpen(false)}
                       disabled={createMutation.isPending}
+                      className="rounded-xl"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={handleCreateKey}
                       disabled={createMutation.isPending}
-                      className="bg-aegis-blue hover:bg-aegis-blue/90"
+                      className="bg-caldera-info hover:bg-caldera-info/90 rounded-xl"
                     >
                       {createMutation.isPending ? (
                         <>
@@ -242,34 +250,40 @@ export function ApiKeysSection({ userId }: { userId: string }) {
             </DialogContent>
           </Dialog>
         </div>
-        <CardDescription>Manage API keys for SDK access to your vaults</CardDescription>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div className="p-6">
         {isLoading ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin text-aegis-blue" />
+            <Loader2 className="w-8 h-8 animate-spin text-caldera-orange" />
           </div>
         ) : apiKeys.length === 0 ? (
-          <div className="text-center py-8 text-aegis-text-secondary">
-            <Key className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No API keys yet</p>
-            <p className="text-sm mt-1">Create your first API key to use the Aegis SDK</p>
+          <div className="text-center py-8">
+            <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <Key className="w-8 h-8 text-caldera-text-muted" />
+            </div>
+            <p className="text-caldera-text-secondary">No API keys yet</p>
+            <p className="text-sm text-caldera-text-muted mt-1">Create your first API key to use the Aegis SDK</p>
           </div>
         ) : (
           <div className="space-y-3">
             {apiKeys.map((key) => (
               <div
                 key={key.id}
-                className="flex items-center justify-between p-4 rounded-lg bg-aegis-bg-tertiary/50 hover:bg-aegis-bg-tertiary transition-colors"
+                className="flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
-                    <div className="font-medium text-aegis-text-primary">{key.name}</div>
-                    <Badge variant={key.isActive ? 'default' : 'outline'}>
+                    <div className="font-medium text-caldera-black">{key.name}</div>
+                    <Badge 
+                      className={key.isActive 
+                        ? 'bg-caldera-success/10 text-caldera-success border-caldera-success/20' 
+                        : 'bg-gray-100 text-caldera-text-muted border-gray-200'
+                      }
+                    >
                       {key.isActive ? 'Active' : 'Revoked'}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-4 mt-1 text-sm text-aegis-text-tertiary">
+                  <div className="flex items-center gap-4 mt-1 text-sm text-caldera-text-muted">
                     <code className="font-mono">{key.prefix}...</code>
                     <span>•</span>
                     <span>Created {formatRelativeTime(key.createdAt)}</span>
@@ -285,6 +299,7 @@ export function ApiKeysSection({ userId }: { userId: string }) {
                   <Button
                     size="sm"
                     variant="outline"
+                    className="rounded-xl border-gray-200 hover:bg-gray-100"
                     onClick={() => {
                       if (confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
                         revokeMutation.mutate(key.id);
@@ -299,7 +314,7 @@ export function ApiKeysSection({ userId }: { userId: string }) {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -20,6 +20,12 @@ export default function DashboardPage() {
   const totalBalance = vaults.reduce((sum, v) => sum + Number(v.dailyLimit), 0);
   const totalTransactions = transactions.length;
 
+  // Calculate actual success rate from transactions
+  const successfulTransactions = transactions.filter(tx => tx.status === TransactionStatus.EXECUTED).length;
+  const successRate = totalTransactions > 0
+    ? ((successfulTransactions / totalTransactions) * 100).toFixed(1)
+    : '0.0';
+
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
@@ -80,9 +86,11 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="text-3xl font-display font-black text-caldera-black">
-            94.5<span className="text-xl text-caldera-text-muted">%</span>
+            {successRate}<span className="text-xl text-caldera-text-muted">%</span>
           </div>
-          <p className="text-sm text-caldera-text-muted mt-1">Success Rate</p>
+          <p className="text-sm text-caldera-text-muted mt-1">
+            Success Rate {totalTransactions > 0 && `(${successfulTransactions}/${totalTransactions})`}
+          </p>
         </div>
       </div>
 
