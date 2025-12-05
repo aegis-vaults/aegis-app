@@ -588,6 +588,53 @@
     animation: fade-up 0.6s ease-out forwards;
     opacity: 0;
   }
+
+  /* Slide-in animation for hero text */
+  @keyframes slide-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-250px) scale(0.85);
+      filter: blur(10px);
+    }
+    60% {
+      opacity: 0.8;
+      transform: translateX(10px) scale(1.02);
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(250px) scale(0.85);
+      filter: blur(10px);
+    }
+    60% {
+      opacity: 0.8;
+      transform: translateX(-10px) scale(1.02);
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
 }
 
 @layer utilities {

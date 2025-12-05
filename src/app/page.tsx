@@ -397,9 +397,9 @@ const tools = createAnthropicTools(aegisClient);`,
               <span className="text-sm font-mono text-caldera-black font-semibold">On-Chain Operating System for AI Finance</span>
             </div>
 
-            <h1 className="font-display font-black text-6xl md:text-8xl lg:text-[140px] tracking-tighter leading-[0.9] uppercase animate-fade-up stagger-1">
-              <span className="block">Guard Your</span>
-              <span className="block text-caldera-orange">AI Agents</span>
+            <h1 className="font-display font-black text-6xl md:text-8xl lg:text-[140px] tracking-tighter leading-[0.9] uppercase">
+              <span className="block animate-slide-in-left stagger-1">Guard Your</span>
+              <span className="block text-caldera-orange animate-slide-in-right stagger-2">AI Agents</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-caldera-text-secondary max-w-3xl mx-auto leading-relaxed font-body animate-fade-up stagger-2">
