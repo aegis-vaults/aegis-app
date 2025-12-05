@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Button } from '@/components/ui/button';
@@ -47,7 +47,7 @@ function HalftoneBackground({ className = '' }: { className?: string }) {
 function HeroBlob() {
   return (
     <>
-      <div className="hero-blob" />
+      <div className="hero-blob gentle-float" />
       <div className="hero-dots-overlay" />
     </>
   );
@@ -57,13 +57,16 @@ function PillCard({
   children,
   className = '',
   variant = 'white',
+  animate = false,
 }: {
   children: React.ReactNode;
   className?: string;
   variant?: 'white' | 'orange';
+  animate?: boolean;
 }) {
   const baseClass = variant === 'orange' ? 'pill-card-orange' : 'pill-card';
-  return <div className={`${baseClass} ${className}`}>{children}</div>;
+  const animateClass = animate ? 'animate-reveal animate-reveal-stagger shimmer-border' : '';
+  return <div className={`${baseClass} ${animateClass} group ${className}`}>{children}</div>;
 }
 
 function StatCardConnected({
@@ -71,11 +74,13 @@ function StatCardConnected({
   value,
   isFirst,
   isLast,
+  delay = 0,
 }: {
   label: string;
   value: string;
   isFirst?: boolean;
   isLast?: boolean;
+  delay?: number;
 }) {
   let roundedClass = '';
   if (isFirst) roundedClass = 'rounded-l-[32px] lg:rounded-l-[32px]';
@@ -85,12 +90,15 @@ function StatCardConnected({
     <div
       className={`bg-caldera-orange flex-1 min-w-[180px] p-8 lg:p-10 ${roundedClass} ${
         !isLast ? 'lg:border-r lg:border-white/20' : ''
-      } rounded-[24px] lg:rounded-none`}
+      } rounded-[24px] lg:rounded-none group hover:bg-caldera-orange-secondary transition-colors duration-300`}
     >
       <div className="text-sm uppercase tracking-wider text-white/70 mb-2 font-bold">
         {label}
       </div>
-      <div className="text-5xl lg:text-6xl font-display font-black text-white">
+      <div 
+        className="text-5xl lg:text-6xl font-display font-black text-white stat-value"
+        style={{ animationDelay: `${delay}ms` }}
+      >
         {value}
       </div>
     </div>
@@ -107,17 +115,17 @@ function NewsCard({
   date: string;
 }) {
   return (
-    <div className="news-card">
-      <div className="card-halftone-thumb h-48 relative">
+    <div className="news-card group cursor-pointer">
+      <div className="card-halftone-thumb h-48 relative overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          <Shield className="w-16 h-16 text-white/80" />
+          <Shield className="w-16 h-16 text-white/80 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6" />
         </div>
       </div>
       <div className="p-6 space-y-3">
-        <span className="inline-block px-3 py-1 text-xs font-bold uppercase bg-caldera-yellow text-caldera-black rounded-full">
+        <span className="inline-block px-3 py-1 text-xs font-bold uppercase bg-caldera-yellow text-caldera-black rounded-full transition-transform duration-300 group-hover:scale-105">
           {category}
         </span>
-        <h4 className="text-xl font-display font-bold text-caldera-black leading-tight">
+        <h4 className="text-xl font-display font-bold text-caldera-black leading-tight group-hover:text-caldera-orange transition-colors duration-300">
           {title}
         </h4>
         <p className="text-sm text-caldera-text-muted">{date}</p>
@@ -138,11 +146,11 @@ function CommunityCard({
   color: string;
 }) {
   return (
-    <div className="community-card">
-      <div className={`community-icon ${color}`}>
+    <div className="community-card animate-reveal animate-reveal-stagger group">
+      <div className={`community-icon ${color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}>
         <Icon className="w-8 h-8 text-white" />
       </div>
-      <div className="text-5xl lg:text-6xl font-display font-black text-caldera-black mb-2">
+      <div className="text-5xl lg:text-6xl font-display font-black text-caldera-black mb-2 stat-value">
         {value}
       </div>
       <div className="text-lg text-caldera-text-secondary font-medium">{label}</div>
@@ -152,7 +160,7 @@ function CommunityCard({
 
 function PartnerLogo({ name }: { name: string }) {
   return (
-    <div className="flex items-center justify-center h-12 px-6 opacity-60 hover:opacity-100 transition-opacity">
+    <div className="flex items-center justify-center h-12 px-6 opacity-50 hover:opacity-100 transition-all duration-300 hover:scale-105 cursor-pointer">
       <span className="text-lg font-display font-bold text-caldera-black tracking-wider uppercase">
         {name}
       </span>
@@ -162,9 +170,36 @@ function PartnerLogo({ name }: { name: string }) {
 
 /* ===== MAIN LANDING PAGE ===== */
 
+// Custom hook for scroll-triggered animations
+function useScrollReveal() {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px',
+      }
+    );
+
+    const elements = document.querySelectorAll('.animate-reveal, .animate-reveal-stagger, .animate-scale-in, .text-reveal, .stat-value');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+}
+
 export default function LandingPage() {
   const { connected } = useWallet();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Initialize scroll reveal animations
+  useScrollReveal();
 
   const ecosystemStats = [
     { label: 'Vaults Secured', value: '25+' },
@@ -312,38 +347,38 @@ const tools = createAnthropicTools(aegisClient);`,
         <div className="container mx-auto px-6 lg:px-20">
           <div className="flex items-center justify-between h-20">
             <div className="flex-1 lg:flex-initial flex items-center justify-center lg:justify-start">
-              <Link href="/" className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-caldera-orange flex items-center justify-center shadow-lg">
-                  <Shield className="w-7 h-7 text-white" strokeWidth={2.5} />
+              <Link href="/" className="flex items-center gap-3 group">
+                <div className="w-12 h-12 rounded-full bg-caldera-orange flex items-center justify-center shadow-lg transition-all duration-300 group-hover:shadow-xl group-hover:scale-105">
+                  <Shield className="w-7 h-7 text-white transition-transform duration-300 group-hover:scale-110" strokeWidth={2.5} />
                 </div>
-                <span className="text-2xl font-display font-black text-caldera-black uppercase">AEGIS</span>
+                <span className="text-2xl font-display font-black text-caldera-black uppercase transition-colors duration-300 group-hover:text-caldera-orange">AEGIS</span>
               </Link>
             </div>
 
             <div className="hidden lg:flex items-center gap-6">
-              <Link href="#features" className="px-5 py-2 rounded-full text-caldera-text-secondary hover:text-caldera-text-primary hover:bg-gray-100 transition-all font-medium">
+              <Link href="#features" className="px-5 py-2 rounded-full text-caldera-text-secondary hover:text-caldera-text-primary hover:bg-gray-100 transition-all duration-300 font-medium link-underline">
                 Features
               </Link>
-              <Link href="#use-cases" className="px-5 py-2 rounded-full text-caldera-text-secondary hover:text-caldera-text-primary hover:bg-gray-100 transition-all font-medium">
+              <Link href="#use-cases" className="px-5 py-2 rounded-full text-caldera-text-secondary hover:text-caldera-text-primary hover:bg-gray-100 transition-all duration-300 font-medium link-underline">
                 Use Cases
               </Link>
-              <Link href="#integrations" className="px-5 py-2 rounded-full text-caldera-text-secondary hover:text-caldera-text-primary hover:bg-gray-100 transition-all font-medium">
+              <Link href="#integrations" className="px-5 py-2 rounded-full text-caldera-text-secondary hover:text-caldera-text-primary hover:bg-gray-100 transition-all duration-300 font-medium link-underline">
                 Integrations
               </Link>
-              <Link href="https://docs.aegis-vaults.xyz/" target="_blank" className="px-5 py-2 rounded-full text-caldera-text-secondary hover:text-caldera-text-primary hover:bg-gray-100 transition-all font-medium">
+              <Link href="https://docs.aegis-vaults.xyz/" target="_blank" className="px-5 py-2 rounded-full text-caldera-text-secondary hover:text-caldera-text-primary hover:bg-gray-100 transition-all duration-300 font-medium link-underline">
                 Docs
               </Link>
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
-              <Link href="https://github.com/aegis-vaults" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                <Github className="w-5 h-5 text-caldera-text-secondary" />
+              <Link href="https://github.com/aegis-vaults" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 group">
+                <Github className="w-5 h-5 text-caldera-text-secondary transition-colors duration-300 group-hover:text-caldera-black" />
               </Link>
-              <Link href="https://twitter.com" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                <Twitter className="w-5 h-5 text-caldera-text-secondary" />
+              <Link href="https://twitter.com" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 group">
+                <Twitter className="w-5 h-5 text-caldera-text-secondary transition-colors duration-300 group-hover:text-caldera-black" />
               </Link>
-              <Link href="https://discord.com" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                <MessageCircle className="w-5 h-5 text-caldera-text-secondary" />
+              <Link href="https://discord.com" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 group">
+                <MessageCircle className="w-5 h-5 text-caldera-text-secondary transition-colors duration-300 group-hover:text-caldera-black" />
               </Link>
               <div className="ml-2">
                 {connected ? (
@@ -409,33 +444,33 @@ const tools = createAnthropicTools(aegisClient);`,
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 animate-fade-up stagger-3">
               {connected ? (
                 <Link href="/dashboard">
-                  <Button size="lg" className="rounded-full px-10 h-14 bg-caldera-orange hover:bg-caldera-orange-secondary text-lg font-semibold shadow-lg shadow-caldera-orange/30">
+                  <Button size="lg" className="rounded-full px-10 h-14 bg-caldera-orange hover:bg-caldera-orange-secondary text-lg font-semibold shadow-lg shadow-caldera-orange/30 btn-ripple group">
                     Go to Dashboard
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <ArrowRight className="w-5 h-5 ml-2 arrow-slide" />
                   </Button>
                 </Link>
               ) : (
                 <WalletButton variant="hero" />
               )}
               <Link href="https://docs.aegis-vaults.xyz/" target="_blank">
-              <Button size="lg" variant="outline" className="rounded-full px-10 h-14 text-lg font-semibold border-2 border-caldera-black text-caldera-black hover:bg-caldera-black hover:text-white">
+              <Button size="lg" variant="outline" className="rounded-full px-10 h-14 text-lg font-semibold border-2 border-caldera-black text-caldera-black hover:bg-caldera-black hover:text-white transition-all duration-300">
                   View Documentation
                 </Button>
               </Link>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-6 pt-8 text-sm font-mono animate-fade-up stagger-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-caldera-success" />
-                <span className="text-caldera-text-muted">Mainnet Ready</span>
+              <div className="flex items-center gap-2 group cursor-default">
+                <CheckCircle className="w-4 h-4 text-caldera-success transition-transform duration-300 group-hover:scale-125" />
+                <span className="text-caldera-text-muted transition-colors duration-300 group-hover:text-caldera-success">Mainnet Ready</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-caldera-success" />
-                <span className="text-caldera-text-muted">Open Source</span>
+              <div className="flex items-center gap-2 group cursor-default">
+                <CheckCircle className="w-4 h-4 text-caldera-success transition-transform duration-300 group-hover:scale-125" />
+                <span className="text-caldera-text-muted transition-colors duration-300 group-hover:text-caldera-success">Open Source</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-caldera-success" />
-                <span className="text-caldera-text-muted">Audited Contracts</span>
+              <div className="flex items-center gap-2 group cursor-default">
+                <CheckCircle className="w-4 h-4 text-caldera-success transition-transform duration-300 group-hover:scale-125" />
+                <span className="text-caldera-text-muted transition-colors duration-300 group-hover:text-caldera-success">Audited Contracts</span>
               </div>
             </div>
           </div>
@@ -453,6 +488,7 @@ const tools = createAnthropicTools(aegisClient);`,
                 value={stat.value}
                 isFirst={index === 0}
                 isLast={index === ecosystemStats.length - 1}
+                delay={index * 100}
               />
             ))}
           </div>
@@ -477,18 +513,18 @@ const tools = createAnthropicTools(aegisClient);`,
         <HalftoneBackground />
         <div className="container mx-auto max-w-7xl relative z-10">
           <div className="text-center mb-16">
-            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase">
+            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase animate-reveal">
               Trusted By Leading Teams
             </h2>
-            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto">
+            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto animate-reveal" style={{ animationDelay: '100ms' }}>
               Enterprise teams and innovative protocols trust Aegis to secure their AI-powered financial operations.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {['DeFi Protocol', 'Trading Firm', 'DAO Treasury', 'AI Startup', 'Venture Fund', 'Gaming Studio', 'Payment Network', 'Infrastructure Co'].map((name, index) => (
-              <PillCard key={index} className="p-8 flex items-center justify-center min-h-[120px]">
-                <span className="text-lg font-display font-bold text-caldera-black/60 text-center">{name}</span>
+              <PillCard key={index} className="p-8 flex items-center justify-center min-h-[120px] animate-reveal animate-reveal-stagger hover:scale-[1.02] transition-transform duration-300">
+                <span className="text-lg font-display font-bold text-caldera-black/60 text-center group-hover:text-caldera-black/80 transition-colors duration-300">{name}</span>
               </PillCard>
             ))}
           </div>
@@ -499,10 +535,10 @@ const tools = createAnthropicTools(aegisClient);`,
       <section id="features" className="px-6 py-32 bg-white">
         <div className="container mx-auto max-w-7xl">
           <div className="text-center mb-20">
-            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase">
+            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase animate-reveal">
               Enterprise-Grade Security
             </h2>
-            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto">
+            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto animate-reveal" style={{ animationDelay: '100ms' }}>
               Built on Solana for speed, security, and scalability. Every feature designed for production AI finance operations.
             </p>
           </div>
@@ -511,8 +547,8 @@ const tools = createAnthropicTools(aegisClient);`,
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <PillCard key={index} className="p-8 space-y-4">
-                  <div className={`w-16 h-16 rounded-2xl ${feature.color} flex items-center justify-center`}>
+                <PillCard key={index} className="p-8 space-y-4" animate>
+                  <div className={`w-16 h-16 rounded-2xl ${feature.color} flex items-center justify-center icon-lift`}>
                     <Icon className={`w-8 h-8 ${feature.iconColor}`} strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-display font-bold text-caldera-black">{feature.title}</h3>
@@ -520,7 +556,7 @@ const tools = createAnthropicTools(aegisClient);`,
                   <ul className="space-y-2 pt-2">
                     {feature.details.map((detail, idx) => (
                       <li key={idx} className="flex items-center gap-2 text-sm text-caldera-text-secondary">
-                        <CheckCircle className={`w-4 h-4 ${feature.iconColor}`} />
+                        <CheckCircle className={`w-4 h-4 ${feature.iconColor} transition-transform duration-300 group-hover:scale-110`} />
                         <span>{detail}</span>
                       </li>
                     ))}
@@ -537,10 +573,10 @@ const tools = createAnthropicTools(aegisClient);`,
         <HalftoneBackground />
         <div className="container mx-auto max-w-7xl relative z-10">
           <div className="text-center mb-20">
-            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase">
+            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase animate-reveal">
               Built For AI Agents
             </h2>
-            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto">
+            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto animate-reveal" style={{ animationDelay: '100ms' }}>
               From autonomous trading bots to treasury management - Aegis enables safe AI-powered financial operations.
             </p>
           </div>
@@ -549,11 +585,11 @@ const tools = createAnthropicTools(aegisClient);`,
             {useCases.map((useCase, index) => {
               const Icon = useCase.icon;
               return (
-                <PillCard key={index} className="p-10 space-y-4">
-                  <Icon className="w-12 h-12 text-caldera-orange" />
+                <PillCard key={index} className="p-10 space-y-4" animate>
+                  <Icon className="w-12 h-12 text-caldera-orange icon-lift transition-all duration-300" />
                   <h3 className="text-3xl font-display font-bold text-caldera-black">{useCase.title}</h3>
                   <p className="text-lg text-caldera-text-secondary leading-relaxed font-body">{useCase.description}</p>
-                  <div className="pt-4 p-4 bg-caldera-light-gray rounded-2xl">
+                  <div className="pt-4 p-4 bg-caldera-light-gray rounded-2xl transition-all duration-300 group-hover:bg-caldera-orange/5">
                     <p className="text-sm font-mono text-caldera-text-secondary">
                       <span className="text-caldera-orange font-bold">Example:</span> {useCase.example}
                     </p>
@@ -569,10 +605,10 @@ const tools = createAnthropicTools(aegisClient);`,
       <section className="px-6 py-32 bg-caldera-black text-white">
         <div className="container mx-auto max-w-7xl">
           <div className="text-center mb-20">
-            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase">
+            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase animate-reveal">
               Technical Stack
             </h2>
-            <p className="text-xl text-white/70 font-body max-w-3xl mx-auto">
+            <p className="text-xl text-white/70 font-body max-w-3xl mx-auto animate-reveal" style={{ animationDelay: '100ms' }}>
               Production-grade architecture built with modern blockchain and backend technologies.
             </p>
           </div>
@@ -581,8 +617,11 @@ const tools = createAnthropicTools(aegisClient);`,
             {technicalSpecs.map((spec, index) => {
               const Icon = spec.icon;
               return (
-                <div key={index} className="bg-white/5 border border-white/10 rounded-[24px] p-6 space-y-3 backdrop-blur-sm hover:bg-white/10 transition-all">
-                  <Icon className="w-8 h-8 text-caldera-orange" />
+                <div 
+                  key={index} 
+                  className="bg-white/5 border border-white/10 rounded-[24px] p-6 space-y-3 backdrop-blur-sm hover:bg-white/10 hover:border-caldera-orange/30 transition-all duration-300 animate-reveal animate-reveal-stagger group"
+                >
+                  <Icon className="w-8 h-8 text-caldera-orange transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" />
                   <div className="text-sm uppercase tracking-wider text-white/60 font-bold font-mono">{spec.label}</div>
                   <div className="text-xl font-display font-bold text-white">{spec.value}</div>
                 </div>
@@ -596,27 +635,27 @@ const tools = createAnthropicTools(aegisClient);`,
       <section id="integrations" className="px-6 py-32 bg-white">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-20">
-            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase">
+            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase animate-reveal">
               AI Framework Ready
             </h2>
-            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto">
+            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto animate-reveal" style={{ animationDelay: '100ms' }}>
               Drop-in tools for popular AI frameworks. Get started in minutes with our TypeScript SDK.
             </p>
           </div>
 
           <div className="space-y-8">
             {integrations.map((integration, index) => (
-              <PillCard key={index} className="p-10">
+              <PillCard key={index} className="p-10 animate-reveal" animate>
                 <div className="flex flex-col lg:flex-row gap-8 items-start">
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center gap-3">
-                      <Code className="w-6 h-6 text-caldera-orange" />
+                      <Code className="w-6 h-6 text-caldera-orange icon-lift" />
                       <h3 className="text-3xl font-display font-bold text-caldera-black">{integration.name}</h3>
                     </div>
                     <p className="text-lg text-caldera-text-secondary font-body">{integration.description}</p>
                   </div>
                   <div className="flex-1 w-full">
-                    <pre className="bg-caldera-black text-emerald-400 p-6 rounded-2xl overflow-x-auto font-mono text-sm">
+                    <pre className="bg-caldera-black text-emerald-400 p-6 rounded-2xl overflow-x-auto font-mono text-sm code-glow transition-all duration-300">
                       {integration.code}
                     </pre>
                   </div>
@@ -641,10 +680,10 @@ const tools = createAnthropicTools(aegisClient);`,
         <HalftoneBackground />
         <div className="container mx-auto max-w-5xl relative z-10">
           <div className="text-center mb-20">
-            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase">
+            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase animate-reveal">
               How It Works
             </h2>
-            <p className="text-xl text-caldera-text-secondary font-body">Three simple steps to secure your AI agents</p>
+            <p className="text-xl text-caldera-text-secondary font-body animate-reveal" style={{ animationDelay: '100ms' }}>Three simple steps to secure your AI agents</p>
           </div>
 
           <div className="space-y-12">
@@ -671,12 +710,12 @@ const tools = createAnthropicTools(aegisClient);`,
                 code: 'const sig = await client.executeAgent({\n  vault: vaultAddress,\n  vaultNonce: nonce,\n  destination: recipientAddress,\n  amount: 100_000_000 // 0.1 SOL\n});',
               },
             ].map((item, index) => (
-              <div key={index} className="flex flex-col md:flex-row gap-8 items-start">
-                <div className="text-8xl font-display font-black text-caldera-orange/20 min-w-[120px]">{item.step}</div>
-                <PillCard className="flex-1 p-8 space-y-4">
+              <div key={index} className="flex flex-col md:flex-row gap-8 items-start animate-reveal" style={{ animationDelay: `${index * 150}ms` }}>
+                <div className="text-8xl font-display font-black text-caldera-orange/20 min-w-[120px] transition-all duration-500 hover:text-caldera-orange/40">{item.step}</div>
+                <PillCard className="flex-1 p-8 space-y-4" animate>
                   <h3 className="text-3xl font-display font-bold text-caldera-black mb-3">{item.title}</h3>
                   <p className="text-lg text-caldera-text-secondary leading-relaxed font-body">{item.description}</p>
-                  <pre className="bg-caldera-black text-emerald-400 p-4 rounded-2xl overflow-x-auto font-mono text-sm mt-4">
+                  <pre className="bg-caldera-black text-emerald-400 p-4 rounded-2xl overflow-x-auto font-mono text-sm mt-4 code-glow">
                     {item.code}
                   </pre>
                 </PillCard>
@@ -714,10 +753,10 @@ const tools = createAnthropicTools(aegisClient);`,
         <HalftoneBackground />
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center mb-16">
-            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase">
+            <h2 className="font-display font-black text-5xl md:text-7xl mb-6 tracking-tight uppercase animate-reveal">
               Join The Aegis Community
             </h2>
-            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto">
+            <p className="text-xl text-caldera-text-secondary font-body max-w-3xl mx-auto animate-reveal" style={{ animationDelay: '100ms' }}>
               Connect with builders, developers, and teams using Aegis to secure AI-powered finance.
             </p>
           </div>
@@ -733,28 +772,28 @@ const tools = createAnthropicTools(aegisClient);`,
       {/* ===== FINAL CTA WITH HALFTONE BLOB ===== */}
       <section className="px-6 py-32">
         <div className="container mx-auto max-w-5xl">
-          <div className="relative halftone-blob superellipse-lg overflow-hidden">
+          <div className="relative halftone-blob superellipse-lg overflow-hidden animate-scale-in">
             <div className="relative z-10 p-16 text-center">
-              <h2 className="font-display font-black text-4xl md:text-6xl text-white mb-6 uppercase">
+              <h2 className="font-display font-black text-4xl md:text-6xl text-white mb-6 uppercase animate-reveal">
                 Ready to Secure Your AI Agents?
               </h2>
-              <p className="text-xl text-white/90 mb-10 font-body max-w-2xl mx-auto">
+              <p className="text-xl text-white/90 mb-10 font-body max-w-2xl mx-auto animate-reveal" style={{ animationDelay: '100ms' }}>
                 Connect your wallet and start building with Aegis today. Enterprise-grade security for AI finance on Solana.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-reveal" style={{ animationDelay: '200ms' }}>
                 {connected ? (
                   <Link href="/dashboard">
-                    <Button size="lg" className="rounded-full px-10 py-7 bg-white text-caldera-orange hover:bg-gray-100 text-lg font-bold shadow-lg">
+                    <Button size="lg" className="rounded-full px-10 py-7 bg-white text-caldera-orange hover:bg-gray-100 text-lg font-bold shadow-lg btn-ripple group transition-transform duration-300 hover:scale-105">
                       Go to Dashboard
-                      <ArrowRight className="w-5 h-5 ml-2" />
+                      <ArrowRight className="w-5 h-5 ml-2 arrow-slide" />
                     </Button>
                   </Link>
                 ) : (
                   <WalletButton className="!rounded-full !px-10 !py-7 !bg-white !text-caldera-orange hover:!bg-gray-100 !text-lg !font-bold !shadow-lg" />
                 )}
                 <Link href="https://github.com/aegis-vaults" target="_blank">
-                  <Button size="lg" variant="outline" className="rounded-full px-10 py-7 bg-white text-caldera-orange hover:bg-gray-100 text-lg font-bold shadow-lg">
-                    <Github className="w-5 h-5 mr-2" />
+                  <Button size="lg" variant="outline" className="rounded-full px-10 py-7 bg-white text-caldera-orange hover:bg-gray-100 text-lg font-bold shadow-lg transition-transform duration-300 hover:scale-105 group">
+                    <Github className="w-5 h-5 mr-2 transition-transform duration-300 group-hover:rotate-12" />
                     View on GitHub
                   </Button>
                 </Link>
