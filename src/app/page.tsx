@@ -774,10 +774,10 @@ const tools = createAnthropicTools(aegisClient);`,
         <div className="container mx-auto max-w-5xl">
           <div className="relative halftone-blob superellipse-lg overflow-hidden">
             <div className="relative z-10 p-16 text-center">
-              <h2 className="font-display font-black text-4xl md:text-6xl text-white mb-6 uppercase">
+              <h2 className="font-display font-black text-4xl md:text-6xl text-caldera-black mb-6 uppercase">
                 Ready to Secure Your AI Agents?
               </h2>
-              <p className="text-xl text-white/90 mb-10 font-body max-w-2xl mx-auto">
+              <p className="text-xl text-caldera-text-secondary mb-10 font-body max-w-2xl mx-auto">
                 Connect your wallet and start building with Aegis today. Enterprise-grade security for AI finance on Solana.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
