@@ -108,16 +108,16 @@ export default function SecurityPage() {
     };
   }, [vaults]);
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-caldera-success';
-    if (score >= 60) return 'text-caldera-yellow';
-    return 'text-red-500';
+  const getScoreBadge = (score: number) => {
+    if (score >= 80) return { text: 'EXCELLENT', className: 'bg-caldera-success/10 text-caldera-success border-caldera-success/20' };
+    if (score >= 60) return { text: 'GOOD', className: 'bg-yellow-100 text-yellow-700 border-yellow-200' };
+    return { text: 'NEEDS ATTENTION', className: 'bg-red-100 text-red-700 border-red-200' };
   };
 
-  const getScoreBadge = (score: number) => {
-    if (score >= 80) return { text: 'Excellent', className: 'bg-caldera-success/10 text-caldera-success border-caldera-success/20' };
-    if (score >= 60) return { text: 'Good', className: 'bg-caldera-yellow/20 text-yellow-700 border-caldera-yellow/30' };
-    return { text: 'Needs Attention', className: 'bg-red-100 text-red-600 border-red-200' };
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-caldera-success';
+    if (score >= 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   if (isLoading) {
@@ -131,116 +131,90 @@ export default function SecurityPage() {
   const scoreBadge = getScoreBadge(securityAnalysis.score);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-3xl font-display font-black text-caldera-black">Security Center</h1>
-        <p className="text-caldera-text-secondary mt-1">Monitor and manage security settings</p>
+        <h1 className="text-2xl font-display font-black text-caldera-black uppercase tracking-tight">Security Center</h1>
+        <p className="text-caldera-text-secondary mt-1 text-sm">Monitor and manage security settings</p>
       </div>
 
-      {/* Security Score */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-caldera-purple" />
+      {/* Top Row: Security Score + Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+        {/* Security Score - Large Card */}
+        <div className="md:col-span-2 bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
+                <Shield className="w-4 h-4 text-caldera-purple" />
+              </div>
+              <h2 className="text-sm font-display font-black text-caldera-black uppercase tracking-wide">Security Score</h2>
             </div>
-            <h2 className="text-lg font-display font-bold text-caldera-black">Security Score</h2>
+            <Badge className={`${scoreBadge.className} border font-bold text-xs`}>
+              {scoreBadge.text}
+            </Badge>
           </div>
-          <Badge className={scoreBadge.className}>
-            {scoreBadge.text}
-          </Badge>
-        </div>
-        <div className="p-6">
-          <div className="flex items-center justify-center py-8">
-            <div className={`w-32 h-32 rounded-full border-8 ${
-              securityAnalysis.score >= 80 
-                ? 'border-caldera-success/20' 
-                : securityAnalysis.score >= 60 
-                  ? 'border-caldera-yellow/20' 
-                  : 'border-red-100'
-            } flex items-center justify-center bg-white`}>
-              <span className={`text-4xl font-display font-black ${getScoreColor(securityAnalysis.score)}`}>
+          <div className="p-8 flex items-center justify-center">
+            <div className="text-center">
+              <div className={`text-6xl font-display font-black ${getScoreColor(securityAnalysis.score)} mb-2`}>
                 {vaults.length === 0 ? '--' : securityAnalysis.score}
-              </span>
-            </div>
-          </div>
-          {vaults.length === 0 && (
-            <p className="text-center text-caldera-text-secondary">Create a vault to see your security score</p>
-          )}
-        </div>
-      </div>
-
-      {/* Summary Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-caldera-info/10 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-caldera-info" />
-            </div>
-            <div>
-              <p className="text-2xl font-display font-black text-caldera-black">{vaults.length}</p>
-              <p className="text-xs text-caldera-text-muted">Protected Vaults</p>
+              </div>
+              <p className="text-sm text-caldera-text-muted uppercase tracking-wide font-bold">
+                {vaults.length === 0 ? 'No Vaults' : 'Overall Security'}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-caldera-success/10 flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-caldera-success" />
+        {/* Stats Grid */}
+        <div className="md:col-span-3 grid grid-cols-3 gap-3">
+          <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100">
+            <div className="w-8 h-8 rounded-xl bg-caldera-info/10 flex items-center justify-center mb-2">
+              <Shield className="w-4 h-4 text-caldera-info" />
             </div>
-            <div>
-              <p className="text-2xl font-display font-black text-caldera-success">{securityAnalysis.passCount}</p>
-              <p className="text-xs text-caldera-text-muted">Checks Passed</p>
-            </div>
+            <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Vaults</div>
+            <div className="text-2xl font-display font-black text-caldera-black">{vaults.length}</div>
+            <p className="text-xs text-caldera-text-muted mt-1">protected</p>
           </div>
-        </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-caldera-orange/10 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-caldera-orange" />
+          <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100">
+            <div className="w-8 h-8 rounded-xl bg-caldera-success/10 flex items-center justify-center mb-2">
+              <CheckCircle className="w-4 h-4 text-caldera-success" />
             </div>
-            <div>
-              <p className="text-2xl font-display font-black text-caldera-orange">{securityAnalysis.warningCount}</p>
-              <p className="text-xs text-caldera-text-muted">Warnings</p>
-            </div>
+            <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Passed</div>
+            <div className="text-2xl font-display font-black text-caldera-success">{securityAnalysis.passCount}</div>
+            <p className="text-xs text-caldera-text-muted mt-1">checks</p>
           </div>
-        </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-              <XCircle className="w-5 h-5 text-red-500" />
+          <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100">
+            <div className="w-8 h-8 rounded-xl bg-caldera-orange/10 flex items-center justify-center mb-2">
+              <AlertTriangle className="w-4 h-4 text-caldera-orange" />
             </div>
-            <div>
-              <p className="text-2xl font-display font-black text-red-500">{securityAnalysis.failCount}</p>
-              <p className="text-xs text-caldera-text-muted">Issues</p>
-            </div>
+            <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Warnings</div>
+            <div className="text-2xl font-display font-black text-caldera-orange">{securityAnalysis.warningCount}</div>
+            <p className="text-xs text-caldera-text-muted mt-1">issues</p>
           </div>
         </div>
       </div>
 
       {/* Security Checks */}
       {securityAnalysis.checks.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
+        <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
-                <List className="w-5 h-5 text-caldera-purple" />
+              <div className="w-8 h-8 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
+                <List className="w-4 h-4 text-caldera-purple" />
               </div>
               <div>
-                <h2 className="text-lg font-display font-bold text-caldera-black">Security Checks</h2>
-                <p className="text-sm text-caldera-text-muted">Detailed analysis of your vault security</p>
+                <h2 className="text-sm font-display font-black text-caldera-black uppercase tracking-wide">Security Checks</h2>
+                <p className="text-xs text-caldera-text-muted">Detailed analysis of your vault security</p>
               </div>
             </div>
           </div>
           <div className="p-6">
-            <div className="space-y-3">
+            <div className="space-y-2">
               {securityAnalysis.checks.map((check, index) => (
                 <div
                   key={index}
-                  className={`flex items-start gap-3 p-4 rounded-xl ${
+                  className={`flex items-start gap-3 p-4 rounded-2xl ${
                     check.status === 'pass'
                       ? 'bg-caldera-success/5 border border-caldera-success/10'
                       : check.status === 'warning'
@@ -256,12 +230,12 @@ export default function SecurityPage() {
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                   )}
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-caldera-black">{check.name}</p>
+                    <p className="text-sm font-bold text-caldera-black">{check.name}</p>
                     <p className="text-xs text-caldera-text-secondary mt-0.5">{check.description}</p>
                   </div>
                   {check.vaultId && (
                     <Link href={`/vaults/${check.vaultId}`}>
-                      <Button variant="ghost" size="sm" className="text-xs rounded-lg">
+                      <Button variant="ghost" size="sm" className="text-xs rounded-full font-bold">
                         View
                       </Button>
                     </Link>
@@ -274,67 +248,59 @@ export default function SecurityPage() {
       )}
 
       {/* Feature Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-caldera-info/10 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-caldera-info" />
-            </div>
-            <h3 className="text-lg font-display font-bold text-caldera-black">On-Chain Protection</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
+          <div className="w-12 h-12 rounded-2xl bg-caldera-info/10 flex items-center justify-center mb-4">
+            <Shield className="w-6 h-6 text-caldera-info" />
           </div>
-          <p className="text-caldera-text-secondary text-sm leading-relaxed">
-            All vaults are protected with on-chain guardrails. Daily limits, whitelist restrictions, 
+          <h3 className="text-lg font-display font-black text-caldera-black uppercase mb-2">On-Chain Protection</h3>
+          <p className="text-sm text-caldera-text-secondary leading-relaxed">
+            All vaults are protected with on-chain guardrails. Daily limits, whitelist restrictions,
             and override delays are enforced by the Solana program—not just our backend.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
-              <Lock className="w-5 h-5 text-caldera-purple" />
-            </div>
-            <h3 className="text-lg font-display font-bold text-caldera-black">Key Separation</h3>
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
+          <div className="w-12 h-12 rounded-2xl bg-caldera-purple/10 flex items-center justify-center mb-4">
+            <Lock className="w-6 h-6 text-caldera-purple" />
           </div>
-          <p className="text-caldera-text-secondary text-sm leading-relaxed">
-            Your wallet remains the sole owner. Agent signers can propose transactions within limits, 
+          <h3 className="text-lg font-display font-black text-caldera-black uppercase mb-2">Key Separation</h3>
+          <p className="text-sm text-caldera-text-secondary leading-relaxed">
+            Your wallet remains the sole owner. Agent signers can propose transactions within limits,
             but only you can approve overrides and modify policies.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-caldera-success/10 flex items-center justify-center">
-              <Key className="w-5 h-5 text-caldera-success" />
-            </div>
-            <h3 className="text-lg font-display font-bold text-caldera-black">Agent Key Rotation</h3>
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
+          <div className="w-12 h-12 rounded-2xl bg-caldera-success/10 flex items-center justify-center mb-4">
+            <Key className="w-6 h-6 text-caldera-success" />
           </div>
-          <p className="text-caldera-text-secondary text-sm leading-relaxed">
-            Rotate agent signer keys anytime from vault settings. If your agent key is compromised, 
+          <h3 className="text-lg font-display font-black text-caldera-black uppercase mb-2">Agent Key Rotation</h3>
+          <p className="text-sm text-caldera-text-secondary leading-relaxed">
+            Rotate agent signer keys anytime from vault settings. If your agent key is compromised,
             update it immediately—the on-chain limits still protect your funds.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-caldera-orange/10 flex items-center justify-center">
-              <Users className="w-5 h-5 text-caldera-orange" />
-            </div>
-            <h3 className="text-lg font-display font-bold text-caldera-black">Team Access Control</h3>
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
+          <div className="w-12 h-12 rounded-2xl bg-caldera-orange/10 flex items-center justify-center mb-4">
+            <Users className="w-6 h-6 text-caldera-orange" />
           </div>
-          <p className="text-caldera-text-secondary text-sm leading-relaxed">
-            Add team members with different roles. Owners have full control, Admins can modify settings, 
+          <h3 className="text-lg font-display font-black text-caldera-black uppercase mb-2">Team Access Control</h3>
+          <p className="text-sm text-caldera-text-secondary leading-relaxed">
+            Add team members with different roles. Owners have full control, Admins can modify settings,
             Members can view activity, and Viewers have read-only access.
           </p>
         </div>
       </div>
 
       {vaults.length === 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12">
+        <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-12">
           <div className="flex flex-col items-center justify-center text-center">
             <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
               <Shield className="w-10 h-10 text-caldera-text-muted" />
             </div>
-            <h3 className="text-xl font-display font-bold text-caldera-black mb-2">No Vaults to Monitor</h3>
+            <h3 className="text-xl font-display font-black text-caldera-black uppercase mb-2">No Vaults to Monitor</h3>
             <p className="text-caldera-text-secondary max-w-md">
               Create your first vault to start monitoring security metrics.
             </p>

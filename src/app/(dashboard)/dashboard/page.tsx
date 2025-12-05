@@ -109,7 +109,7 @@ export default function DashboardPage() {
 
   const vaultsWithIssues = vaultHealthData.filter(({ health }) => health.status === 'poor' || health.status === 'critical').length;
 
-  // Generate alerts
+  // Generate alerts (filtered to only show critical issues)
   const alerts = useMemo<Alert[]>(() => {
     const alertList: Alert[] = [];
 
@@ -121,22 +121,8 @@ export default function DashboardPage() {
         type: 'critical',
         message: `${criticalAgents.length} agent${criticalAgents.length > 1 ? 's' : ''} critically low on gas - transactions may fail`,
         action: {
-          label: 'Fund Agents',
+          label: 'Fund Now',
           onClick: () => console.log('Fund agents'),
-        },
-      });
-    }
-
-    // Warning: Agents with low balance
-    const lowAgents = vaultHealthData.filter(({ agentBalance }) => agentBalance >= 0.005 && agentBalance < 0.01);
-    if (lowAgents.length > 0) {
-      alertList.push({
-        id: 'low-agent-balance',
-        type: 'warning',
-        message: `${lowAgents.length} agent${lowAgents.length > 1 ? 's' : ''} running low on gas`,
-        action: {
-          label: 'Top Up',
-          onClick: () => console.log('Top up agents'),
         },
       });
     }
@@ -154,31 +140,8 @@ export default function DashboardPage() {
       });
     }
 
-    // Warning: Vaults near daily limit
-    const vaultsNearLimit = vaults.filter(v => {
-      const limit = Number(v.dailyLimit);
-      const spent = Number(v.dailySpent);
-      return limit > 0 && (spent / limit) > 0.8;
-    });
-    if (vaultsNearLimit.length > 0) {
-      alertList.push({
-        id: 'near-limit',
-        type: 'warning',
-        message: `${vaultsNearLimit.length} vault${vaultsNearLimit.length > 1 ? 's' : ''} near daily limit`,
-      });
-    }
-
-    // Info: Low success rate
-    if (transactions.length >= 10 && Number(successRate) < 70) {
-      alertList.push({
-        id: 'low-success-rate',
-        type: 'info',
-        message: `Success rate at ${successRate}% - consider reviewing policies`,
-      });
-    }
-
     return alertList.filter(alert => !dismissedAlerts.has(alert.id));
-  }, [vaultHealthData, pausedVaults, vaults, transactions.length, successRate, dismissedAlerts]);
+  }, [vaultHealthData, pausedVaults, dismissedAlerts]);
 
   const dismissAlert = (alertId: string) => {
     setDismissedAlerts(prev => new Set(prev).add(alertId));
@@ -206,10 +169,10 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-baseline gap-4">
-            <h1 className="text-2xl font-display font-black text-caldera-black">Command Center</h1>
-            <span className="flex items-center gap-1.5 text-xs text-caldera-success">
+            <h1 className="text-2xl font-display font-black text-caldera-black uppercase tracking-tight">Command Center</h1>
+            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold bg-caldera-success/10 text-caldera-success rounded-full border border-caldera-success/20">
               <span className="w-1.5 h-1.5 rounded-full bg-caldera-success animate-pulse" />
-              System Online • Devnet
+              ONLINE • DEVNET
             </span>
           </div>
           {alerts.length > 0 && (
@@ -217,9 +180,18 @@ export default function DashboardPage() {
               {alerts.map(alert => (
                 <div
                   key={alert.id}
-                  className={`text-xs rounded-lg px-3 py-1.5 border flex items-center gap-2 ${getAlertColor(alert.type)}`}
+                  className={`text-xs rounded-full px-4 py-2 border flex items-center gap-2 font-medium ${getAlertColor(alert.type)}`}
                 >
-                  <span className="font-medium">{alert.message}</span>
+                  {getAlertIcon(alert.type)}
+                  <span>{alert.message}</span>
+                  {alert.action && (
+                    <button
+                      onClick={alert.action.onClick}
+                      className="ml-1 px-2 py-0.5 bg-white/50 hover:bg-white rounded-full text-xs font-bold transition-colors"
+                    >
+                      {alert.action.label}
+                    </button>
+                  )}
                   <button onClick={() => dismissAlert(alert.id)} className="hover:opacity-70">
                     <X className="w-3 h-3" />
                   </button>
@@ -230,9 +202,9 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link href="/vaults">
-            <button className="px-3 py-1.5 rounded-lg bg-caldera-orange hover:bg-caldera-orange-secondary text-white text-sm font-medium transition-colors flex items-center gap-1.5">
+            <button className="px-4 py-2 rounded-full bg-caldera-orange hover:bg-caldera-orange-secondary text-white text-sm font-bold transition-all shadow-lg shadow-caldera-orange/20 flex items-center gap-1.5">
               <Plus className="w-4 h-4" />
-              Create Vault
+              New Vault
             </button>
           </Link>
         </div>
@@ -240,84 +212,76 @@ export default function DashboardPage() {
 
       {/* Compact Stats Grid - 6 columns */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-caldera-orange/10 flex items-center justify-center">
-              <Vault className="w-4 h-4 text-caldera-orange" />
-            </div>
-            <span className="text-xs text-caldera-text-muted">Vaults</span>
+        <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-xl bg-caldera-orange/10 flex items-center justify-center mb-2">
+            <Vault className="w-4 h-4 text-caldera-orange" />
           </div>
-          <div className="text-xl font-display font-black text-caldera-black">{totalVaults}</div>
-          <div className="text-xs text-caldera-text-muted mt-0.5">{activeVaults} active</div>
+          <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Vaults</div>
+          <div className="text-2xl font-display font-black text-caldera-black">{totalVaults}</div>
+          <div className="text-xs text-caldera-success font-medium mt-1">{activeVaults} active</div>
         </div>
 
-        <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-caldera-success/10 flex items-center justify-center">
-              <Coins className="w-4 h-4 text-caldera-success" />
-            </div>
-            <span className="text-xs text-caldera-text-muted">Daily Limit</span>
+        <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-xl bg-caldera-success/10 flex items-center justify-center mb-2">
+            <Coins className="w-4 h-4 text-caldera-success" />
           </div>
-          <div className="text-xl font-display font-black text-caldera-black">{formatSol(totalBalance.toString())}</div>
-          <div className="text-xs text-caldera-text-muted mt-0.5">SOL</div>
+          <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Daily Limit</div>
+          <div className="text-2xl font-display font-black text-caldera-black">{formatSol(totalBalance.toString())}</div>
+          <div className="text-xs text-caldera-text-muted font-medium mt-1">SOL</div>
         </div>
 
-        <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-caldera-purple/10 flex items-center justify-center">
-              <ArrowRightLeft className="w-4 h-4 text-caldera-purple" />
-            </div>
-            <span className="text-xs text-caldera-text-muted">Transactions</span>
+        <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-xl bg-caldera-purple/10 flex items-center justify-center mb-2">
+            <ArrowRightLeft className="w-4 h-4 text-caldera-purple" />
           </div>
-          <div className="text-xl font-display font-black text-caldera-black">{transactions.length}</div>
-          <div className="text-xs text-caldera-success mt-0.5">+{successfulTransactions}</div>
+          <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Transactions</div>
+          <div className="text-2xl font-display font-black text-caldera-black">{transactions.length}</div>
+          <div className="text-xs text-caldera-success font-medium mt-1">+{successfulTransactions} executed</div>
         </div>
 
-        <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-caldera-info/10 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-caldera-info" />
-            </div>
-            <span className="text-xs text-caldera-text-muted">Success</span>
+        <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-xl bg-caldera-info/10 flex items-center justify-center mb-2">
+            <TrendingUp className="w-4 h-4 text-caldera-info" />
           </div>
-          <div className="text-xl font-display font-black text-caldera-black">{successRate}%</div>
-          <div className="text-xs text-caldera-text-muted mt-0.5">{successfulTransactions}/{transactions.length}</div>
+          <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Success Rate</div>
+          <div className="text-2xl font-display font-black text-caldera-black">{successRate}%</div>
+          <div className="text-xs text-caldera-text-muted font-medium mt-1">{successfulTransactions}/{transactions.length}</div>
         </div>
 
-        <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className={`w-7 h-7 rounded-lg ${getHealthScoreBgColor(averageHealth)} flex items-center justify-center`}>
-              <Activity className={`w-4 h-4 ${getHealthScoreColor(averageHealth)}`} />
-            </div>
-            <span className="text-xs text-caldera-text-muted">Health</span>
+        <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className={`w-8 h-8 rounded-xl ${getHealthScoreBgColor(averageHealth)} flex items-center justify-center mb-2`}>
+            <Activity className={`w-4 h-4 ${getHealthScoreColor(averageHealth)}`} />
           </div>
-          <div className={`text-xl font-display font-black ${getHealthScoreColor(averageHealth)}`}>{averageHealth}</div>
-          <div className="text-xs text-caldera-text-muted mt-0.5">{vaultsWithIssues} issues</div>
+          <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Health Score</div>
+          <div className={`text-2xl font-display font-black ${getHealthScoreColor(averageHealth)}`}>{averageHealth}</div>
+          <div className="text-xs text-caldera-text-muted font-medium mt-1">{vaultsWithIssues} issues</div>
         </div>
 
-        <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-caldera-orange/10 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-caldera-orange" />
-            </div>
-            <span className="text-xs text-caldera-text-muted">Agents</span>
+        <div className="bg-white rounded-[16px] p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-xl bg-caldera-orange/10 flex items-center justify-center mb-2">
+            <Zap className="w-4 h-4 text-caldera-orange" />
           </div>
-          <div className="text-xl font-display font-black text-caldera-black">{agentPublicKeys.length}</div>
-          <div className="text-xs text-caldera-text-muted mt-0.5">active</div>
+          <div className="text-xs uppercase tracking-wide text-caldera-text-muted font-bold mb-1">Agents</div>
+          <div className="text-2xl font-display font-black text-caldera-black">{agentPublicKeys.length}</div>
+          <div className="text-xs text-caldera-text-muted font-medium mt-1">active</div>
         </div>
       </div>
 
       {/* Main Content: 2 Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left: Agent Health (Compact Table) */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-caldera-orange" />
-              <h2 className="text-sm font-display font-bold text-caldera-black">Agent Health Monitor</h2>
+        <div className="lg:col-span-2 bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-caldera-orange/10 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-caldera-orange" />
+              </div>
+              <h2 className="text-sm font-display font-black text-caldera-black uppercase tracking-wide">Agent Health Monitor</h2>
             </div>
             {agentBalances && Object.values(agentBalances).some(b => b.isLow) && (
-              <AlertTriangle className="w-4 h-4 text-orange-600" />
+              <span className="px-2 py-1 text-xs font-bold bg-orange-100 text-orange-700 rounded-full">
+                {Object.values(agentBalances).filter(b => b.isLow).length} LOW
+              </span>
             )}
           </div>
 
@@ -380,20 +344,20 @@ export default function DashboardPage() {
 
         {/* Right: Quick Actions */}
         <div className="space-y-4">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <h3 className="text-sm font-display font-bold text-caldera-black mb-3">Quick Actions</h3>
+          <div className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100">
+            <h3 className="text-xs font-display font-black text-caldera-black uppercase tracking-wide mb-4">Quick Actions</h3>
             <div className="space-y-2">
-              <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 hover:border-gray-300 text-caldera-black transition-colors text-sm">
+              <button className="w-full flex items-center gap-2 px-4 py-2.5 rounded-full border-2 border-gray-200 hover:border-caldera-black text-caldera-black transition-all text-sm font-bold">
                 <Wallet className="w-4 h-4" />
-                <span className="font-medium">Fund Agents</span>
+                <span>Fund Agents</span>
               </button>
-              <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-orange-200 hover:border-orange-300 text-orange-700 transition-colors text-sm">
+              <button className="w-full flex items-center gap-2 px-4 py-2.5 rounded-full border-2 border-orange-200 hover:border-orange-400 text-orange-700 transition-all text-sm font-bold">
                 <Pause className="w-4 h-4" />
-                <span className="font-medium">Emergency Pause</span>
+                <span>Emergency Pause</span>
               </button>
-              <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 hover:border-gray-300 text-caldera-black transition-colors text-sm">
+              <button className="w-full flex items-center gap-2 px-4 py-2.5 rounded-full border-2 border-gray-200 hover:border-caldera-black text-caldera-black transition-all text-sm font-bold">
                 <Download className="w-4 h-4" />
-                <span className="font-medium">Export Report</span>
+                <span>Export Report</span>
               </button>
             </div>
           </div>
@@ -401,13 +365,15 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity - Compact List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-caldera-purple" />
-            <h2 className="text-sm font-display font-bold text-caldera-black">Recent Activity</h2>
+      <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-caldera-purple" />
+            </div>
+            <h2 className="text-sm font-display font-black text-caldera-black uppercase tracking-wide">Recent Activity</h2>
           </div>
-          <Link href="/transactions" className="text-xs font-medium text-caldera-purple hover:text-caldera-purple/80 flex items-center gap-1">
+          <Link href="/transactions" className="text-xs font-bold text-caldera-purple hover:text-caldera-purple/80 flex items-center gap-1">
             View all <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
