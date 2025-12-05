@@ -48,16 +48,18 @@ export const PDA_SEEDS = {
 export const DEFAULT_PAGE_SIZE = 20;
 export const MAX_PAGE_SIZE = 100;
 
-// React Query Cache Times
+// React Query Cache Times (staleTime in ms)
+// Data is considered "fresh" for this duration and won't refetch
 export const CACHE_TIMES = {
-  VAULT: 30_000, // 30 seconds
-  VAULTS_LIST: 30_000,
-  TRANSACTION: 60_000, // 1 minute
-  TRANSACTIONS_LIST: 15_000, // 15 seconds
-  OVERRIDE: 10_000, // 10 seconds
-  OVERRIDES_LIST: 10_000,
-  ANALYTICS: 300_000, // 5 minutes
-  GLOBAL_ANALYTICS: 300_000,
+  VAULT: 60_000, // 1 minute - single vault details
+  VAULTS_LIST: 60_000, // 1 minute - vault list
+  TRANSACTION: 120_000, // 2 minutes - single transaction
+  TRANSACTIONS_LIST: 60_000, // 1 minute - transaction list
+  OVERRIDE: 30_000, // 30 seconds - override details (needs fresher data)
+  OVERRIDES_LIST: 30_000, // 30 seconds
+  ANALYTICS: 300_000, // 5 minutes - analytics data
+  GLOBAL_ANALYTICS: 300_000, // 5 minutes
+  AGENT_BALANCE: 60_000, // 1 minute - agent wallet balances
 } as const;
 
 // WebSocket Events

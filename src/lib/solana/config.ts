@@ -5,9 +5,20 @@
 import { Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
 import { CONFIG } from '@/lib/constants';
 
-// Solana Connection
+// Singleton connection instance for performance
+// Reusing the same connection avoids handshake overhead
+let connectionInstance: Connection | null = null;
+
+// Solana Connection (singleton pattern)
 export const getConnection = (): Connection => {
-  return new Connection(CONFIG.SOLANA_RPC_URL, 'confirmed');
+  if (!connectionInstance) {
+    connectionInstance = new Connection(CONFIG.SOLANA_RPC_URL, {
+      commitment: 'confirmed',
+      // Enable batch requests for better performance
+      disableRetryOnRateLimit: false,
+    });
+  }
+  return connectionInstance;
 };
 
 // Program ID

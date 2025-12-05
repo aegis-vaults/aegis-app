@@ -1,23 +1,47 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { LayoutDashboard, Vault, ArrowRightLeft, BarChart3, Shield, Settings, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores/ui';
+import { api } from '@/lib/api';
 
 const NAV_ITEMS = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Vaults', href: '/vaults', icon: Vault },
-  { name: 'Transactions', href: '/transactions', icon: ArrowRightLeft },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Security', href: '/security', icon: Shield },
-  { name: 'Settings', href: '/settings', icon: Settings },
-];
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, prefetch: ['vaults', 'transactions'] },
+  { name: 'Vaults', href: '/vaults', icon: Vault, prefetch: ['vaults'] },
+  { name: 'Transactions', href: '/transactions', icon: ArrowRightLeft, prefetch: ['transactions'] },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3, prefetch: ['vaults', 'transactions'] },
+  { name: 'Security', href: '/security', icon: Shield, prefetch: [] },
+  { name: 'Settings', href: '/settings', icon: Settings, prefetch: [] },
+] as const;
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const { sidebarCollapsed, toggleSidebar, mobileMenuOpen, setMobileMenuOpen } = useUIStore();
+
+  // Prefetch data on hover for instant page loads
+  const handlePrefetch = useCallback((prefetchKeys: readonly string[]) => {
+    prefetchKeys.forEach(key => {
+      if (key === 'vaults') {
+        queryClient.prefetchQuery({
+          queryKey: ['vaults', 'list', { myVaults: true }],
+          queryFn: () => api.vaults.list({ myVaults: true }),
+          staleTime: 60_000,
+        });
+      } else if (key === 'transactions') {
+        queryClient.prefetchQuery({
+          queryKey: ['transactions', 'list', { myTransactions: true, pageSize: 10 }],
+          queryFn: () => api.transactions.list({ myTransactions: true, pageSize: 10 }),
+          staleTime: 60_000,
+        });
+      }
+    });
+  }, [queryClient]);
 
   return (
     <>
@@ -105,6 +129,12 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
+                onMouseEnter={() => {
+                  // Prefetch data when user hovers over nav item
+                  handlePrefetch(item.prefetch);
+                  // Also prefetch the route
+                  router.prefetch(item.href);
+                }}
                 className={cn(
                   'flex items-center rounded-xl transition-all duration-200',
                   sidebarCollapsed && !mobileMenuOpen 

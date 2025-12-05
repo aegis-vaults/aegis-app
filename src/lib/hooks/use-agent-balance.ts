@@ -79,11 +79,12 @@ export function useAgentBalance(agentPublicKey?: string) {
 }
 
 /**
- * Fetch balances for multiple agents at once
+ * Fetch balances for multiple agents at once using batch RPC call
+ * This is much faster than individual getBalance calls
  */
 export function useMultipleAgentBalances(agentPublicKeys: string[]) {
   return useQuery<Record<string, AgentBalanceResult>>({
-    queryKey: ['agent-balances', agentPublicKeys.join(',')],
+    queryKey: ['agent-balances', agentPublicKeys.sort().join(',')],
     queryFn: async () => {
       if (agentPublicKeys.length === 0) {
         return {};
@@ -92,11 +93,17 @@ export function useMultipleAgentBalances(agentPublicKeys: string[]) {
       const connection = getConnection();
       const results: Record<string, AgentBalanceResult> = {};
 
-      // Fetch all balances in parallel
-      const balancePromises = agentPublicKeys.map(async (agentKey) => {
-        try {
-          const pubkey = new PublicKey(agentKey);
-          const balanceLamports = await connection.getBalance(pubkey);
+      try {
+        // Convert all keys to PublicKeys
+        const pubkeys = agentPublicKeys.map(key => new PublicKey(key));
+        
+        // Use getMultipleAccountsInfo for batch fetching (single RPC call!)
+        // This is MUCH faster than individual getBalance calls
+        const accounts = await connection.getMultipleAccountsInfo(pubkeys);
+        
+        accounts.forEach((account, index) => {
+          const agentKey = agentPublicKeys[index];
+          const balanceLamports = account?.lamports || 0;
           const balance = balanceLamports / LAMPORTS_PER_SOL;
 
           const isLow = balance < MIN_BALANCE_LOW;
@@ -112,42 +119,35 @@ export function useMultipleAgentBalances(agentPublicKeys: string[]) {
             status = 'healthy';
           }
 
-          return {
-            agentKey,
-            result: {
-              balance,
-              balanceLamports,
-              isLow,
-              isCritical,
-              status,
-              estimatedTransactions,
-            },
+          results[agentKey] = {
+            balance,
+            balanceLamports,
+            isLow,
+            isCritical,
+            status,
+            estimatedTransactions,
           };
-        } catch (error) {
-          console.error(`Error fetching balance for ${agentKey}:`, error);
-          return {
-            agentKey,
-            result: {
-              balance: 0,
-              balanceLamports: 0,
-              isLow: true,
-              isCritical: true,
-              status: 'critical' as const,
-              estimatedTransactions: 0,
-            },
+        });
+      } catch (error) {
+        console.error('Error fetching agent balances:', error);
+        // Return empty results for all agents on error
+        agentPublicKeys.forEach(agentKey => {
+          results[agentKey] = {
+            balance: 0,
+            balanceLamports: 0,
+            isLow: true,
+            isCritical: true,
+            status: 'critical' as const,
+            estimatedTransactions: 0,
           };
-        }
-      });
-
-      const balances = await Promise.all(balancePromises);
-      balances.forEach(({ agentKey, result }) => {
-        results[agentKey] = result;
-      });
+        });
+      }
 
       return results;
     },
     enabled: agentPublicKeys.length > 0,
-    staleTime: CACHE_TIMES.VAULT,
+    staleTime: 60_000, // Cache for 60 seconds (balances don't change that often)
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
     refetchInterval: 60000, // Refetch every minute
   });
 }

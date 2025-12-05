@@ -21,6 +21,11 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
+      // Performance optimizations
+      staleTime: 30_000, // Data is fresh for 30 seconds
+      gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes (was cacheTime)
+      refetchOnMount: false, // Don't refetch if data is still fresh
+      refetchOnReconnect: false, // Don't refetch on reconnect if fresh
     },
   },
 });
