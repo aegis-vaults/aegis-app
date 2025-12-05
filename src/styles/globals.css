@@ -623,7 +623,8 @@
 }
 
 /* ===== WALLET ADAPTER OVERRIDES ===== */
-.wallet-adapter-button {
+/* Base trigger button styles (NOT modal buttons) */
+.wallet-adapter-button-trigger {
   background-color: #fc5000 !important;
   border-radius: 9999px !important;
   font-family: inherit !important;
@@ -636,13 +637,6 @@
   box-shadow: none !important;
   border: none !important;
   outline: none !important;
-}
-
-/* Remove any pseudo-element backgrounds */
-.wallet-adapter-button::before,
-.wallet-adapter-button::after {
-  display: none !important;
-  background: transparent !important;
 }
 
 /* Hero wallet button wrapper - completely invisible */
@@ -674,7 +668,7 @@
   box-shadow: none !important;
 }
 
-/* Fallback direct class selectors */
+/* Fallback direct class selectors for hero button */
 button[class*="hero-wallet-button"],
 button.wallet-adapter-button.hero-wallet-button {
   height: 56px !important;
@@ -690,24 +684,10 @@ button.wallet-adapter-button.hero-wallet-button {
   box-shadow: none !important;
 }
 
-/* Remove pseudo-elements from hero button */
-[data-wallet-hero] button::before,
-[data-wallet-hero] button::after,
-button[class*="hero-wallet-button"]::before,
-button[class*="hero-wallet-button"]::after {
-  display: none !important;
-  content: none !important;
-  background: transparent !important;
-}
-
-.wallet-adapter-button:not([disabled]):hover {
+.wallet-adapter-button-trigger:not([disabled]):hover {
   background-color: #eb4a00 !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 6px 20px rgba(252, 80, 0, 0.35) !important;
-}
-
-.wallet-adapter-button-trigger {
-  background-color: #fc5000 !important;
 }
 
 .wallet-adapter-button-start-icon {
@@ -791,6 +771,9 @@ div[class*="wallet-adapter-modal"],
 .wallet-adapter-modal ul {
   background: white !important;
   background-color: white !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Wallet list container */
@@ -799,37 +782,63 @@ div[class*="wallet-adapter-modal"],
   padding: 0 16px 24px !important;
   background: white !important;
   background-color: white !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  list-style: none !important;
+}
+
+/* Ensure all modal content is visible */
+.wallet-adapter-modal-wrapper *,
+.wallet-adapter-modal-container * {
+  visibility: visible !important;
 }
 
 /* Individual wallet items */
 .wallet-adapter-modal-list li {
-  background-color: #fc5000 !important;
+  background-color: transparent !important;
   border-radius: 16px !important;
   margin-bottom: 8px !important;
   overflow: hidden !important;
+  list-style: none !important;
 }
 
 .wallet-adapter-modal-list li:last-child {
   margin-bottom: 0 !important;
 }
 
-.wallet-adapter-modal-list li:hover {
-  background-color: #eb4a00 !important;
-  transform: translateY(-1px) !important;
-}
-
 /* Wallet button inside list */
-.wallet-adapter-modal-list .wallet-adapter-button {
+.wallet-adapter-modal-list .wallet-adapter-button,
+.wallet-adapter-modal-list button {
   width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
   justify-content: flex-start !important;
   padding: 16px 20px !important;
   border-radius: 16px !important;
   font-size: 16px !important;
+  font-weight: 600 !important;
   box-shadow: none !important;
+  background-color: #fc5000 !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
 }
 
-.wallet-adapter-modal-list .wallet-adapter-button:hover {
+.wallet-adapter-modal-list .wallet-adapter-button:hover,
+.wallet-adapter-modal-list button:hover {
+  background-color: #eb4a00 !important;
   transform: none !important;
+}
+
+/* Wallet icons in modal */
+.wallet-adapter-modal-list .wallet-adapter-button-start-icon,
+.wallet-adapter-modal-list .wallet-adapter-button img,
+.wallet-adapter-modal-list .wallet-adapter-button svg {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* "More options" text */
