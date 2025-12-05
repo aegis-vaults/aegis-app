@@ -159,7 +159,7 @@ export function Sidebar() {
         {(!sidebarCollapsed || mobileMenuOpen) && (
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
             <p className="text-xs text-caldera-text-muted text-center">
-              © 2024 Aegis Vaults
+              © 2025 Aegis Vaults
             </p>
           </div>
         )}
