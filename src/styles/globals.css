@@ -264,6 +264,19 @@
     @apply bg-white rounded-[32px] py-6 px-8 flex items-center justify-between gap-8 overflow-x-auto;
   }
 
+  .partner-strip-container {
+    @apply flex items-center justify-between gap-8 overflow-x-auto;
+  }
+
+  .partner-strip-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .partner-strip-container {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
   .partner-logo {
     @apply h-8 opacity-60 hover:opacity-100 transition-opacity flex-shrink-0;
   }
