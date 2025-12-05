@@ -247,6 +247,7 @@ export function VaultCredentials({ vaultAddress, agentSigner, vaultName, vaultNo
                   <pre className="p-4 rounded-xl bg-caldera-black border border-gray-800 overflow-x-auto">
                     <code className="text-xs font-mono text-gray-300 whitespace-pre">{`import { AegisClient } from '@aegis-vaults/sdk';
 import { Keypair } from '@solana/web3.js';
+import { Wallet } from '@coral-xyz/anchor';
 
 // Load your agent's keypair from environment
 const agentKeypair = Keypair.fromSecretKey(
@@ -258,8 +259,41 @@ const client = new AegisClient({
   guardianApiUrl: 'https://aegis-guardian-production.up.railway.app',
 });
 
-client.setWallet(agentKeypair);`}</code>
+// Wrap keypair in Wallet (required by SDK)
+const wallet = new Wallet(agentKeypair);
+client.setWallet(wallet);`}</code>
                   </pre>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(`import { AegisClient } from '@aegis-vaults/sdk';
+import { Keypair } from '@solana/web3.js';
+import { Wallet } from '@coral-xyz/anchor';
+
+const agentKeypair = Keypair.fromSecretKey(
+  new Uint8Array(JSON.parse(process.env.AGENT_SECRET_KEY!))
+);
+
+const client = new AegisClient({
+  cluster: 'devnet',
+  guardianApiUrl: 'https://aegis-guardian-production.up.railway.app',
+});
+
+const wallet = new Wallet(agentKeypair);
+client.setWallet(wallet);`, 'Code')}
+                    className="absolute top-2 right-2 h-7 w-7 p-0 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg"
+                  >
+                    {copiedField === 'Code' ? (
+                      <Check className="w-3 h-3 text-caldera-success" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )}
+                  </Button>
+                </div>
+                <div className="p-3 rounded-xl bg-caldera-info/5 border border-caldera-info/20">
+                  <p className="text-xs text-caldera-text-secondary">
+                    <strong className="text-caldera-info">Note:</strong> <code className="bg-white px-1 py-0.5 rounded">setWallet</code> expects a <code className="bg-white px-1 py-0.5 rounded">Wallet</code> from <code className="bg-white px-1 py-0.5 rounded">@coral-xyz/anchor</code>, not a <code className="bg-white px-1 py-0.5 rounded">Keypair</code>. Wrap your keypair using <code className="bg-white px-1 py-0.5 rounded">new Wallet(agentKeypair)</code>.
+                  </p>
                 </div>
               </div>
 
@@ -311,11 +345,13 @@ try {
                     <code className="text-xs font-mono text-gray-300 whitespace-pre">{`import OpenAI from 'openai';
 import { AegisClient } from '@aegis-vaults/sdk';
 import { Keypair } from '@solana/web3.js';
+import { Wallet } from '@coral-xyz/anchor';
 
 const openai = new OpenAI();
 const aegisClient = new AegisClient({ cluster: 'devnet' });
 const agentKeypair = Keypair.fromSecretKey(/* ... */);
-aegisClient.setWallet(agentKeypair);
+const wallet = new Wallet(agentKeypair);
+aegisClient.setWallet(wallet);
 
 // Define Aegis tools
 const tools = [
@@ -374,9 +410,11 @@ if (response.choices[0].message.tool_calls) {
                     <code className="text-xs font-mono text-gray-300 whitespace-pre">{`import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { AegisClient } from '@aegis-vaults/sdk';
+import { Wallet } from '@coral-xyz/anchor';
 
 const aegisClient = new AegisClient({ cluster: 'devnet' });
-aegisClient.setWallet(agentKeypair);
+const wallet = new Wallet(agentKeypair);
+aegisClient.setWallet(wallet);
 
 // Create Aegis transfer tool
 const aegisTransferTool = new DynamicStructuredTool({
