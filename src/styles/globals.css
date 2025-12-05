@@ -777,22 +777,17 @@ button.wallet-adapter-button.hero-wallet-button {
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  bottom: 0 !important;
   width: 100vw !important;
-  height: 100vh !important;
   z-index: 9999 !important;
 }
 
-/* Modal container - white background and centered */
+/* Modal container - transparent, just for positioning */
 .wallet-adapter-modal-container {
-  background: white !important;
-  background-color: white !important;
-  border-radius: 24px !important;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3) !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
   max-width: 420px !important;
   width: 90% !important;
-  padding: 0 !important;
   overflow: visible !important;
   position: fixed !important;
   top: 50% !important;
@@ -800,25 +795,32 @@ button.wallet-adapter-button.hero-wallet-button {
   transform: translate(-50%, -50%) !important;
   margin: 0 !important;
   z-index: 10000 !important;
+  padding: 0 !important;
 }
 
-/* Override ALL possible modal backgrounds */
+/* Override ALL possible modal backgrounds - but NOT the container */
 .wallet-adapter-modal,
-.wallet-adapter-modal-container,
 .wallet-adapter-modal-wrapper .wallet-adapter-modal,
-.wallet-adapter-modal-wrapper .wallet-adapter-modal-container,
-div[class*="wallet-adapter-modal"],
+div[class*="wallet-adapter-modal"]:not(.wallet-adapter-modal-container),
 [class*="WalletModal"] {
   background: white !important;
   background-color: white !important;
+  border-radius: 24px !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Fix for the inner wrapper that might have dark background */
 .wallet-adapter-modal > div,
-.wallet-adapter-modal-container > div,
 .wallet-adapter-modal-wrapper > div > div {
   background: white !important;
   background-color: white !important;
+}
+
+/* Container should not have background on its direct children */
+.wallet-adapter-modal-container > div {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Modal title */
