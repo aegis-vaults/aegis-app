@@ -2,9 +2,10 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { formatAddress } from '@/lib/utils';
-import { Wallet, Bell, Shield, Palette, Loader2 } from 'lucide-react';
+import { Wallet, Bell, Loader2, Key } from 'lucide-react';
 import { ApiKeysSection } from '@/components/settings/api-keys-section';
 import { EmailSetup } from '@/components/settings/email-setup';
 import { TelegramSetup } from '@/components/settings/telegram-setup';
@@ -17,155 +18,149 @@ export default function SettingsPage() {
   const { profile, loading: profileLoading, refresh } = useUserProfile();
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-3xl font-display font-black text-caldera-black">Settings</h1>
-        <p className="text-caldera-text-secondary mt-1">Manage your account and preferences</p>
+    <div className="max-w-7xl mx-auto">
+      {/* Hero Header with Halftone Pattern */}
+      <div className="relative overflow-hidden rounded-caldera-xl bg-caldera-orange mb-6 p-6 md:p-8">
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="halftone-dots-lg w-full h-full" />
+        </div>
+        <div className="relative z-10">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-black text-white tracking-tighter mb-2">
+            Settings
+          </h1>
+          <p className="text-white/90 text-base md:text-lg font-body font-medium">
+            Configure your account, notifications, and security preferences
+          </p>
+        </div>
+        <div className="absolute -right-20 -top-20 w-80 h-80 bg-caldera-purple/30 rounded-full blur-3xl pointer-events-none" />
       </div>
 
-      {/* Account Settings */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-caldera-info/10 flex items-center justify-center">
-              <Wallet className="w-5 h-5 text-caldera-info" />
-            </div>
-            <div>
-              <h2 className="text-lg font-display font-bold text-caldera-black">Account</h2>
-              <p className="text-sm text-caldera-text-muted">Your wallet and account information</p>
-            </div>
-          </div>
-        </div>
-        <div className="p-6">
-          <div>
-            <label className="text-sm font-medium text-caldera-text-secondary">Wallet Address</label>
-            <div className="mt-2 flex items-center gap-3">
-              <code className="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-sm font-mono text-caldera-black">
-                {connected && publicKey ? formatAddress(publicKey.toString(), 8) : 'Not connected'}
-              </code>
-              <Badge 
-                className={connected 
-                  ? 'bg-caldera-success/10 text-caldera-success border-caldera-success/20' 
-                  : 'bg-gray-100 text-caldera-text-muted border-gray-200'
-                }
-              >
-                {connected ? 'Connected' : 'Disconnected'}
-              </Badge>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Notification Settings */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-caldera-purple/10 flex items-center justify-center">
-              <Bell className="w-5 h-5 text-caldera-purple" />
-            </div>
-            <div>
-              <h2 className="text-lg font-display font-bold text-caldera-black">Notifications</h2>
-              <p className="text-sm text-caldera-text-muted">
-                Configure how and when you receive notifications about your vaults
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="p-6">
-          {!connected ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                <Wallet className="w-8 h-8 text-caldera-text-muted" />
+      {/* Two Column Grid Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* LEFT COLUMN */}
+        <div className="space-y-5">
+          {/* Account Settings */}
+          <div className="superellipse-lg bg-white shadow-caldera overflow-hidden border-2 border-caldera-off-white/50">
+            <div className="bg-gradient-to-br from-caldera-info via-caldera-purple to-caldera-info/80 p-5 relative overflow-hidden">
+              <div className="halftone-dots-sm absolute inset-0 opacity-10" />
+              <div className="relative z-10 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                  <Wallet className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-body font-bold text-white tracking-tight">Account</h2>
+                  <p className="text-white/80 text-sm font-medium">Wallet connection</p>
+                </div>
               </div>
-              <p className="text-caldera-text-secondary">Connect your wallet to manage notification settings</p>
             </div>
-          ) : profileLoading ? (
-            <div className="text-center py-12">
-              <Loader2 className="w-10 h-10 mx-auto animate-spin text-caldera-orange" />
-              <p className="text-sm text-caldera-text-muted mt-3">Loading settings...</p>
+
+            <div className="p-5">
+              <label className="text-xs font-semibold text-caldera-text-secondary uppercase tracking-wide mb-2 block">
+                Wallet Address
+              </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                <code className="flex-1 min-w-[200px] px-4 py-3 bg-caldera-light-gray rounded-2xl text-sm font-mono text-caldera-black font-semibold border-2 border-caldera-off-white">
+                  {connected && publicKey ? formatAddress(publicKey.toString(), 8) : 'Not connected'}
+                </code>
+                <Badge
+                  className={`${
+                    connected
+                      ? 'bg-caldera-success/15 text-caldera-success border-2 border-caldera-success/30'
+                      : 'bg-caldera-medium-gray/10 text-caldera-medium-gray border-2 border-caldera-medium-gray/20'
+                  } px-3 py-1.5 text-xs font-bold uppercase tracking-wide`}
+                >
+                  {connected ? '● Connected' : '○ Disconnected'}
+                </Badge>
+              </div>
             </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Notification Channels */}
-              <div>
-                <h3 className="font-semibold text-caldera-black mb-4">
-                  Notification Channels
-                </h3>
-                <div className="space-y-6">
-                  <EmailSetup user={profile} onUpdate={refresh} />
-                  <div className="border-t border-gray-100" />
-                  <TelegramSetup user={profile} onUpdate={refresh} />
-                  <div className="border-t border-gray-100" />
-                  <DiscordSetup user={profile} onUpdate={refresh} />
+          </div>
+
+          {/* API Keys - Moved to left column when connected */}
+          {connected && publicKey && (
+            <div className="superellipse-lg bg-white shadow-caldera overflow-hidden border-2 border-caldera-off-white/50">
+              <div className="bg-gradient-to-br from-caldera-info via-blue-600 to-caldera-info/80 p-5 relative overflow-hidden">
+                <div className="halftone-dots-sm absolute inset-0 opacity-10" />
+                <div className="relative z-10 flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                    <Key className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-body font-bold text-white tracking-tight">API Keys</h2>
+                    <p className="text-white/80 text-sm font-medium">SDK integration</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Notification Preferences */}
-              <div className="border-t border-gray-100 pt-6">
-                <h3 className="font-semibold text-caldera-black mb-4">
-                  Notification Preferences
-                </h3>
-                <p className="text-sm text-caldera-text-muted mb-4">
-                  Choose which events trigger notifications across all your channels
-                </p>
-                <NotificationPreferences user={profile} onUpdate={refresh} />
+              <div className="p-5">
+                <ApiKeysSection userId={publicKey.toString()} />
               </div>
             </div>
           )}
         </div>
-      </div>
 
-      {/* API Keys */}
-      {connected && publicKey && (
-        <ApiKeysSection userId={publicKey.toString()} />
-      )}
+        {/* RIGHT COLUMN */}
+        <div className="space-y-5">
+          {/* Notification Settings */}
+          <div className="superellipse-lg bg-white shadow-caldera overflow-hidden border-2 border-caldera-off-white/50">
+            <div className="bg-gradient-to-br from-caldera-purple via-purple-600 to-caldera-purple/80 p-5 relative overflow-hidden">
+              <div className="halftone-dots-sm absolute inset-0 opacity-10" />
+              <div className="relative z-10 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                  <Bell className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-body font-bold text-white tracking-tight">Notifications</h2>
+                  <p className="text-white/80 text-sm font-medium">Channels & preferences</p>
+                </div>
+              </div>
+            </div>
 
-      {/* Security Settings */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-caldera-success/10 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-caldera-success" />
-            </div>
-            <div>
-              <h2 className="text-lg font-display font-bold text-caldera-black">Security</h2>
-              <p className="text-sm text-caldera-text-muted">Security and privacy settings</p>
-            </div>
-          </div>
-        </div>
-        <div className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-caldera-black">Two-Factor Authentication</p>
-              <p className="text-sm text-caldera-text-muted mt-0.5">Add an extra layer of security</p>
-            </div>
-            <Button variant="outline" size="sm" className="rounded-xl border-gray-200 hover:bg-gray-100">
-              Setup
-            </Button>
-          </div>
-        </div>
-      </div>
+            <div className="p-5">
+              {!connected ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 rounded-3xl bg-caldera-light-gray flex items-center justify-center mx-auto mb-3 border-2 border-caldera-off-white">
+                    <Wallet className="w-8 h-8 text-caldera-medium-gray" />
+                  </div>
+                  <p className="text-caldera-text-secondary font-semibold text-sm">Connect your wallet to manage notifications</p>
+                </div>
+              ) : profileLoading ? (
+                <div className="text-center py-8">
+                  <Loader2 className="w-10 h-10 mx-auto animate-spin text-caldera-orange mb-2" />
+                  <p className="text-sm text-caldera-text-muted font-medium">Loading settings...</p>
+                </div>
+              ) : (
+                <Tabs defaultValue="channels" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4 bg-caldera-light-gray p-1 rounded-2xl">
+                    <TabsTrigger
+                      value="channels"
+                      className="rounded-xl font-bold text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    >
+                      Channels
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="preferences"
+                      className="rounded-xl font-bold text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    >
+                      Preferences
+                    </TabsTrigger>
+                  </TabsList>
 
-      {/* Appearance */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-caldera-orange/10 flex items-center justify-center">
-              <Palette className="w-5 h-5 text-caldera-orange" />
-            </div>
-            <div>
-              <h2 className="text-lg font-display font-bold text-caldera-black">Appearance</h2>
-              <p className="text-sm text-caldera-text-muted">Customize how Aegis looks</p>
-            </div>
-          </div>
-        </div>
-        <div className="p-6">
-          <div>
-            <label className="text-sm font-medium text-caldera-text-secondary">Theme</label>
-            <div className="mt-2">
-              <Badge className="bg-caldera-orange/10 text-caldera-orange border-caldera-orange/20">
-                Light (Default)
-              </Badge>
+                  <TabsContent value="channels" className="space-y-4 mt-0">
+                    <EmailSetup user={profile} onUpdate={refresh} />
+                    <div className="border-t-2 border-caldera-off-white" />
+                    <TelegramSetup user={profile} onUpdate={refresh} />
+                    <div className="border-t-2 border-caldera-off-white" />
+                    <DiscordSetup user={profile} onUpdate={refresh} />
+                  </TabsContent>
+
+                  <TabsContent value="preferences" className="mt-0">
+                    <p className="text-xs text-caldera-text-muted mb-3 font-medium">
+                      Choose which events trigger notifications
+                    </p>
+                    <NotificationPreferences user={profile} onUpdate={refresh} />
+                  </TabsContent>
+                </Tabs>
+              )}
             </div>
           </div>
         </div>

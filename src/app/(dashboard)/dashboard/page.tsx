@@ -168,13 +168,7 @@ export default function DashboardPage() {
       {/* Compact Header with Inline Alerts */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <div className="flex items-baseline gap-4">
-            <h1 className="text-2xl font-display font-black text-caldera-black uppercase tracking-tight">Command Center</h1>
-            <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold bg-caldera-success/10 text-caldera-success rounded-full border border-caldera-success/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-caldera-success animate-pulse" />
-              ONLINE • DEVNET
-            </span>
-          </div>
+          <h1 className="text-2xl font-display font-black text-caldera-black uppercase tracking-tight">Command Center</h1>
           {alerts.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
               {alerts.map(alert => (

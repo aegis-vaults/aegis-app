@@ -80,23 +80,24 @@ export function EmailSetup({ user, onUpdate }: EmailSetupProps) {
   return (
     <div className="space-y-4">
       <div>
-        <label className="text-sm font-medium text-aegis-text-primary flex items-center gap-2">
-          <Mail className="w-4 h-4" />
+        <label className="text-sm font-bold text-caldera-black flex items-center gap-2 mb-2">
+          <Mail className="w-4 h-4 text-caldera-info" />
           Email Address
         </label>
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2">
           <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             disabled={loading}
-            className="flex-1"
+            className="flex-1 rounded-2xl border-2 border-caldera-off-white font-medium"
           />
-          <Button 
-            onClick={handleUpdateEmail} 
+          <Button
+            onClick={handleUpdateEmail}
             disabled={loading || !email || email === user?.email}
             size="sm"
+            className="rounded-2xl font-bold bg-caldera-info hover:bg-caldera-info/90"
           >
             {loading ? (
               <>
@@ -111,16 +112,19 @@ export function EmailSetup({ user, onUpdate }: EmailSetupProps) {
       </div>
 
       {user?.email && (
-        <div className="flex items-center gap-2 pl-6">
+        <div className="flex items-center gap-3 pl-6 flex-wrap">
           {user.emailVerified ? (
             <>
-              <CheckCircle2 className="w-4 h-4 text-aegis-emerald" />
-              <span className="text-sm text-aegis-emerald">Verified</span>
-              <Button 
-                onClick={handleTest} 
-                variant="outline" 
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-caldera-success/10 rounded-xl border-2 border-caldera-success/20">
+                <CheckCircle2 className="w-4 h-4 text-caldera-success" />
+                <span className="text-sm text-caldera-success font-bold">Verified</span>
+              </div>
+              <Button
+                onClick={handleTest}
+                variant="outline"
                 size="sm"
                 disabled={sendingTest}
+                className="rounded-xl border-2 border-caldera-off-white hover:bg-caldera-light-gray font-bold"
               >
                 {sendingTest ? (
                   <>
@@ -134,13 +138,16 @@ export function EmailSetup({ user, onUpdate }: EmailSetupProps) {
             </>
           ) : (
             <>
-              <AlertCircle className="w-4 h-4 text-aegis-amber" />
-              <span className="text-sm text-aegis-amber">Not verified</span>
-              <Button 
-                onClick={handleSendVerification} 
-                variant="outline" 
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-caldera-yellow/10 rounded-xl border-2 border-caldera-yellow/30">
+                <AlertCircle className="w-4 h-4 text-amber-600" />
+                <span className="text-sm text-amber-600 font-bold">Not verified</span>
+              </div>
+              <Button
+                onClick={handleSendVerification}
+                variant="outline"
                 size="sm"
                 disabled={sendingVerification}
+                className="rounded-xl border-2 border-caldera-off-white hover:bg-caldera-light-gray font-bold"
               >
                 {sendingVerification ? (
                   <>
@@ -158,6 +165,3 @@ export function EmailSetup({ user, onUpdate }: EmailSetupProps) {
     </div>
   );
 }
-
-
-

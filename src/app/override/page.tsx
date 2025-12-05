@@ -351,7 +351,7 @@ function OverridePageContent() {
       
       {/* Footer */}
       <div className="fixed bottom-4 left-0 right-0 text-center text-xs text-gray-500">
-        © 2024 Aegis Vaults. Secure your AI agents.
+        © 2025 Aegis Vaults. Secure your AI agents.
       </div>
     </div>
   );

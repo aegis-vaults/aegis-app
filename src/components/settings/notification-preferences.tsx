@@ -50,40 +50,46 @@ export function NotificationPreferences({ user, onUpdate }: NotificationPreferen
       icon: AlertCircle,
       title: 'Transaction Blocked',
       description: 'Get notified when transactions are blocked by policy',
-      color: 'text-aegis-crimson',
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-200',
     },
     {
       key: 'notifyOnExecuted' as const,
       icon: CheckCircle,
       title: 'Transaction Executed',
       description: 'Get notified for every executed transaction',
-      color: 'text-aegis-emerald',
+      color: 'text-caldera-success',
+      bgColor: 'bg-caldera-success/10',
+      borderColor: 'border-caldera-success/20',
     },
     {
       key: 'notifyOnOverride' as const,
       icon: Bell,
       title: 'Override Requests',
       description: 'Get notified when override requests are created',
-      color: 'text-aegis-amber',
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-50',
+      borderColor: 'border-amber-200',
     },
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {preferenceItems.map((item) => {
         const Icon = item.icon;
         const isUpdating = updating === item.key;
-        
+
         return (
-          <div 
-            key={item.key} 
-            className="flex items-center justify-between py-2"
+          <div
+            key={item.key}
+            className={`flex items-center justify-between p-4 rounded-2xl border-2 ${item.bgColor} ${item.borderColor} transition-all hover:shadow-sm`}
           >
             <div className="flex items-start gap-3 flex-1">
               <Icon className={`w-5 h-5 mt-0.5 ${item.color}`} />
               <div className="flex-1">
-                <div className="font-medium text-aegis-text-primary">{item.title}</div>
-                <div className="text-sm text-aegis-text-tertiary mt-0.5">
+                <div className="font-bold text-caldera-black">{item.title}</div>
+                <div className="text-sm text-caldera-text-muted mt-0.5 font-medium">
                   {item.description}
                 </div>
               </div>
@@ -92,6 +98,7 @@ export function NotificationPreferences({ user, onUpdate }: NotificationPreferen
               checked={prefs[item.key]}
               onCheckedChange={(checked) => handleToggle(item.key, checked)}
               disabled={isUpdating}
+              className="ml-4"
             />
           </div>
         );
@@ -99,6 +106,3 @@ export function NotificationPreferences({ user, onUpdate }: NotificationPreferen
     </div>
   );
 }
-
-
-

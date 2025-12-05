@@ -167,9 +167,9 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const ecosystemStats = [
-    { label: 'Vaults Secured', value: '500+' },
-    { label: 'Transactions Protected', value: '2.5M' },
-    { label: 'Total Value Locked', value: '$12M' },
+    { label: 'Vaults Secured', value: '25+' },
+    { label: 'Transactions Protected', value: '125+' },
+    { label: 'Total SDK Downloads', value: '355' },
     { label: 'Protocols Integrated', value: '25+' },
   ];
 

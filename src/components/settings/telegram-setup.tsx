@@ -27,7 +27,7 @@ export function TelegramSetup({ user, onUpdate }: TelegramSetupProps) {
         toast.success('Opening Telegram... Send /start to link your account.', {
           duration: 6000,
         });
-        
+
         // Poll for updates
         setTimeout(() => {
           onUpdate?.();
@@ -82,25 +82,28 @@ export function TelegramSetup({ user, onUpdate }: TelegramSetupProps) {
   return (
     <div className="space-y-4">
       <div>
-        <label className="text-sm font-medium text-aegis-text-primary flex items-center gap-2">
-          <Send className="w-4 h-4" />
+        <label className="text-sm font-bold text-caldera-black flex items-center gap-2 mb-2">
+          <Send className="w-4 h-4 text-caldera-info" />
           Telegram
         </label>
-        
+
         {user?.telegramChatId ? (
-          <div className="mt-2 space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center gap-2 pl-6">
-              <CheckCircle2 className="w-4 h-4 text-aegis-emerald" />
-              <span className="text-sm text-aegis-emerald">
-                Connected{user.telegramUsername ? ` as @${user.telegramUsername}` : ''}
-              </span>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-caldera-success/10 rounded-xl border-2 border-caldera-success/20">
+                <CheckCircle2 className="w-4 h-4 text-caldera-success" />
+                <span className="text-sm text-caldera-success font-bold">
+                  Connected{user.telegramUsername ? ` as @${user.telegramUsername}` : ''}
+                </span>
+              </div>
             </div>
-            <div className="flex gap-2 pl-6">
-              <Button 
-                onClick={handleTest} 
-                variant="outline" 
+            <div className="flex gap-2 pl-6 flex-wrap">
+              <Button
+                onClick={handleTest}
+                variant="outline"
                 size="sm"
                 disabled={testing}
+                className="rounded-xl border-2 border-caldera-off-white hover:bg-caldera-light-gray font-bold"
               >
                 {testing ? (
                   <>
@@ -111,11 +114,12 @@ export function TelegramSetup({ user, onUpdate }: TelegramSetupProps) {
                   'Send Test'
                 )}
               </Button>
-              <Button 
-                onClick={handleUnlink} 
-                variant="destructive" 
+              <Button
+                onClick={handleUnlink}
+                variant="outline"
                 size="sm"
                 disabled={unlinking}
+                className="rounded-xl border-2 border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700 font-bold"
               >
                 {unlinking ? (
                   <>
@@ -129,33 +133,31 @@ export function TelegramSetup({ user, onUpdate }: TelegramSetupProps) {
             </div>
           </div>
         ) : (
-          <Button 
-            onClick={handleLink} 
-            disabled={loading} 
-            size="sm"
-            className="mt-2 ml-6"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating Link...
-              </>
-            ) : (
-              <>
-                Connect Telegram
-                <ExternalLink className="w-3 h-3 ml-2" />
-              </>
-            )}
-          </Button>
-        )}
-        
-        {!user?.telegramChatId && (
-          <p className="text-xs text-aegis-text-tertiary mt-2 pl-6">
-            You&apos;ll be redirected to Telegram. Send /start to complete the setup.
-          </p>
+          <div>
+            <Button
+              onClick={handleLink}
+              disabled={loading}
+              size="sm"
+              className="ml-6 rounded-2xl font-bold bg-caldera-info hover:bg-caldera-info/90"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Generating Link...
+                </>
+              ) : (
+                <>
+                  Connect Telegram
+                  <ExternalLink className="w-3 h-3 ml-2" />
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-caldera-text-muted mt-2 pl-6 font-medium">
+              You'll be redirected to Telegram. Send /start to complete the setup.
+            </p>
+          </div>
         )}
       </div>
     </div>
   );
 }
-

@@ -298,25 +298,29 @@ client.setWallet(wallet);`, 'Code')}
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-caldera-black">3. Execute transactions</h4>
+                <h4 className="text-sm font-semibold text-caldera-black">3. Execute agent transactions</h4>
                 <div className="relative">
                   <pre className="p-4 rounded-xl bg-caldera-black border border-gray-800 overflow-x-auto">
                     <code className="text-xs font-mono text-gray-300 whitespace-pre">{`// Check vault balance first
 const balance = await client.getVaultBalance('${vaultAddress}');
 console.log('Balance:', balance / 1e9, 'SOL');
 
-// Execute a guarded transaction
+// Execute an agent transaction (destination must be whitelisted)
 try {
-  const signature = await client.executeGuarded({
+  const signature = await client.executeAgent({
     vault: '${vaultAddress}',
     vaultNonce: ${vaultNonce},
-    destination: 'RECIPIENT_ADDRESS',
+    destination: 'RECIPIENT_ADDRESS', // Must be whitelisted!
     amount: 100000000, // 0.1 SOL in lamports
     purpose: 'Payment for service',
   });
   console.log('Success:', signature);
 } catch (error) {
-  console.error('Transaction blocked:', error.message);
+  if (error.overrideRequested) {
+    console.log('Blocked. Blink URL:', error.blinkUrl);
+  } else {
+    console.error('Failed:', error.message);
+  }
 }`}</code>
                   </pre>
                 </div>
@@ -387,7 +391,7 @@ if (response.choices[0].message.tool_calls) {
   for (const call of response.choices[0].message.tool_calls) {
     if (call.function.name === 'aegis_transfer') {
       const args = JSON.parse(call.function.arguments);
-      await aegisClient.executeGuarded({
+      await aegisClient.executeAgent({
         vault: '${vaultAddress}',
         vaultNonce: ${vaultNonce},
         destination: args.destination,
@@ -427,7 +431,7 @@ const aegisTransferTool = new DynamicStructuredTool({
   }),
   func: async ({ destination, amount, purpose }) => {
     try {
-      const signature = await aegisClient.executeGuarded({
+      const signature = await aegisClient.executeAgent({
         vault: '${vaultAddress}',
         vaultNonce: ${vaultNonce},
         destination,
@@ -436,8 +440,8 @@ const aegisTransferTool = new DynamicStructuredTool({
       });
       return \`Transfer successful. Signature: \${signature}\`;
     } catch (error) {
-      if (error.message.includes('Daily limit exceeded')) {
-        return 'Transfer blocked: Daily limit exceeded. Awaiting approval.';
+      if (error.overrideRequested) {
+        return \`Transfer blocked. Awaiting approval. Blink: \${error.blinkUrl}\`;
       }
       return \`Transfer failed: \${error.message}\`;
     }
