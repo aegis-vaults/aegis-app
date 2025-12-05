@@ -39,7 +39,7 @@ export default function VaultDetailPage() {
 
   // Fetch transactions for analytics
   const { data: transactionsData } = useTransactions({ vaultId: id, pageSize: 1000 });
-  const transactions = transactionsData?.data?.items || [];
+  const transactions = useMemo(() => transactionsData?.data?.items || [], [transactionsData?.data?.items]);
 
   // Fetch agent balance
   const { data: agentBalanceData, refetch: refetchAgentBalance } = useAgentBalance(vault?.agentSigner);
@@ -674,7 +674,7 @@ export default function VaultDetailPage() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100">
                 <h3 className="text-lg font-display font-bold text-caldera-black">Agent Wallet</h3>
-                <p className="text-sm text-caldera-text-muted">Monitor and fund your AI agent's gas wallet</p>
+                <p className="text-sm text-caldera-text-muted">Monitor and fund your AI agent&apos;s gas wallet</p>
               </div>
               <div className="p-6 space-y-6">
                 {agentBalance ? (

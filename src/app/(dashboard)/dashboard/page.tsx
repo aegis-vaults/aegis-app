@@ -46,8 +46,8 @@ export default function DashboardPage() {
   const { data: vaultsData, isLoading: vaultsLoading } = useVaults({ myVaults: true });
   const { data: transactionsData, isLoading: transactionsLoading } = useTransactions({ pageSize: 10, myTransactions: true });
 
-  const vaults = vaultsData?.data?.items || [];
-  const transactions = transactionsData?.data?.items || [];
+  const vaults = useMemo(() => vaultsData?.data?.items || [], [vaultsData?.data?.items]);
+  const transactions = useMemo(() => transactionsData?.data?.items || [], [transactionsData?.data?.items]);
 
   // Extract unique agent signers from all vaults
   const agentPublicKeys = useMemo(() => {

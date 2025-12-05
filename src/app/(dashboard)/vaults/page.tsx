@@ -74,7 +74,7 @@ export default function VaultsPage() {
   const wallet = useWallet();
   const { publicKey, signTransaction } = wallet;
   const { data, isLoading, refetch } = useVaults({ myVaults: true });
-  const vaults = data?.data?.items || [];
+  const vaults = useMemo(() => data?.data?.items || [], [data?.data?.items]);
 
   // View state
   const [viewMode, setViewMode] = useState<ViewMode>('grid');

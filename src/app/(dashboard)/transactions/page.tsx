@@ -76,26 +76,6 @@ export default function TransactionsPage() {
     }
   };
 
-  // Filter transactions by date range
-  const filterByDateRange = (tx: Transaction): boolean => {
-    if (dateRange === 'all') return true;
-
-    const now = new Date();
-    const txDate = new Date(tx.createdAt);
-    const diffInDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-
-    switch (dateRange) {
-      case 'today':
-        return diffInDays < 1;
-      case '7days':
-        return diffInDays < 7;
-      case '30days':
-        return diffInDays < 30;
-      default:
-        return true;
-    }
-  };
-
   // Filtered and sorted transactions
   const filteredTransactions = useMemo(() => {
     let filtered = transactions;
@@ -111,7 +91,24 @@ export default function TransactionsPage() {
     }
 
     // Date range filter
-    filtered = filtered.filter(filterByDateRange);
+    filtered = filtered.filter((tx: Transaction): boolean => {
+      if (dateRange === 'all') return true;
+
+      const now = new Date();
+      const txDate = new Date(tx.createdAt);
+      const diffInDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
+
+      switch (dateRange) {
+        case 'today':
+          return diffInDays < 1;
+        case '7days':
+          return diffInDays < 7;
+        case '30days':
+          return diffInDays < 30;
+        default:
+          return true;
+      }
+    });
 
     // Search filter
     if (searchQuery.trim()) {
