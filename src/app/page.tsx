@@ -287,14 +287,14 @@ const tools = createOpenAITools(aegisClient);`,
     {
       name: 'LangChain',
       description: 'Dynamic structured tools for agent chains',
-      code: `import { AegisTool } from '@aegis-vaults/sdk/agents';
-const tool = new AegisTool(aegisClient);`,
+      code: `import { createLangChainTools } from '@aegis-vaults/sdk/agents';
+const tools = createLangChainTools(aegisClient);`,
     },
     {
       name: 'Anthropic Claude',
       description: 'Tool use for Claude models',
-      code: `import { createClaudeTools } from '@aegis-vaults/sdk/agents';
-const tools = createClaudeTools(aegisClient);`,
+      code: `import { createAnthropicTools } from '@aegis-vaults/sdk/agents';
+const tools = createAnthropicTools(aegisClient);`,
     },
   ];
 
@@ -654,21 +654,21 @@ const tools = createClaudeTools(aegisClient);`,
                 title: 'Create a Vault',
                 description:
                   'Initialize a vault on-chain with your desired daily spending limit and authorized AI agent public key. Fund the vault deposit address with SOL.',
-                code: 'const vault = await client.createVault({ agentSigner, dailyLimit: 1_000_000_000 });',
+                code: 'const { vaultAddress, depositAddress, nonce } = await client.createVault({\n  name: \'My AI Treasury\',\n  agentSigner: agentPublicKey,\n  dailyLimit: 1_000_000_000 // 1 SOL in lamports\n});',
               },
               {
                 step: '02',
                 title: 'Configure Policies',
                 description:
                   'Add whitelisted addresses for approved recipients, set daily limits, configure multi-channel notifications, and customize override expiration times.',
-                code: 'await client.addToWhitelist(vault, recipientAddress);',
+                code: 'await client.addToWhitelist(vaultAddress, nonce, recipientAddress);',
               },
               {
                 step: '03',
                 title: 'Execute & Monitor',
                 description:
                   'Your AI agent executes transactions autonomously. If a transaction exceeds limits, you receive instant notifications with Blink approval links. Track everything in real-time.',
-                code: 'const sig = await client.executeAgent({ vault, destination, amount });',
+                code: 'const sig = await client.executeAgent({\n  vault: vaultAddress,\n  vaultNonce: nonce,\n  destination: recipientAddress,\n  amount: 100_000_000 // 0.1 SOL\n});',
               },
             ].map((item, index) => (
               <div key={index} className="flex flex-col md:flex-row gap-8 items-start">

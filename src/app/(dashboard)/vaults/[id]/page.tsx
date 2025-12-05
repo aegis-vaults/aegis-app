@@ -246,6 +246,7 @@ export default function VaultDetailPage() {
             vaultAddress={vault.publicKey}
             agentSigner={vault.agentSigner || 'Not set'}
             vaultName={vault.name || undefined}
+            vaultNonce={vault.vaultNonce || '0'}
           />
         </TabsContent>
 

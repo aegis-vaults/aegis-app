@@ -14,9 +14,10 @@ interface VaultCredentialsProps {
   vaultAddress: string;
   agentSigner: string;
   vaultName?: string;
+  vaultNonce?: string;
 }
 
-export function VaultCredentials({ vaultAddress, agentSigner, vaultName }: VaultCredentialsProps) {
+export function VaultCredentials({ vaultAddress, agentSigner, vaultName, vaultNonce = '0' }: VaultCredentialsProps) {
   const [showFullAddress, setShowFullAddress] = useState(false);
   const [showFullAgent, setShowFullAgent] = useState(false);
   const [showFullDeposit, setShowFullDeposit] = useState(false);
@@ -274,6 +275,7 @@ console.log('Balance:', balance / 1e9, 'SOL');
 try {
   const signature = await client.executeGuarded({
     vault: '${vaultAddress}',
+    vaultNonce: ${vaultNonce},
     destination: 'RECIPIENT_ADDRESS',
     amount: 100000000, // 0.1 SOL in lamports
     purpose: 'Payment for service',
@@ -351,6 +353,7 @@ if (response.choices[0].message.tool_calls) {
       const args = JSON.parse(call.function.arguments);
       await aegisClient.executeGuarded({
         vault: '${vaultAddress}',
+        vaultNonce: ${vaultNonce},
         destination: args.destination,
         amount: args.amount,
       });
@@ -388,6 +391,7 @@ const aegisTransferTool = new DynamicStructuredTool({
     try {
       const signature = await aegisClient.executeGuarded({
         vault: '${vaultAddress}',
+        vaultNonce: ${vaultNonce},
         destination,
         amount,
         purpose,
