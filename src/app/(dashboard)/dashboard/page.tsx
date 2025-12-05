@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export default function DashboardPage() {
   const { data: vaultsData, isLoading: vaultsLoading } = useVaults({ myVaults: true });
-  const { data: transactionsData, isLoading: transactionsLoading } = useTransactions({ pageSize: 10 });
+  const { data: transactionsData, isLoading: transactionsLoading } = useTransactions({ pageSize: 10, myTransactions: true });
 
   const vaults = vaultsData?.data?.items || [];
   const transactions = transactionsData?.data?.items || [];

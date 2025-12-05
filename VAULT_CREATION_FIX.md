@@ -188,3 +188,4 @@ If you continue to have issues:
 4. Check you have sufficient SOL for transaction fees (~0.001 SOL)
 
 
+

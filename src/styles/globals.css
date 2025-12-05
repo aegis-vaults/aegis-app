@@ -633,17 +633,71 @@
   font-size: 14px !important;
   line-height: 1.25 !important;
   transition: all 0.2s ease !important;
-  box-shadow: 0 4px 14px rgba(252, 80, 0, 0.25) !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
-/* Hero wallet button - matches "Go to Dashboard" button */
-.hero-wallet-button,
-.hero-wallet-button.wallet-adapter-button,
-.wallet-adapter-button.hero-wallet-button {
+/* Remove any pseudo-element backgrounds */
+.wallet-adapter-button::before,
+.wallet-adapter-button::after {
+  display: none !important;
+  background: transparent !important;
+}
+
+/* Hero wallet button wrapper - completely invisible */
+[data-wallet-hero] {
+  display: inline-block;
+  line-height: 0;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Hero wallet button - matches "Go to Dashboard" / "View Documentation" button */
+/* Target via parent wrapper for guaranteed specificity */
+[data-wallet-hero] button,
+[data-wallet-hero] .wallet-adapter-button,
+[data-wallet-hero] button.wallet-adapter-button,
+[data-wallet-hero] button.wallet-adapter-button.wallet-adapter-button-trigger {
   height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
   padding: 0 40px !important;
   font-size: 18px !important;
-  box-shadow: 0 10px 25px -5px rgba(252, 80, 0, 0.3) !important;
+  border-radius: 9999px !important;
+  line-height: 56px !important;
+  background-color: #fc5000 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Fallback direct class selectors */
+button[class*="hero-wallet-button"],
+button.wallet-adapter-button.hero-wallet-button {
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  padding: 0 40px !important;
+  font-size: 18px !important;
+  border-radius: 9999px !important;
+  line-height: 56px !important;
+  background-color: #fc5000 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove pseudo-elements from hero button */
+[data-wallet-hero] button::before,
+[data-wallet-hero] button::after,
+button[class*="hero-wallet-button"]::before,
+button[class*="hero-wallet-button"]::after {
+  display: none !important;
+  content: none !important;
+  background: transparent !important;
 }
 
 .wallet-adapter-button:not([disabled]):hover {

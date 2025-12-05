@@ -299,10 +299,10 @@ const tools = createClaudeTools(aegisClient);`,
   ];
 
   const newsItems = [
-    { title: 'Aegis v0.3 – Blink Approvals Now Live', category: 'Release', date: 'Dec 1, 2024' },
-    { title: 'Multi-Chain Support Coming Q1 2025', category: 'Update', date: 'Nov 28, 2024' },
-    { title: 'Partnership with Major DEX Aggregator', category: 'Customer', date: 'Nov 20, 2024' },
-    { title: 'Security Audit Completed by OtterSec', category: 'Security', date: 'Nov 15, 2024' },
+    { title: 'Aegis v0.3 – Blink Approvals Now Live', category: 'Release', date: 'Dec 1, 2025' },
+    { title: 'Multi-Chain Support Coming Q1 2025', category: 'Update', date: 'Nov 28, 2025' },
+    { title: 'Partnership with Major DEX Aggregator', category: 'Customer', date: 'Nov 20, 2025' },
+    { title: 'Security Audit Completed by OtterSec', category: 'Security', date: 'Nov 15, 2025' },
   ];
 
   return (
@@ -415,10 +415,10 @@ const tools = createClaudeTools(aegisClient);`,
                   </Button>
                 </Link>
               ) : (
-                <WalletButton className="hero-wallet-button" />
+                <WalletButton variant="hero" />
               )}
               <Link href="https://docs.aegis-vaults.xyz/" target="_blank">
-                <Button size="lg" variant="outline" className="rounded-full px-10 h-14 text-lg font-semibold border-2 border-caldera-black text-caldera-black hover:bg-caldera-black hover:text-white">
+              <Button size="lg" variant="outline" className="rounded-full px-10 h-14 text-lg font-semibold border-2 border-caldera-black text-caldera-black hover:bg-caldera-black hover:text-white">
                   View Documentation
                 </Button>
               </Link>
@@ -775,7 +775,7 @@ const tools = createClaudeTools(aegisClient);`,
                 </div>
                 <span className="text-xl font-display font-black text-caldera-black uppercase">AEGIS</span>
               </div>
-              <span className="text-caldera-text-muted text-sm">© 2024 Aegis. Built on Solana.</span>
+              <span className="text-caldera-text-muted text-sm">© 2025 Aegis. Built on Solana.</span>
             </div>
             <div className="flex items-center gap-8">
               <Link href="https://docs.aegis-vaults.xyz/" target="_blank" className="text-caldera-text-secondary hover:text-caldera-text-primary transition-colors font-medium">
