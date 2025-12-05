@@ -14,8 +14,7 @@ import { clusterApiUrl } from '@solana/web3.js';
 import { Toaster } from 'sonner';
 import { CONFIG } from '@/lib/constants';
 
-// Import wallet adapter styles
-import '@solana/wallet-adapter-react-ui/styles.css';
+// Note: Wallet adapter styles are imported in globals.css to ensure proper CSS override order
 
 const queryClient = new QueryClient({
   defaultOptions: {
