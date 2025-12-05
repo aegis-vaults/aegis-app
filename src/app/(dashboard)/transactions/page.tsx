@@ -34,8 +34,8 @@ type SortOrder = 'asc' | 'desc';
 export default function TransactionsPage() {
   const { data, isLoading, refetch } = useTransactions({ myTransactions: true });
   const { data: vaultsData } = useVaults({ myVaults: true });
-  const transactions = data?.data?.items || [];
-  const vaults = vaultsData?.data?.items || [];
+  const transactions = useMemo(() => data?.data?.items || [], [data?.data?.items]);
+  const vaults = useMemo(() => vaultsData?.data?.items || [], [vaultsData?.data?.items]);
 
   // Filter states
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | 'all'>('all');
