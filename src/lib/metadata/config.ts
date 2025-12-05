@@ -29,14 +29,14 @@ export const siteConfig = {
   url: process.env.NEXT_PUBLIC_APP_URL || 'https://aegis.fi',
   ogImage: `${process.env.NEXT_PUBLIC_APP_URL || 'https://aegis.fi'}/og-image.png`,
   links: {
-    twitter: 'https://twitter.com/aegisfi',
-    github: 'https://github.com/aegis-protocol',
+    twitter: 'https://twitter.com/aegis_vaults',
+    github: 'https://github.com/aegis-vaults',
     docs: 'https://docs.aegis.fi',
-    discord: 'https://discord.gg/aegis',
+    discord: 'https://discord.gg/WJWTqbAmcy',
   },
   creator: {
     name: 'Aegis Team',
-    twitter: '@aegisfi',
+    twitter: '@aegis_vaults',
   },
 };
 

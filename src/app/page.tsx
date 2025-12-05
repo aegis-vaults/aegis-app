@@ -374,10 +374,10 @@ const tools = createAnthropicTools(aegisClient);`,
               <Link href="https://github.com/aegis-vaults" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 group">
                 <Github className="w-5 h-5 text-caldera-text-secondary transition-colors duration-300 group-hover:text-caldera-black" />
               </Link>
-              <Link href="https://twitter.com" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 group">
+              <Link href="https://twitter.com/aegis_vaults" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 group">
                 <Twitter className="w-5 h-5 text-caldera-text-secondary transition-colors duration-300 group-hover:text-caldera-black" />
               </Link>
-              <Link href="https://discord.com" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 group">
+              <Link href="https://discord.gg/WJWTqbAmcy" target="_blank" className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 group">
                 <MessageCircle className="w-5 h-5 text-caldera-text-secondary transition-colors duration-300 group-hover:text-caldera-black" />
               </Link>
               <div className="ml-2">
@@ -406,8 +406,8 @@ const tools = createAnthropicTools(aegisClient);`,
               <Link href="https://docs.aegis-vaults.xyz/" target="_blank" className="block py-2 text-caldera-text-secondary hover:text-caldera-text-primary">Docs</Link>
               <div className="flex items-center gap-4 pt-2">
                 <Link href="https://github.com/aegis-vaults" target="_blank"><Github className="w-5 h-5 text-caldera-text-secondary" /></Link>
-                <Link href="https://twitter.com" target="_blank"><Twitter className="w-5 h-5 text-caldera-text-secondary" /></Link>
-                <Link href="https://discord.com" target="_blank"><MessageCircle className="w-5 h-5 text-caldera-text-secondary" /></Link>
+                <Link href="https://twitter.com/aegis_vaults" target="_blank"><Twitter className="w-5 h-5 text-caldera-text-secondary" /></Link>
+                <Link href="https://discord.gg/WJWTqbAmcy" target="_blank"><MessageCircle className="w-5 h-5 text-caldera-text-secondary" /></Link>
               </div>
               <div className="pt-4">
                 {connected ? (
@@ -823,10 +823,10 @@ const tools = createAnthropicTools(aegisClient);`,
               <Link href="https://github.com/aegis-vaults" target="_blank" className="text-caldera-text-secondary hover:text-caldera-text-primary transition-colors font-medium">
                 GitHub
               </Link>
-              <Link href="https://twitter.com" target="_blank" className="text-caldera-text-secondary hover:text-caldera-text-primary transition-colors font-medium">
+              <Link href="https://twitter.com/aegis_vaults" target="_blank" className="text-caldera-text-secondary hover:text-caldera-text-primary transition-colors font-medium">
                 Twitter
               </Link>
-              <Link href="https://discord.com" target="_blank" className="text-caldera-text-secondary hover:text-caldera-text-primary transition-colors font-medium">
+              <Link href="https://discord.gg/WJWTqbAmcy" target="_blank" className="text-caldera-text-secondary hover:text-caldera-text-primary transition-colors font-medium">
                 Discord
               </Link>
             </div>
