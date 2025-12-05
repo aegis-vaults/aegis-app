@@ -153,7 +153,7 @@ export function TelegramSetup({ user, onUpdate }: TelegramSetupProps) {
               )}
             </Button>
             <p className="text-xs text-caldera-text-muted mt-2 pl-6 font-medium">
-              You'll be redirected to Telegram. Send /start to complete the setup.
+              You&apos;ll be redirected to Telegram. Send /start to complete the setup.
             </p>
           </div>
         )}
