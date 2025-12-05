@@ -280,7 +280,11 @@ export default function DashboardPage() {
           </div>
 
           <div className="overflow-x-auto">
-            {!agentBalances ? (
+            {vaults.length === 0 && !vaultsLoading ? (
+              <div className="text-center py-6">
+                <p className="text-sm text-caldera-text-secondary">No agents configured</p>
+              </div>
+            ) : !agentBalances ? (
               <div className="flex justify-center py-6">
                 <div className="h-6 w-6 animate-spin rounded-full border-4 border-caldera-orange/20 border-t-caldera-orange" />
               </div>
