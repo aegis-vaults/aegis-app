@@ -16,7 +16,7 @@ export function generateMetadata(options: MetadataOptions = {}): Metadata {
   const {
     title = siteConfig.title,
     description = siteConfig.description,
-    image = siteConfig.ogImage,
+    image,
     path = '/',
     noIndex = false,
   } = options;
@@ -58,14 +58,16 @@ export function generateMetadata(options: MetadataOptions = {}): Metadata {
       siteName: siteConfig.name,
       title,
       description,
-      images: [
-        {
-          url: image,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
+      images: image
+        ? [
+            {
+              url: image,
+              width: 1200,
+              height: 630,
+              alt: title,
+            },
+          ]
+        : undefined,
     },
 
     // Twitter
@@ -75,7 +77,7 @@ export function generateMetadata(options: MetadataOptions = {}): Metadata {
       creator: siteConfig.creator.twitter,
       title,
       description,
-      images: [image],
+      images: image ? [image] : undefined,
     },
 
     // Alternate URLs
