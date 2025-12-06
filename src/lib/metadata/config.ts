@@ -27,7 +27,7 @@ export const siteConfig = {
     'Spending limits',
   ],
   url: process.env.NEXT_PUBLIC_APP_URL || 'https://aegis.fi',
-  ogImage: `${process.env.NEXT_PUBLIC_APP_URL || 'https://aegis.fi'}/og-image.png`,
+  ogImage: `${process.env.NEXT_PUBLIC_APP_URL || 'https://aegis.fi'}/opengraph-image`,
   links: {
     twitter: 'https://twitter.com/aegis_vaults',
     github: 'https://github.com/aegis-vaults',
